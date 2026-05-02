@@ -1,19 +1,26 @@
 // next.config.ts
-import { withPayload } from '@payloadcms/next/withPayload'
-import type { NextConfig } from 'next'
+import { withPayload } from '@payloadcms/next/withPayload';
+import type { NextConfig } from 'next';
 
 /**
- * Enterprise-grade Next.js Configuration
- * Version: Optimized for Next.js 15+ & Payload CMS 3.0
- * Focus: High-performance SSR and strict workspace resolution.
+ * Enterprise Next.js Configuration for Vzsoluciones
+ * Focus: High-performance SSR, Medical SEO, and Admin UI stability.
  */
 const nextConfig: NextConfig = {
-  // Fix: Move experimental.serverComponentsExternalPackages to top-level
-  serverExternalPackages: ['@payloadcms/next'],
-  
-  // SEO & Core Web Vitals Optimization
+  // 1. CORE PERFORMANCE & SECURITY
   reactStrictMode: true,
-  
+
+  // 2. CSS/SSR RESOLUTION FIX
+  // We explicitly tell Next.js to transpile this specific package.
+  // This allows Turbopack/Webpack to process the .css file inside node_modules
+  // BEFORE Node.js attempts to execute it during Server-Side Rendering.
+  transpilePackages: ['react-image-crop'],
+
+  // NOTE: We deliberately removed 'serverExternalPackages: ["@payloadcms/next"]'
+  // The 'withPayload' wrapper handles the exact dependency tree required 
+  // so the Admin Panel doesn't crash on CSS imports.
+
+  // 3. MEDICAL TOURISM IMAGE OPTIMIZATION
   images: {
     remotePatterns: [
       {
@@ -31,16 +38,7 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+};
 
-  // Webpack Fallbacks for Payload 3.0 TypeScript resolution
-  webpack: (config) => {
-    config.resolve.extensionAlias = {
-      '.js': ['.ts', '.tsx', '.js', '.jsx'],
-      '.mjs': ['.mts', '.mjs'],
-    }
-    return config
-  },
-}
-
-// Ensure devBundleServerPackages is false to avoid excessive memory usage in dev
-export default withPayload(nextConfig, { devBundleServerPackages: false })
+// devBundleServerPackages: false optimizes local memory usage
+export default withPayload(nextConfig, { devBundleServerPackages: false });
