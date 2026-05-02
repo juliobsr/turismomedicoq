@@ -56,9 +56,9 @@ export default async function WhyDestinationPage() {
   });
 
   // Type Guards for Media
-  const heroImageUrl = destinationData.heroImage && typeof destinationData.heroImage === 'object' && 'url' in destinationData.heroImage 
-    ? destinationData.heroImage.url 
-    : '/assets/placeholders/queretaro-city.jpg'; // Fallback image
+  //const heroImageUrl = destinationData.heroImage && typeof destinationData.heroImage === 'object' && 'url' in destinationData.heroImage 
+   // ? destinationData.heroImage.url 
+   // : '/assets/placeholders/queretaro-city.jpg'; // Fallback image
 
   // Type Guards for Arrays
   const advantages = Array.isArray(destinationData.advantages) 
@@ -74,14 +74,14 @@ export default async function WhyDestinationPage() {
       <section className="relative w-full h-[60vh] min-h-[500px] flex items-center justify-center overflow-hidden">
         {/* Background Image with Overlay */}
         <div className="absolute inset-0 z-0">
-          <Image
-            src={heroImageUrl!}
+          {/*<Image
+         //   src={heroImageUrl!}
             alt="Beautiful panoramic view of Queretaro downtown"
             fill
             className="object-cover"
             priority // Critical for LCP (Core Web Vitals)
             sizes="100vw"
-          />
+          />*/}
           <div className="absolute inset-0 bg-blue-900/60 mix-blend-multiply" />
           <div className="absolute inset-0 bg-gradient-to-t from-gray-50 to-transparent" />
         </div>
@@ -92,7 +92,7 @@ export default async function WhyDestinationPage() {
             The Hidden Gem of Mexico
           </span>
           <h1 className="text-4xl md:text-6xl font-black text-white mb-6 leading-tight drop-shadow-lg">
-            {destinationData.heroHeadline as string}
+           {/* {destinationData.heroHeadline as string} */}
           </h1>
           <p className="text-xl md:text-2xl text-blue-50 max-w-2xl mx-auto leading-relaxed drop-shadow-md">
             {destinationData.heroSubtitle as string}

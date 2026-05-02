@@ -1,85 +1,98 @@
 // src/globals/WhyDestination.ts
 import type { GlobalConfig } from 'payload'
 
+/**
+ * Enterprise Global Configuration: Why Queretaro Destination Page
+ * Purpose: Allows Marketing team to manage destination selling points and SEO metadata.
+ */
 export const WhyDestination: GlobalConfig = {
   slug: 'why-destination',
   admin: {
-    group: 'Pages Content',
-    description: 'Content for the "Why Choose Us / Destination" landing page.',
+    group: 'Marketing & Landing Pages',
+    description: 'Manage the content and SEO for the "Why Queretaro" medical tourism page.',
   },
   access: {
+    // Read access must be completely public so Next.js SSR can fetch it
     read: () => true,
+    // Only authenticated staff can update
+    update: ({ req: { user } }) => Boolean(user),
   },
   fields: [
     {
-      type: 'tabs',
+      type: 'tabs', // Tabs for a clean, Enterprise-grade Admin UI
       tabs: [
         {
           label: 'Hero Section',
           fields: [
             {
-              name: 'heroHeadline',
+              name: 'heroTitle',
               type: 'text',
               required: true,
+              label: 'Main Headline (H1)',
               defaultValue: 'Discover Queretaro: The Hidden Gem of Medical Tourism',
             },
             {
               name: 'heroSubtitle',
               type: 'textarea',
               required: true,
-              defaultValue: 'Experience world-class healthcare in one of Mexico’s safest, most culturally rich, and highly connected cities.',
+              label: 'Supporting Subtitle (H2)',
             },
             {
-              name: 'heroImage',
+              name: 'heroBackgroundImage',
               type: 'upload',
               relationTo: 'media',
               required: true,
+              label: 'Hero Background Image',
             },
           ],
         },
         {
-          label: 'Selling Points',
+          label: 'Value Proposition',
           fields: [
             {
               name: 'advantages',
               type: 'array',
               label: 'Destination Advantages',
-              minRows: 3,
+              minRows: 3, // Enforce at least 3 points for good UI balance
               maxRows: 6,
               fields: [
                 {
                   name: 'icon',
                   type: 'text',
-                  label: 'Icon / Emoji (e.g., 🛡️, ✈️, 🏥)',
                   required: true,
+                  label: 'Icon Emoji (e.g., 🛡️, ✈️, 🏥)',
                 },
                 {
                   name: 'title',
                   type: 'text',
                   required: true,
-                  label: 'Advantage Title (e.g., Unmatched Safety)',
+                  label: 'Advantage Title',
                 },
                 {
                   name: 'description',
                   type: 'textarea',
                   required: true,
+                  label: 'Advantage Description',
                 },
               ],
             },
           ],
         },
         {
-          label: 'SEO & Metadata',
+          label: 'SEO Metadata',
           fields: [
             {
               name: 'metaTitle',
               type: 'text',
+              required: true,
+              label: 'SEO Meta Title',
               defaultValue: 'Why Queretaro for Medical Tourism | Queretaro Medical',
             },
             {
               name: 'metaDescription',
               type: 'textarea',
-              defaultValue: 'Discover why Queretaro is the safest and most advanced destination for medical tourism in Mexico. World-class hospitals and a peaceful recovery environment.',
+              required: true,
+              label: 'SEO Meta Description',
             },
           ],
         },

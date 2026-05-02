@@ -570,16 +570,16 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   createdAt?: T;
 }
 /**
- * Content for the "Why Choose Us / Destination" landing page.
+ * Manage the content and SEO for the "Why Queretaro" medical tourism page.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "why-destination".
  */
 export interface WhyDestination {
   id: string;
-  heroHeadline: string;
+  heroTitle: string;
   heroSubtitle: string;
-  heroImage: string | Media;
+  heroBackgroundImage: string | Media;
   advantages?:
     | {
         icon: string;
@@ -588,8 +588,8 @@ export interface WhyDestination {
         id?: string | null;
       }[]
     | null;
-  metaTitle?: string | null;
-  metaDescription?: string | null;
+  metaTitle: string;
+  metaDescription: string;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -598,9 +598,9 @@ export interface WhyDestination {
  * via the `definition` "why-destination_select".
  */
 export interface WhyDestinationSelect<T extends boolean = true> {
-  heroHeadline?: T;
+  heroTitle?: T;
   heroSubtitle?: T;
-  heroImage?: T;
+  heroBackgroundImage?: T;
   advantages?:
     | T
     | {
