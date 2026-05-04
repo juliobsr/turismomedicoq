@@ -62,7 +62,7 @@ export async function generateMetadata({ params }: DoctorProfileProps): Promise<
   if (!doctor) return {}
 
   return {
-    title: doctor.metaTitle || `${doctor.fullName} | Vzsoluciones Medical`,
+    title: doctor.metaTitle || `${doctor.fullName} | Queretaro Medical`,
     description: doctor.metaDescription || `View the medical profile of ${doctor.fullName}.`,
     openGraph: { title: doctor.fullName, type: 'profile' },
   }
@@ -107,7 +107,7 @@ export default async function DoctorProfilePage({ params }: DoctorProfileProps) 
           </div>
           <div className="text-center md:text-left flex-grow">
             <h1 className="text-4xl md:text-5xl font-extrabold mb-4">{doctor.fullName}</h1>
-            <p className="text-blue-200 text-lg font-mono mb-6">{doctor.medicalLicense}</p>
+            <p className="text-blue-200 text-lg font-mono mb-6">Lic: {doctor.medicalLicense}</p>
             {specialties && specialties.length > 0 && (
               <div className="flex flex-wrap gap-3 justify-center md:justify-start">
                 {specialties.map((spec) => (

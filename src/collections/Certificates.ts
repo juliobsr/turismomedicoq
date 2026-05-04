@@ -53,8 +53,8 @@ export const Certificates: CollectionConfig = {
     {
       // STRICT RELATIONSHIP: Foreign Key to the Media table for the badge/logo
       name: 'logo',
-      type: 'upload',
-      relationTo: 'media',
+      type: 'relationship',
+      relationTo: 'certificates-media',
       required: true,
     },
     {

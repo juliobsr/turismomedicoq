@@ -52,12 +52,26 @@ export const Doctors: CollectionConfig = {
               required: false,
               label: 'Medical License Number (Cédula)',
             },
-            {
-              name: 'profilePicture',
-              type: 'upload',
-              relationTo: 'media',
-              required: false,
-            },
+            // Main profile picture (Single relationship)
+    {
+      name: 'profilePicture',
+      type: 'relationship',
+      relationTo: 'doctors-media',
+      required: true,
+      admin: {
+        description: 'Primary headshot for directory cards.',
+      },
+    },
+    // Additional images (One-to-Many relationship)
+    {
+      name: 'officeGallery',
+      type: 'relationship',
+      relationTo: 'doctors-media',
+      hasMany: true, // This enables multiple selection
+      admin: {
+        description: 'Photos of the doctor\'s office or consultation rooms.',
+      },
+    },
           ],
         },
         {

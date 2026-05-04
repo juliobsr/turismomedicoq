@@ -3,55 +3,60 @@ import { getPayload } from 'payload'
 import configPromise from '@payload-config'
 import { Metadata } from 'next'
 import Link from 'next/link'
+
+import { getActiveSpecialtiesForMenu } from '@/lib/navigation'
+import { SpecialtyFilter } from '@/app/components/Directory/SpecialtyFilter'
 import { CardDoctor } from '@/app/components/CardDoctor'
 
-// ============================================================================
-// ENTERPRISE TYPES: Next.js 15+ strict searchParams handling
-// ============================================================================
+// ✅ 1. Import our cached global settings utility
+import { getSiteSettings } from '@/lib/globals'
+
 interface DoctorsDirectoryProps {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }
 
-// Generate dynamic metadata based on the search parameter for SEO
+// ============================================================================
+// DYNAMIC SEO METADATA
+// ============================================================================
 export async function generateMetadata({ searchParams }: DoctorsDirectoryProps): Promise<Metadata> {
   const resolvedParams = await searchParams
   const specialtySlug = typeof resolvedParams.specialty === 'string' ? resolvedParams.specialty : undefined
 
-  let title = 'Our Medical Specialists | Queretaro Medical'
+  // ✅ 2. Fetch globals for SEO. (Cached instantly, 0ms overhead)
+  const settings = await getSiteSettings()
+  const companyName = settings?.companyName || 'Medical Tourism'
+
+  let title = `Our Medical Specialists | ${companyName}`
   
   if (specialtySlug) {
-    // Format the slug for the title (e.g., 'plastic-surgery' -> 'Plastic Surgery')
     const formattedTitle = specialtySlug.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')
-    title = `${formattedTitle} Specialists | Queretaro Medical`
+    title = `${formattedTitle} Specialists | ${companyName}`
   }
 
   return {
     title,
-    description: 'Browse our directory of board-certified surgeons and medical specialists.',
+    description: `Browse the directory of board-certified surgeons and medical specialists at ${companyName}.`,
   }
 }
 
 /**
- * Enterprise Page: Medical Directory (Filtered via URL Parameters)
- * Architecture: React Server Component (RSC) with Dynamic SSR.
+ * Enterprise Page: Medical Directory
+ * Architecture: React Server Component (RSC) with parallel data fetching.
  */
 export default async function DoctorsDirectoryPage({ searchParams }: DoctorsDirectoryProps) {
   const payload = await getPayload({ config: configPromise })
-  
-  // 1. Resolve Next.js Search Params Promise securely
   const resolvedParams = await searchParams
   const specialtySlug = typeof resolvedParams.specialty === 'string' ? resolvedParams.specialty : undefined
 
   let specialtyId: string | undefined = undefined
   let specialtyTitle: string | undefined = undefined
 
-  // 2. Step One Query: If a filter exists, securely fetch the Specialty ID
   if (specialtySlug) {
     const { docs: specs } = await payload.find({
       collection: 'specialties',
       where: { slug: { equals: specialtySlug } },
-      limit: 1, // Optimize: We only need the first match
-      select: { id: true, title: true }, // Memory optimization
+      limit: 1,
+      select: { id: true, title: true },
     })
 
     if (specs.length > 0) {
@@ -60,32 +65,35 @@ export default async function DoctorsDirectoryPage({ searchParams }: DoctorsDire
     }
   }
 
-  // 3. Step Two Query: Build the secure Where clause for Doctors
-  // Using explicit typing for the Payload Where clause to prevent type errors
   const baseWhere: Record<string, any> = {
     isActive: { equals: true },
   }
 
-  // If we found a valid specialty ID, append it to the Postgres query
-  // The 'contains' operator works perfectly for 'hasMany' relationship arrays in Payload
   if (specialtyId) {
     baseWhere.specialties = { contains: specialtyId }
   } else if (specialtySlug && !specialtyId) {
-    // Edge Case Protection: User typed a non-existent slug in the URL
-    baseWhere.id = { equals: '00000000-0000-0000-0000-000000000000' } // Force empty result
+    baseWhere.id = { equals: '00000000-0000-0000-0000-000000000000' } 
   }
 
-  // 4. Fetch the doctors based on the constructed conditions
-  const { docs: doctors } = await payload.find({
-    collection: 'doctors',
-    depth: 1,
-    limit: 100,
-    where: baseWhere,
-    sort: 'fullName',
-  })
+  // ✅ 3. Add getSiteSettings to our Parallel Fetching engine
+  // This guarantees all 3 distinct data sources resolve concurrently.
+  const [doctorsResponse, activeSpecialties, settings] = await Promise.all([
+    payload.find({
+      collection: 'doctors',
+      depth: 1,
+      limit: 100,
+      where: baseWhere,
+      sort: 'fullName',
+    }),
+    getActiveSpecialtiesForMenu(),
+    getSiteSettings() // Fetches the company name for the UI
+  ])
+
+  const doctors = doctorsResponse.docs
+  const companyName = settings?.companyName || 'Queretaro Medical'
 
   return (
-    <main className="min-h-screen bg-brand-bg py-8 transition-colors duration-300">
+    <main className="min-h-screen bg-brand-bg py-16 transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Dynamic Header Section */}
@@ -93,24 +101,16 @@ export default async function DoctorsDirectoryPage({ searchParams }: DoctorsDire
           <h1 className="text-4xl font-extrabold text-brand-text tracking-tight sm:text-5xl mb-4">
             {specialtyTitle ? `${specialtyTitle} Specialists` : 'Meet Our Specialists'}
           </h1>
-          <p className="text-lg text-gray-600 mb-6">
-            Every doctor in our network is board-certified and vetted for international patient care.
+          
+          {/* ✅ 4. Inject the dynamic company name into the UI text */}
+          <p className="text-lg text-gray-600 mb-8">
+            Every doctor in the <strong className="text-brand-primary">{companyName}</strong> network is board-certified and strictly vetted for international patient care.
           </p>
 
-          {/* Active Filter Indicator & Clear Button */}
-          {specialtySlug && (
-            <div className="flex items-center justify-center gap-4 animate-fade-in">
-              <span className="inline-flex items-center px-4 py-2 rounded-full bg-blue-50 text-brand-primary text-sm font-semibold border border-brand-primary/20">
-                Active Filter: {specialtyTitle || 'Unknown Specialty'}
-              </span>
-              <Link 
-                href="/doctors"
-                className="text-sm font-semibold text-gray-500 hover:text-red-600 transition-colors underline underline-offset-4"
-              >
-                Clear Filter
-              </Link>
-            </div>
-          )}
+          <SpecialtyFilter 
+            specialties={activeSpecialties} 
+            currentSlug={specialtySlug} 
+          />
         </header>
 
         {/* Directory Grid */}
@@ -119,7 +119,7 @@ export default async function DoctorsDirectoryPage({ searchParams }: DoctorsDire
             <h2 className="text-2xl font-semibold text-brand-text">No specialists found</h2>
             <p className="mt-2 text-gray-500 mb-6">
               {specialtySlug 
-                ? `We currently don't have active doctors listed for this specialty.` 
+                ? `We currently don't have active doctors listed for this specialty at ${companyName}.` 
                 : `We are currently updating our medical directory.`}
             </p>
             {specialtySlug && (

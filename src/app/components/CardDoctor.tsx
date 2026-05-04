@@ -36,9 +36,9 @@ export const CardDoctor = ({ doctor }: CardDoctorProps) => {
           <h3 className="text-xl font-bold text-brand-text mb-1">
             {doctor.fullName}
           </h3>
-          <p className="text-sm text-gray-500 mb-4 font-mono">
+         {/* <p className="text-sm text-gray-500 mb-4 font-mono">
             Lic: {doctor.medicalLicense}
-          </p>
+          </p>*/}
         </header>
 
         {specialties && specialties.length > 0 && (

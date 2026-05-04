@@ -68,7 +68,6 @@ export interface Config {
   blocks: {};
   collections: {
     users: User;
-    media: Media;
     specialties: Specialty;
     doctors: Doctor;
     certificates: Certificate;
@@ -76,6 +75,11 @@ export interface Config {
     institutions: Institution;
     leads: Lead;
     procedures: Procedure;
+    'doctors-media': DoctorsMedia;
+    'facilities-media': FacilitiesMedia;
+    'institutions-media': InstitutionsMedia;
+    'certificates-media': CertificatesMedia;
+    'procedures-media': ProceduresMedia;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -84,7 +88,6 @@ export interface Config {
   collectionsJoins: {};
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
-    media: MediaSelect<false> | MediaSelect<true>;
     specialties: SpecialtiesSelect<false> | SpecialtiesSelect<true>;
     doctors: DoctorsSelect<false> | DoctorsSelect<true>;
     certificates: CertificatesSelect<false> | CertificatesSelect<true>;
@@ -92,13 +95,18 @@ export interface Config {
     institutions: InstitutionsSelect<false> | InstitutionsSelect<true>;
     leads: LeadsSelect<false> | LeadsSelect<true>;
     procedures: ProceduresSelect<false> | ProceduresSelect<true>;
+    'doctors-media': DoctorsMediaSelect<false> | DoctorsMediaSelect<true>;
+    'facilities-media': FacilitiesMediaSelect<false> | FacilitiesMediaSelect<true>;
+    'institutions-media': InstitutionsMediaSelect<false> | InstitutionsMediaSelect<true>;
+    'certificates-media': CertificatesMediaSelect<false> | CertificatesMediaSelect<true>;
+    'procedures-media': ProceduresMediaSelect<false> | ProceduresMediaSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
   };
   db: {
-    defaultIDType: number;
+    defaultIDType: string;
   };
   fallbackLocale: null;
   globals: {
@@ -140,7 +148,7 @@ export interface UserAuthOperations {
  * via the `definition` "users".
  */
 export interface User {
-  id: number;
+  id: string;
   roles: ('admin' | 'doctor' | 'patient')[];
   fullName: string;
   updatedAt: string;
@@ -164,11 +172,77 @@ export interface User {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "media".
+ * via the `definition` "specialties".
  */
-export interface Media {
-  id: number;
+export interface Specialty {
+  id: string;
+  title: string;
+  slug: string;
+  /**
+   * Brief description of the specialty for the category landing page.
+   */
+  description: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "doctors".
+ */
+export interface Doctor {
+  id: string;
+  fullName: string;
+  slug: string;
+  medicalLicense?: string | null;
+  /**
+   * Primary headshot for directory cards.
+   */
+  profilePicture: string | DoctorsMedia;
+  /**
+   * Photos of the doctor's office or consultation rooms.
+   */
+  officeGallery?: (string | DoctorsMedia)[] | null;
+  specialties?: (string | Specialty)[] | null;
+  /**
+   * Select the specific procedures this doctor is authorized to perform.
+   */
+  procedures?: (string | Procedure)[] | null;
+  /**
+   * Hospitals or clinics where this specialist attends patients.
+   */
+  facilities?: (string | Facility)[] | null;
+  biography?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  metaTitle?: string | null;
+  metaDescription?: string | null;
+  isActive?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "doctors-media".
+ */
+export interface DoctorsMedia {
+  id: string;
+  /**
+   * Crucial for SEO and Accessibility. Describe the image content.
+   */
   alt: string;
+  caption?: string | null;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -197,73 +271,26 @@ export interface Media {
       filesize?: number | null;
       filename?: string | null;
     };
-  };
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "specialties".
- */
-export interface Specialty {
-  id: number;
-  title: string;
-  slug: string;
-  /**
-   * Brief description of the specialty for the category landing page.
-   */
-  description: string;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "doctors".
- */
-export interface Doctor {
-  id: number;
-  fullName: string;
-  slug: string;
-  medicalLicense?: string | null;
-  profilePicture?: (number | null) | Media;
-  specialties?: (number | Specialty)[] | null;
-  /**
-   * Select the specific procedures this doctor is authorized to perform.
-   */
-  procedures?: (number | Procedure)[] | null;
-  /**
-   * Hospitals or clinics where this specialist attends patients.
-   */
-  facilities?: (number | Facility)[] | null;
-  biography?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
+    hero?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
     };
-    [k: string]: unknown;
-  } | null;
-  metaTitle?: string | null;
-  metaDescription?: string | null;
-  isActive?: boolean | null;
-  updatedAt: string;
-  createdAt: string;
+  };
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "procedures".
  */
 export interface Procedure {
-  id: number;
+  id: string;
   name: string;
   slug: string;
-  specialty: number | Specialty;
-  coverImage: number | Media;
+  specialty: string | Specialty;
+  coverImage: string | ProceduresMedia;
   /**
    * Used for procedure cards and SEO Meta Description (Max 160 chars).
    */
@@ -312,10 +339,59 @@ export interface Procedure {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "procedures-media".
+ */
+export interface ProceduresMedia {
+  id: string;
+  /**
+   * Crucial for SEO and Accessibility. Describe the image content.
+   */
+  alt: string;
+  caption?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
+  focalX?: number | null;
+  focalY?: number | null;
+  sizes?: {
+    thumbnail?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+    card?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+    hero?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+  };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "facilities".
  */
 export interface Facility {
-  id: number;
+  id: string;
   name: string;
   slug: string;
   description: {
@@ -340,14 +416,14 @@ export interface Facility {
   /**
    * Select official accreditations (e.g., JCI, ISO) from the database.
    */
-  accreditations?: (number | Certificate)[] | null;
-  specialtiesOffered: (number | Specialty)[];
+  accreditations?: (string | Certificate)[] | null;
+  specialtiesOffered: (string | Specialty)[];
   gallery: {
-    photo: number | Media;
+    heroImage: string | FacilitiesMedia;
     /**
-     * Crucial for Google Images. Describe the photo (e.g., "Operating room at Hospital San Jose").
+     * Showcase rooms, medical equipment, and amenities.
      */
-    altText: string;
+    infrastructureGallery?: (string | FacilitiesMedia)[] | null;
     id?: string | null;
   }[];
   isActive?: boolean | null;
@@ -359,7 +435,7 @@ export interface Facility {
  * via the `definition` "certificates".
  */
 export interface Certificate {
-  id: number;
+  id: string;
   /**
    * e.g., Board Certified Plastic Surgeon, Joint Commission International.
    */
@@ -372,7 +448,7 @@ export interface Certificate {
    * Public link to verify this accreditation online.
    */
   verificationUrl?: string | null;
-  logo: number | Media;
+  logo: string | CertificatesMedia;
   /**
    * Uncheck to hide this certificate from the frontend without deleting it.
    */
@@ -382,10 +458,108 @@ export interface Certificate {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "certificates-media".
+ */
+export interface CertificatesMedia {
+  id: string;
+  /**
+   * Crucial for SEO and Accessibility. Describe the image content.
+   */
+  alt: string;
+  caption?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
+  focalX?: number | null;
+  focalY?: number | null;
+  sizes?: {
+    thumbnail?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+    card?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+    hero?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+  };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "facilities-media".
+ */
+export interface FacilitiesMedia {
+  id: string;
+  /**
+   * Crucial for SEO and Accessibility. Describe the image content.
+   */
+  alt: string;
+  caption?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
+  focalX?: number | null;
+  focalY?: number | null;
+  sizes?: {
+    thumbnail?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+    card?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+    hero?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+  };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "institutions".
  */
 export interface Institution {
-  id: number;
+  id: string;
   /**
    * The official name of the medical network or institution.
    */
@@ -409,7 +583,7 @@ export interface Institution {
     };
     [k: string]: unknown;
   };
-  logo: number | Media;
+  logo: string | InstitutionsMedia;
   /**
    * Official external website URL (e.g., https://www.institucion.com). Ensure to include https://
    */
@@ -423,10 +597,59 @@ export interface Institution {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "institutions-media".
+ */
+export interface InstitutionsMedia {
+  id: string;
+  /**
+   * Crucial for SEO and Accessibility. Describe the image content.
+   */
+  alt: string;
+  caption?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
+  focalX?: number | null;
+  focalY?: number | null;
+  sizes?: {
+    thumbnail?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+    card?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+    hero?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+  };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "leads".
  */
 export interface Lead {
-  id: number;
+  id: string;
   /**
    * Auto-generated secure tracking identifier.
    */
@@ -435,7 +658,7 @@ export interface Lead {
   name: string;
   email: string;
   phone: string;
-  doctor: number | Doctor;
+  doctor: string | Doctor;
   notes?: string | null;
   updatedAt: string;
   createdAt: string;
@@ -445,7 +668,7 @@ export interface Lead {
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
-  id: number;
+  id: string;
   key: string;
   data:
     | {
@@ -462,48 +685,64 @@ export interface PayloadKv {
  * via the `definition` "payload-locked-documents".
  */
 export interface PayloadLockedDocument {
-  id: number;
+  id: string;
   document?:
     | ({
         relationTo: 'users';
-        value: number | User;
-      } | null)
-    | ({
-        relationTo: 'media';
-        value: number | Media;
+        value: string | User;
       } | null)
     | ({
         relationTo: 'specialties';
-        value: number | Specialty;
+        value: string | Specialty;
       } | null)
     | ({
         relationTo: 'doctors';
-        value: number | Doctor;
+        value: string | Doctor;
       } | null)
     | ({
         relationTo: 'certificates';
-        value: number | Certificate;
+        value: string | Certificate;
       } | null)
     | ({
         relationTo: 'facilities';
-        value: number | Facility;
+        value: string | Facility;
       } | null)
     | ({
         relationTo: 'institutions';
-        value: number | Institution;
+        value: string | Institution;
       } | null)
     | ({
         relationTo: 'leads';
-        value: number | Lead;
+        value: string | Lead;
       } | null)
     | ({
         relationTo: 'procedures';
-        value: number | Procedure;
+        value: string | Procedure;
+      } | null)
+    | ({
+        relationTo: 'doctors-media';
+        value: string | DoctorsMedia;
+      } | null)
+    | ({
+        relationTo: 'facilities-media';
+        value: string | FacilitiesMedia;
+      } | null)
+    | ({
+        relationTo: 'institutions-media';
+        value: string | InstitutionsMedia;
+      } | null)
+    | ({
+        relationTo: 'certificates-media';
+        value: string | CertificatesMedia;
+      } | null)
+    | ({
+        relationTo: 'procedures-media';
+        value: string | ProceduresMedia;
       } | null);
   globalSlug?: string | null;
   user: {
     relationTo: 'users';
-    value: number | User;
+    value: string | User;
   };
   updatedAt: string;
   createdAt: string;
@@ -513,10 +752,10 @@ export interface PayloadLockedDocument {
  * via the `definition` "payload-preferences".
  */
 export interface PayloadPreference {
-  id: number;
+  id: string;
   user: {
     relationTo: 'users';
-    value: number | User;
+    value: string | User;
   };
   key?: string | null;
   value?:
@@ -536,7 +775,7 @@ export interface PayloadPreference {
  * via the `definition` "payload-migrations".
  */
 export interface PayloadMigration {
-  id: number;
+  id: string;
   name?: string | null;
   batch?: number | null;
   updatedAt: string;
@@ -568,48 +807,6 @@ export interface UsersSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "media_select".
- */
-export interface MediaSelect<T extends boolean = true> {
-  alt?: T;
-  updatedAt?: T;
-  createdAt?: T;
-  url?: T;
-  thumbnailURL?: T;
-  filename?: T;
-  mimeType?: T;
-  filesize?: T;
-  width?: T;
-  height?: T;
-  focalX?: T;
-  focalY?: T;
-  sizes?:
-    | T
-    | {
-        thumbnail?:
-          | T
-          | {
-              url?: T;
-              width?: T;
-              height?: T;
-              mimeType?: T;
-              filesize?: T;
-              filename?: T;
-            };
-        card?:
-          | T
-          | {
-              url?: T;
-              width?: T;
-              height?: T;
-              mimeType?: T;
-              filesize?: T;
-              filename?: T;
-            };
-      };
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "specialties_select".
  */
 export interface SpecialtiesSelect<T extends boolean = true> {
@@ -628,6 +825,7 @@ export interface DoctorsSelect<T extends boolean = true> {
   slug?: T;
   medicalLicense?: T;
   profilePicture?: T;
+  officeGallery?: T;
   specialties?: T;
   procedures?: T;
   facilities?: T;
@@ -665,8 +863,8 @@ export interface FacilitiesSelect<T extends boolean = true> {
   gallery?:
     | T
     | {
-        photo?: T;
-        altText?: T;
+        heroImage?: T;
+        infrastructureGallery?: T;
         id?: T;
       };
   isActive?: T;
@@ -735,6 +933,271 @@ export interface ProceduresSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "doctors-media_select".
+ */
+export interface DoctorsMediaSelect<T extends boolean = true> {
+  alt?: T;
+  caption?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  url?: T;
+  thumbnailURL?: T;
+  filename?: T;
+  mimeType?: T;
+  filesize?: T;
+  width?: T;
+  height?: T;
+  focalX?: T;
+  focalY?: T;
+  sizes?:
+    | T
+    | {
+        thumbnail?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        card?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        hero?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+      };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "facilities-media_select".
+ */
+export interface FacilitiesMediaSelect<T extends boolean = true> {
+  alt?: T;
+  caption?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  url?: T;
+  thumbnailURL?: T;
+  filename?: T;
+  mimeType?: T;
+  filesize?: T;
+  width?: T;
+  height?: T;
+  focalX?: T;
+  focalY?: T;
+  sizes?:
+    | T
+    | {
+        thumbnail?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        card?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        hero?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+      };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "institutions-media_select".
+ */
+export interface InstitutionsMediaSelect<T extends boolean = true> {
+  alt?: T;
+  caption?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  url?: T;
+  thumbnailURL?: T;
+  filename?: T;
+  mimeType?: T;
+  filesize?: T;
+  width?: T;
+  height?: T;
+  focalX?: T;
+  focalY?: T;
+  sizes?:
+    | T
+    | {
+        thumbnail?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        card?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        hero?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+      };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "certificates-media_select".
+ */
+export interface CertificatesMediaSelect<T extends boolean = true> {
+  alt?: T;
+  caption?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  url?: T;
+  thumbnailURL?: T;
+  filename?: T;
+  mimeType?: T;
+  filesize?: T;
+  width?: T;
+  height?: T;
+  focalX?: T;
+  focalY?: T;
+  sizes?:
+    | T
+    | {
+        thumbnail?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        card?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        hero?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+      };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "procedures-media_select".
+ */
+export interface ProceduresMediaSelect<T extends boolean = true> {
+  alt?: T;
+  caption?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  url?: T;
+  thumbnailURL?: T;
+  filename?: T;
+  mimeType?: T;
+  filesize?: T;
+  width?: T;
+  height?: T;
+  focalX?: T;
+  focalY?: T;
+  sizes?:
+    | T
+    | {
+        thumbnail?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        card?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        hero?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+      };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv_select".
  */
 export interface PayloadKvSelect<T extends boolean = true> {
@@ -778,7 +1241,7 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
  * via the `definition` "site-settings".
  */
 export interface SiteSetting {
-  id: number;
+  id: string;
   /**
    * The official name of the business. Used in SEO meta tags and footers.
    */

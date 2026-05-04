@@ -4,7 +4,7 @@ import React from 'react'
 import type { Metadata } from 'next'
 
 import { Header } from '@/app/components/Header/Header'
-import  Footer  from '@/app/components/Footer'
+import  { Footer } from '@/app/components/Footer'
 import { getSiteSettings } from '@/lib/globals'
 
 // ============================================================================
@@ -12,7 +12,7 @@ import { getSiteSettings } from '@/lib/globals'
 // ============================================================================
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSiteSettings()
-  const siteName = settings?.companyName || 'Vzsoluciones Medical Tourism'
+  const siteName = settings?.companyName || 'Queretaro Medical Tourism'
   
   return {
     title: {

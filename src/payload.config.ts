@@ -4,7 +4,11 @@ import { postgresAdapter } from '@payloadcms/db-postgres'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import path from 'path'
 import { fileURLToPath } from 'url'
-import { Media } from './collections/Media'
+import { DoctorsMedia } from './collections/media/DoctorsMedia';
+import { FacilitiesMedia } from './collections/media/FacilitiesMedia';
+import { InstitutionsMedia } from './collections/media/InstitutionsMedia';
+import { CertificatesMedia } from './collections/media/CertificatesMedia';
+import { ProceduresMedia } from './collections/media/ProceduresMedia';
 import { Specialties } from './collections/Specialties'
 import { Doctors } from './collections/Doctors'
 import { Certificates } from './collections/Certificates'
@@ -49,14 +53,19 @@ export default buildConfig({
 
   collections: [
     Users,
-    Media,        // 1. Dependency
+   
     Specialties,  // 2. Dependency
     Doctors,      // 3. Main Entity
     Certificates,
     Facilities,
     Institutions,
     Leads,
-    Procedures
+    Procedures,
+    DoctorsMedia,
+    FacilitiesMedia,
+    InstitutionsMedia,
+    CertificatesMedia,
+    ProceduresMedia
   ],
 
   globals: [
@@ -83,6 +92,7 @@ export default buildConfig({
       connectionTimeoutMillis: 5000,
       allowExitOnIdle: false,
     },
+    idType: 'uuid',
     // MUST be false in production environments (where we use formal migration files).
     push: process.env.NODE_ENV !== 'production',
   }),

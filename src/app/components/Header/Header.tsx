@@ -72,7 +72,7 @@ const rawCompanyName = companyName || 'Queretaro Medical'
             Hospitals
           </Link>
           <Link href="/about" className="text-sm font-semibold leading-6 text-brand-text hover:text-brand-primary transition-colors">
-            Why Us?
+            Why Queretaro?
           </Link>
         </div>
 

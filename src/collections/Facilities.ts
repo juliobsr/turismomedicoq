@@ -92,21 +92,23 @@ export const Facilities: CollectionConfig = {
               required: true,
               minRows: 1,
               fields: [
-                {
-                  name: 'photo',
-                  type: 'upload',
-                  relationTo: 'media',
-                  required: true,
-                },
-                {
-                  name: 'altText',
-                  type: 'text',
-                  required: true,
-                  label: 'SEO Alt Text',
-                  admin: {
-                    description: 'Crucial for Google Images. Describe the photo (e.g., "Operating room at Hospital San Jose").',
-                  },
-                },
+                // Hero image for the facility page
+    {
+      name: 'heroImage',
+      type: 'relationship',
+      relationTo: 'facilities-media',
+      required: true,
+    },
+    // Gallery of the infrastructure
+    {
+      name: 'infrastructureGallery',
+      type: 'relationship',
+      relationTo: 'facilities-media',
+      hasMany: true,
+      admin: {
+        description: 'Showcase rooms, medical equipment, and amenities.',
+      },
+    },
               ],
             },
           ],

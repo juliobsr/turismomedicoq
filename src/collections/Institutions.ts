@@ -62,8 +62,8 @@ export const Institutions: CollectionConfig = {
             {
               // STRICT RELATIONSHIP: Foreign Key mapping to the Media collection
               name: 'logo',
-              type: 'upload',
-              relationTo: 'media',
+              type: 'relationship',
+              relationTo: 'institutions-media',
               required: true,
             },
             {
