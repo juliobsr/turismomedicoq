@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { NAV_LINKS, CONTACT_INFO } from '@/lib/navigation'
+//import { NAV_LINKS, CONTACT_INFO } from '@/lib/navigation'
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
@@ -24,7 +24,7 @@ export default function Footer() {
             </p>
           </div>
 
-          {/* Columna 2: Navegación (Usando NAV_LINKS) */}
+          {/* Columna 2: Navegación (Usando NAV_LINKS) 
           <div>
             <h4 className="text-white font-bold mb-6 uppercase text-xs tracking-widest">Quick Links</h4>
             <ul className="space-y-4">
@@ -36,7 +36,7 @@ export default function Footer() {
                 </li>
               ))}
             </ul>
-          </div>
+          </div>*/}
 
           {/* Columna 3: Contacto */}
           <div>
@@ -48,15 +48,11 @@ export default function Footer() {
               </li>
               <li className="flex items-center gap-3">
                 <span className="text-blue-400">📞</span>
-                <a href={`tel:${CONTACT_INFO.tel}`} className="hover:text-white transition-colors">
-                  {CONTACT_INFO.phone}
-                </a>
+                
               </li>
               <li className="flex items-center gap-3">
                 <span className="text-blue-400">✉️</span>
-                <a href={`mailto:${CONTACT_INFO.email}`} className="hover:text-white transition-colors">
-                  {CONTACT_INFO.email}
-                </a>
+                
               </li>
             </ul>
           </div>

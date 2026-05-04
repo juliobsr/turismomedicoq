@@ -1,93 +1,152 @@
 // src/collections/Leads.ts
-import type { CollectionConfig } from 'payload'
+import type { 
+  CollectionConfig, 
+  CollectionBeforeChangeHook, 
+  CollectionAfterChangeHook 
+} from 'payload'
+import crypto from 'crypto'
 
-const Leads: CollectionConfig = {
+// 1. STRICT TYPING: Define the expected shape of the Lead document
+interface LeadDocument {
+  id?: string;
+  name: string;
+  folio?: string;
+  email: string;
+  phone: string;
+  doctor: string | object; // Can be an ID or the populated Doctor object
+  notes?: string;
+  status: 'new' | 'contacted' | 'scheduled' | 'completed' | 'cancelled';
+}
+
+// ============================================================================
+// HOOKS: Enterprise Business Logic
+// ============================================================================
+
+const generateSecureFolio: CollectionBeforeChangeHook = ({ data, operation }) => {
+  if (operation === 'create') {
+    // Generate a secure, uppercase 6-character alphanumeric string
+    const secureRandom = crypto.randomBytes(3).toString('hex').toUpperCase();
+    return {
+      ...data,
+      folio: `QM-${secureRandom}`,
+    }
+  }
+  return data;
+}
+
+const sendNotificationEmails: CollectionAfterChangeHook = async ({ doc, operation, req }) => {
+  if (operation === 'create') {
+    const lead = doc as LeadDocument; // Type assertion for strict TS
+
+    try {
+      // 1. Internal Staff Notification
+      await req.payload.sendEmail({
+        to: process.env.ADMIN_EMAIL || 'jcvaldez@outlook.com', 
+        from: 'onboarding@resend.dev',
+        subject: `[ACTION REQUIRED] New Patient Inquiry: ${lead.name} - Folio: ${lead.folio}`,
+        html: `
+          <div style="font-family: sans-serif;">
+            <h2>New Patient Lead Alert</h2>
+            <p>A new request has been submitted. Please review the admin panel.</p>
+            <ul>
+              <li><strong>Patient:</strong> ${lead.name}</li>
+              <li><strong>Folio:</strong> ${lead.folio}</li>
+              <li><strong>Contact:</strong> ${lead.phone} | ${lead.email}</li>
+            </ul>
+          </div>
+        `,
+      });
+
+      // 2. Patient Confirmation (Fixed dynamic email routing)
+      await req.payload.sendEmail({
+        to: lead.email, // DYNAMIC: Sends directly to the patient's submitted email
+        from: 'Queretaro Medical <onboarding@resend.dev>',
+        subject: `We've received your request - Folio: ${lead.folio}`,
+        html: `
+          <div style="font-family: sans-serif; max-width: 600px; margin: auto; border: 1px solid #eee; padding: 20px;">
+            <h2 style="color: #2563eb;">Queretaro Medical</h2>
+            <p>Dear <strong>${lead.name}</strong>,</p>
+            <p>Thank you for reaching out to us. We have successfully received your consultation request.</p>
+            <div style="background-color: #f8fafc; padding: 15px; border-radius: 8px; text-align: center; margin: 20px 0;">
+              <p style="margin: 0; color: #64748b; font-size: 14px;">YOUR TRACKING FOLIO</p>
+              <h3 style="margin: 5px 0; color: #1e293b; font-size: 24px; letter-spacing: 2px;">${lead.folio}</h3>
+            </div>
+            <p>Our medical coordinator will contact you shortly via phone or email to finalize the details of your appointment.</p>
+            <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;" />
+            <p style="font-size: 12px; color: #94a3b8;">
+              This is an automated message, please do not reply directly to this email.
+            </p>
+          </div>
+        `,
+      });
+
+      req.payload.logger.info(`Successfully dispatched notification emails for Lead Folio: ${lead.folio}`);
+    } catch (error) {
+      // Avoid breaking the API response if the email provider (Resend) fails
+      req.payload.logger.error(`Critical error sending emails for Lead ${lead.folio}:`, error);
+    }
+  }
+}
+
+/**
+ * Enterprise Collection: Leads (Patient Inquiries)
+ * Architecture: PostgreSQL mapped table via Drizzle ORM.
+ */
+export const Leads: CollectionConfig = {
   slug: 'leads',
   admin: {
-    // 1. Este valor DEBE existir abajo en la lista de fields
     useAsTitle: 'name', 
     group: 'Medical Directory',
-    defaultColumns: ['name', 'doctor', 'status'],
+    defaultColumns: ['folio', 'name', 'status', 'createdAt'],
   },
+  
+  // 2. SECURITY: Hardened access control for Medical PII
   access: {
+    // Anyone (Next.js public forms) can create a lead
     create: () => true,
-    read: () => true,
+    // ONLY authenticated clinical staff/admins can read the leads
+    read: ({ req: { user } }) => Boolean(user),
+    update: ({ req: { user } }) => Boolean(user),
+    delete: ({ req: { user } }) => Boolean(user),
   },
- 
+
   hooks: {
-    beforeChange: [
-      ({ data, operation }) => {
-        // Generamos un folio aleatorio si es un registro nuevo
-        // Ejemplo: QM-7823
-        if (operation === 'create') {
-          const randomDigits = Math.floor(1000 + Math.random() * 9000);
-          return {
-            ...data,
-            folio: `QM-${randomDigits}`,
-          };
-        }
-        return data;
-      },
-    ],
-    afterChange: [
-      async ({ doc, operation, req }) => {
-        if (operation === 'create') {
-          try {
-            // 1. Correo para el STAFF (Admin)
-            await req.payload.sendEmail({
-              to: 'jcvaldez@outlook.com', // Tu correo de pruebas
-              from: 'onboarding@resend.dev',
-              subject: `[New Lead] ${doc.name} - Folio: ${doc.folio}`,
-              html: `<h2>New Patient Inquiry</h2><p>Check the admin panel for Folio: <b>${doc.folio}</b></p>`,
-            });
-  
-            // 2. Correo para el PACIENTE (Confirmación)
-            await req.payload.sendEmail({
-              to: 'jcvaldez@outlook.com', // Correo que el paciente puso en el formulario
-              from: 'Queretaro Medical <onboarding@resend.dev>',
-              subject: `We've received your request - Folio: ${doc.folio}`,
-              html: `
-                <div style="font-family: sans-serif; max-width: 600px; margin: auto; border: 1px solid #eee; padding: 20px;">
-                  <h2 style="color: #2563eb;">Queretaro Medical</h2>
-                  <p>Dear <strong>${doc.name}</strong>,</p>
-                  <p>Thank you for reaching out to us. We have successfully received your consultation request.</p>
-                  <div style="background-color: #f8fafc; padding: 15px; border-radius: 8px; text-align: center; margin: 20px 0;">
-                    <p style="margin: 0; color: #64748b; font-size: 14px;">YOUR TRACKING FOLIO</p>
-                    <h3 style="margin: 5px 0; color: #1e293b; font-size: 24px; letter-spacing: 2px;">${doc.folio}</h3>
-                  </div>
-                  <p>Our medical coordinator will contact you shortly via phone or email to finalize the details of your appointment.</p>
-                  <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;" />
-                  <p style="font-size: 12px; color: #94a3b8;">
-                    This is an automated message, please do not reply directly to this email.
-                  </p>
-                </div>
-              `,
-            });
-  
-            console.log(`Emails sent for Folio: ${doc.folio}`);
-          } catch (error) {
-            console.error('Error sending emails:', error);
-          }
-        }
-      },
-    ],
+    beforeChange: [generateSecureFolio],
+    afterChange: [sendNotificationEmails],
   },
+
   fields: [
     {
-      name: 'name', // 2. Verifica que este sea EXACTAMENTE 'name'
+      name: 'folio',
+      type: 'text',
+      admin: {
+        position: 'sidebar',
+        readOnly: true,
+        description: 'Auto-generated secure tracking identifier.',
+      },
+      label: 'Case Folio',
+    },
+    {
+      name: 'status',
+      type: 'select',
+      defaultValue: 'new',
+      admin: {
+        position: 'sidebar',
+      },
+      options: [
+        { label: 'New', value: 'new' },
+        { label: 'Contacted', value: 'contacted' },
+        { label: 'Scheduled', value: 'scheduled' },
+        { label: 'Completed', value: 'completed' },
+        { label: 'Cancelled', value: 'cancelled' },
+      ],
+    },
+    {
+      name: 'name', 
       type: 'text',
       required: true,
       label: 'Patient Name',
     },
-    {
-        name: 'folio',
-        type: 'text',
-        admin: {
-          position: 'sidebar', // Lo ponemos a un lado en el admin
-          readOnly: true,
-        },
-        label: 'Case Folio',
-      },
     {
       name: 'email',
       type: 'email',
@@ -99,6 +158,7 @@ const Leads: CollectionConfig = {
       required: true,
     },
     {
+      // RELATIONSHIP: Links the patient inquiry directly to the target Specialist
       name: 'doctor',
       type: 'relationship',
       relationTo: 'doctors',
@@ -108,20 +168,8 @@ const Leads: CollectionConfig = {
       name: 'notes',
       type: 'textarea',
     },
-    {
-      name: 'status',
-      type: 'select',
-      defaultValue: 'new',
-      options: [
-        { label: 'New', value: 'new' },
-        { label: 'Contacted', value: 'contacted' },
-        { label: 'Scheduled', value: 'scheduled' },
-        { label: 'Completed', value: 'completed' },
-        { label: 'Cancelled', value: 'cancelled' },
-      ],
-    },
-    
   ],
+  timestamps: true, // Auto-generates createdAt for funnel tracking
 }
 
 export default Leads

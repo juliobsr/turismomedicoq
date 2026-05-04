@@ -69,13 +69,13 @@ export interface Config {
   collections: {
     users: User;
     media: Media;
-    doctors: Doctor;
-    procedures: Procedure;
-    facilities: Facility;
-    leads: Lead;
     specialties: Specialty;
+    doctors: Doctor;
     certificates: Certificate;
+    facilities: Facility;
     institutions: Institution;
+    leads: Lead;
+    procedures: Procedure;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -85,27 +85,27 @@ export interface Config {
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
-    doctors: DoctorsSelect<false> | DoctorsSelect<true>;
-    procedures: ProceduresSelect<false> | ProceduresSelect<true>;
-    facilities: FacilitiesSelect<false> | FacilitiesSelect<true>;
-    leads: LeadsSelect<false> | LeadsSelect<true>;
     specialties: SpecialtiesSelect<false> | SpecialtiesSelect<true>;
+    doctors: DoctorsSelect<false> | DoctorsSelect<true>;
     certificates: CertificatesSelect<false> | CertificatesSelect<true>;
+    facilities: FacilitiesSelect<false> | FacilitiesSelect<true>;
     institutions: InstitutionsSelect<false> | InstitutionsSelect<true>;
+    leads: LeadsSelect<false> | LeadsSelect<true>;
+    procedures: ProceduresSelect<false> | ProceduresSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
   };
   db: {
-    defaultIDType: string;
+    defaultIDType: number;
   };
   fallbackLocale: null;
   globals: {
-    'why-destination': WhyDestination;
+    'site-settings': SiteSetting;
   };
   globalsSelect: {
-    'why-destination': WhyDestinationSelect<false> | WhyDestinationSelect<true>;
+    'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
   };
   locale: null;
   widgets: {
@@ -140,7 +140,7 @@ export interface UserAuthOperations {
  * via the `definition` "users".
  */
 export interface User {
-  id: string;
+  id: number;
   roles: ('admin' | 'doctor' | 'patient')[];
   fullName: string;
   updatedAt: string;
@@ -167,7 +167,7 @@ export interface User {
  * via the `definition` "media".
  */
 export interface Media {
-  id: string;
+  id: number;
   alt: string;
   updatedAt: string;
   createdAt: string;
@@ -180,17 +180,95 @@ export interface Media {
   height?: number | null;
   focalX?: number | null;
   focalY?: number | null;
+  sizes?: {
+    thumbnail?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+    card?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+  };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "specialties".
+ */
+export interface Specialty {
+  id: number;
+  title: string;
+  slug: string;
+  /**
+   * Brief description of the specialty for the category landing page.
+   */
+  description: string;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "doctors".
  */
 export interface Doctor {
-  id: string;
+  id: number;
+  fullName: string;
+  slug: string;
+  medicalLicense?: string | null;
+  profilePicture?: (number | null) | Media;
+  specialties?: (number | Specialty)[] | null;
+  /**
+   * Select the specific procedures this doctor is authorized to perform.
+   */
+  procedures?: (number | Procedure)[] | null;
+  /**
+   * Hospitals or clinics where this specialist attends patients.
+   */
+  facilities?: (number | Facility)[] | null;
+  biography?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  metaTitle?: string | null;
+  metaDescription?: string | null;
+  isActive?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "procedures".
+ */
+export interface Procedure {
+  id: number;
   name: string;
-  specialty: (string | Specialty)[];
-  profilePicture: string | Media;
-  biography: {
+  slug: string;
+  specialty: number | Specialty;
+  coverImage: number | Media;
+  /**
+   * Used for procedure cards and SEO Meta Description (Max 160 chars).
+   */
+  shortSummary: string;
+  fullDescription: {
     root: {
       type: string;
       children: {
@@ -205,37 +283,30 @@ export interface Doctor {
     };
     [k: string]: unknown;
   };
-  procedures?: (string | Procedure)[] | null;
-  facilities?: (string | Facility)[] | null;
-  certifications?: (string | Certificate)[] | null;
-  affiliations?: (string | Institution)[] | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "specialties".
- */
-export interface Specialty {
-  id: string;
-  name: string;
+  pricing: {
+    /**
+     * Numeric value for sorting/filtering. Displayed in USD.
+     */
+    startingPriceUSD: number;
+    financingAvailable?: boolean | null;
+  };
   /**
-   * Used for URLs (e.g., dental-care)
+   * e.g., "1 to 2 weeks"
    */
-  slug: string;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "procedures".
- */
-export interface Procedure {
-  id: string;
-  name: string;
-  description: string;
-  priceRange: string;
   recoveryTime: string;
+  /**
+   * e.g., "2 to 3 hours"
+   */
+  surgeryDuration: string;
+  anesthesiaType?: ('general' | 'local_sedation' | 'local') | null;
+  faqs?:
+    | {
+        question: string;
+        answer: string;
+        id?: string | null;
+      }[]
+    | null;
+  isActive?: boolean | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -244,15 +315,42 @@ export interface Procedure {
  * via the `definition` "facilities".
  */
 export interface Facility {
-  id: string;
+  id: number;
   name: string;
-  accreditations?:
-    | {
-        accreditationName?: string | null;
-        id?: string | null;
-      }[]
-    | null;
-  photos: (string | Media)[];
+  slug: string;
+  description: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  /**
+   * City where the facility is located (e.g., Hermosillo, Ciudad Obregón).
+   */
+  city: string;
+  /**
+   * Select official accreditations (e.g., JCI, ISO) from the database.
+   */
+  accreditations?: (number | Certificate)[] | null;
+  specialtiesOffered: (number | Specialty)[];
+  gallery: {
+    photo: number | Media;
+    /**
+     * Crucial for Google Images. Describe the photo (e.g., "Operating room at Hospital San Jose").
+     */
+    altText: string;
+    id?: string | null;
+  }[];
+  isActive?: boolean | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -261,9 +359,24 @@ export interface Facility {
  * via the `definition` "certificates".
  */
 export interface Certificate {
-  id: string;
+  id: number;
+  /**
+   * e.g., Board Certified Plastic Surgeon, Joint Commission International.
+   */
   name: string;
-  logo: string | Media;
+  /**
+   * Entity that granted the certificate (e.g., Consejo Mexicano de Cirugía Plástica).
+   */
+  issuer: string;
+  /**
+   * Public link to verify this accreditation online.
+   */
+  verificationUrl?: string | null;
+  logo: number | Media;
+  /**
+   * Uncheck to hide this certificate from the frontend without deleting it.
+   */
+  isActive?: boolean | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -272,10 +385,39 @@ export interface Certificate {
  * via the `definition` "institutions".
  */
 export interface Institution {
-  id: string;
+  id: number;
+  /**
+   * The official name of the medical network or institution.
+   */
   name: string;
-  logo: string | Media;
+  slug: string;
+  /**
+   * Detailed content for the institution landing page. Crucial for SEO.
+   */
+  description: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  logo: number | Media;
+  /**
+   * Official external website URL (e.g., https://www.institucion.com). Ensure to include https://
+   */
   website?: string | null;
+  /**
+   * Uncheck to hide this institution from the public Next.js frontend.
+   */
+  isActive?: boolean | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -284,14 +426,17 @@ export interface Institution {
  * via the `definition` "leads".
  */
 export interface Lead {
-  id: string;
-  name: string;
+  id: number;
+  /**
+   * Auto-generated secure tracking identifier.
+   */
   folio?: string | null;
+  status?: ('new' | 'contacted' | 'scheduled' | 'completed' | 'cancelled') | null;
+  name: string;
   email: string;
   phone: string;
-  doctor: string | Doctor;
+  doctor: number | Doctor;
   notes?: string | null;
-  status?: ('new' | 'contacted' | 'scheduled' | 'completed' | 'cancelled') | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -300,7 +445,7 @@ export interface Lead {
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
-  id: string;
+  id: number;
   key: string;
   data:
     | {
@@ -317,48 +462,48 @@ export interface PayloadKv {
  * via the `definition` "payload-locked-documents".
  */
 export interface PayloadLockedDocument {
-  id: string;
+  id: number;
   document?:
     | ({
         relationTo: 'users';
-        value: string | User;
+        value: number | User;
       } | null)
     | ({
         relationTo: 'media';
-        value: string | Media;
-      } | null)
-    | ({
-        relationTo: 'doctors';
-        value: string | Doctor;
-      } | null)
-    | ({
-        relationTo: 'procedures';
-        value: string | Procedure;
-      } | null)
-    | ({
-        relationTo: 'facilities';
-        value: string | Facility;
-      } | null)
-    | ({
-        relationTo: 'leads';
-        value: string | Lead;
+        value: number | Media;
       } | null)
     | ({
         relationTo: 'specialties';
-        value: string | Specialty;
+        value: number | Specialty;
+      } | null)
+    | ({
+        relationTo: 'doctors';
+        value: number | Doctor;
       } | null)
     | ({
         relationTo: 'certificates';
-        value: string | Certificate;
+        value: number | Certificate;
+      } | null)
+    | ({
+        relationTo: 'facilities';
+        value: number | Facility;
       } | null)
     | ({
         relationTo: 'institutions';
-        value: string | Institution;
+        value: number | Institution;
+      } | null)
+    | ({
+        relationTo: 'leads';
+        value: number | Lead;
+      } | null)
+    | ({
+        relationTo: 'procedures';
+        value: number | Procedure;
       } | null);
   globalSlug?: string | null;
   user: {
     relationTo: 'users';
-    value: string | User;
+    value: number | User;
   };
   updatedAt: string;
   createdAt: string;
@@ -368,10 +513,10 @@ export interface PayloadLockedDocument {
  * via the `definition` "payload-preferences".
  */
 export interface PayloadPreference {
-  id: string;
+  id: number;
   user: {
     relationTo: 'users';
-    value: string | User;
+    value: number | User;
   };
   key?: string | null;
   value?:
@@ -391,7 +536,7 @@ export interface PayloadPreference {
  * via the `definition` "payload-migrations".
  */
 export interface PayloadMigration {
-  id: string;
+  id: number;
   name?: string | null;
   batch?: number | null;
   updatedAt: string;
@@ -438,73 +583,58 @@ export interface MediaSelect<T extends boolean = true> {
   height?: T;
   focalX?: T;
   focalY?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "doctors_select".
- */
-export interface DoctorsSelect<T extends boolean = true> {
-  name?: T;
-  specialty?: T;
-  profilePicture?: T;
-  biography?: T;
-  procedures?: T;
-  facilities?: T;
-  certifications?: T;
-  affiliations?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "procedures_select".
- */
-export interface ProceduresSelect<T extends boolean = true> {
-  name?: T;
-  description?: T;
-  priceRange?: T;
-  recoveryTime?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "facilities_select".
- */
-export interface FacilitiesSelect<T extends boolean = true> {
-  name?: T;
-  accreditations?:
+  sizes?:
     | T
     | {
-        accreditationName?: T;
-        id?: T;
+        thumbnail?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        card?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
       };
-  photos?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "leads_select".
- */
-export interface LeadsSelect<T extends boolean = true> {
-  name?: T;
-  folio?: T;
-  email?: T;
-  phone?: T;
-  doctor?: T;
-  notes?: T;
-  status?: T;
-  updatedAt?: T;
-  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "specialties_select".
  */
 export interface SpecialtiesSelect<T extends boolean = true> {
-  name?: T;
+  title?: T;
   slug?: T;
+  description?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "doctors_select".
+ */
+export interface DoctorsSelect<T extends boolean = true> {
+  fullName?: T;
+  slug?: T;
+  medicalLicense?: T;
+  profilePicture?: T;
+  specialties?: T;
+  procedures?: T;
+  facilities?: T;
+  biography?: T;
+  metaTitle?: T;
+  metaDescription?: T;
+  isActive?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -514,7 +644,32 @@ export interface SpecialtiesSelect<T extends boolean = true> {
  */
 export interface CertificatesSelect<T extends boolean = true> {
   name?: T;
+  issuer?: T;
+  verificationUrl?: T;
   logo?: T;
+  isActive?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "facilities_select".
+ */
+export interface FacilitiesSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  description?: T;
+  city?: T;
+  accreditations?: T;
+  specialtiesOffered?: T;
+  gallery?:
+    | T
+    | {
+        photo?: T;
+        altText?: T;
+        id?: T;
+      };
+  isActive?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -524,8 +679,57 @@ export interface CertificatesSelect<T extends boolean = true> {
  */
 export interface InstitutionsSelect<T extends boolean = true> {
   name?: T;
+  slug?: T;
+  description?: T;
   logo?: T;
   website?: T;
+  isActive?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "leads_select".
+ */
+export interface LeadsSelect<T extends boolean = true> {
+  folio?: T;
+  status?: T;
+  name?: T;
+  email?: T;
+  phone?: T;
+  doctor?: T;
+  notes?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "procedures_select".
+ */
+export interface ProceduresSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  specialty?: T;
+  coverImage?: T;
+  shortSummary?: T;
+  fullDescription?: T;
+  pricing?:
+    | T
+    | {
+        startingPriceUSD?: T;
+        financingAvailable?: T;
+      };
+  recoveryTime?: T;
+  surgeryDuration?: T;
+  anesthesiaType?: T;
+  faqs?:
+    | T
+    | {
+        question?: T;
+        answer?: T;
+        id?: T;
+      };
+  isActive?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -570,47 +774,72 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   createdAt?: T;
 }
 /**
- * Manage the content and SEO for the "Why Queretaro" medical tourism page.
- *
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "why-destination".
+ * via the `definition` "site-settings".
  */
-export interface WhyDestination {
-  id: string;
-  heroTitle: string;
-  heroSubtitle: string;
-  heroBackgroundImage: string | Media;
-  advantages?:
-    | {
-        icon: string;
-        title: string;
-        description: string;
-        id?: string | null;
-      }[]
-    | null;
-  metaTitle: string;
-  metaDescription: string;
+export interface SiteSetting {
+  id: number;
+  /**
+   * The official name of the business. Used in SEO meta tags and footers.
+   */
+  companyName: string;
+  contactEmail: string;
+  /**
+   * Recommended format: +1 (555) 123-4567 for global Click-to-Call compatibility.
+   */
+  contactPhone: string;
+  address: {
+    street?: string | null;
+    city?: string | null;
+    state?: string | null;
+    zipCode?: string | null;
+    country: string;
+  };
+  /**
+   * Main brand color (Buttons, active links).
+   */
+  primaryColor: string;
+  /**
+   * Secondary elements (Headers, footers, accents).
+   */
+  secondaryColor: string;
+  /**
+   * Call to Actions, highlight badges, alert icons.
+   */
+  accentColor: string;
+  /**
+   * Global application background color.
+   */
+  backgroundColor: string;
+  /**
+   * Default typography color for high contrast.
+   */
+  textColor: string;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "why-destination_select".
+ * via the `definition` "site-settings_select".
  */
-export interface WhyDestinationSelect<T extends boolean = true> {
-  heroTitle?: T;
-  heroSubtitle?: T;
-  heroBackgroundImage?: T;
-  advantages?:
+export interface SiteSettingsSelect<T extends boolean = true> {
+  companyName?: T;
+  contactEmail?: T;
+  contactPhone?: T;
+  address?:
     | T
     | {
-        icon?: T;
-        title?: T;
-        description?: T;
-        id?: T;
+        street?: T;
+        city?: T;
+        state?: T;
+        zipCode?: T;
+        country?: T;
       };
-  metaTitle?: T;
-  metaDescription?: T;
+  primaryColor?: T;
+  secondaryColor?: T;
+  accentColor?: T;
+  backgroundColor?: T;
+  textColor?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

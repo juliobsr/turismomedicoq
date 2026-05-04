@@ -1,60 +1,73 @@
+// src/components/CardDoctor.tsx
 import Image from 'next/image'
 import Link from 'next/link'
+import type { Doctor, Media, Specialty } from '@/payload-types'
 
-export default function CardDoctor({ doctor }: { doctor: any }) {
-  const profilePic = doctor.profilePicture && typeof doctor.profilePicture !== 'string' 
-    ? doctor.profilePicture.url 
-    : null;
+interface CardDoctorProps {
+  doctor: Doctor
+}
+
+export const CardDoctor = ({ doctor }: CardDoctorProps) => {
+  const profilePicture = doctor.profilePicture as Media | undefined
+  const specialties = doctor.specialties as Specialty[] | undefined
 
   return (
-    <div className="group bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 flex flex-col h-full">
-      
-      {/* Contenedor de la Imagen */}
-      <div className="relative aspect-[3/4] overflow-hidden bg-gray-100">
-        {profilePic ? (
+    <article className="flex flex-col bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow duration-300">
+      <div className="relative w-full h-64 bg-gray-50">
+        {profilePicture?.url ? (
           <Image
-            src={profilePic}
-            alt={doctor.name}
+            src={profilePicture.url}
+            alt={profilePicture.alt || `Portrait of ${doctor.fullName}`}
             fill
-            className="object-cover transition-transform duration-500 group-hover:scale-105"
-            sizes="(max-width: 768px) 100vw, 33vw"
+            className="object-cover object-top"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            priority={false}
           />
         ) : (
-          <div className="flex items-center justify-center h-full text-gray-400 font-bold uppercase text-xs">
-            No Photo
+          <div className="flex items-center justify-center w-full h-full text-gray-400">
+            No Image Available
           </div>
         )}
-        
-        {/* CONTENEDOR DE BADGES DINÁMICO */}
-        <div className="absolute top-4 left-4 right-4 flex flex-wrap gap-2">
-          {doctor.specialty?.map((spec: any, index: number) => (
-            <span 
-              key={index}
-              className="bg-white/90 backdrop-blur-md text-blue-700 text-[10px] font-black px-3 py-1.5 rounded-full shadow-sm uppercase tracking-wider whitespace-nowrap"
-            >
-              {typeof spec === 'object' ? spec.name : 'Specialist'}
-            </span>
-          ))}
-        </div>
       </div>
 
-      {/* Contenido de la Tarjeta */}
       <div className="p-6 flex flex-col flex-grow">
-        <h3 className="text-xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors mb-4">
-          Dr. {doctor.name}
-        </h3>
-        
-        {/* Footer de la tarjeta con botón */}
-        <div className="mt-auto">
-          <Link 
-            href={`/doctors/${doctor.id}`}
-            className="inline-flex items-center justify-center w-full bg-blue-50 text-blue-700 group-hover:bg-blue-600 group-hover:text-white px-4 py-3 rounded-2xl font-bold text-sm transition-all duration-300"
+        <header>
+          {/* ✅ UPDATED: Using dynamic text color if needed, or keeping high-contrast gray */}
+          <h3 className="text-xl font-bold text-brand-text mb-1">
+            {doctor.fullName}
+          </h3>
+          <p className="text-sm text-gray-500 mb-4 font-mono">
+            Lic: {doctor.medicalLicense}
+          </p>
+        </header>
+
+        {specialties && specialties.length > 0 && (
+          <ul className="flex flex-wrap gap-2 mb-6">
+            {specialties.map((specialty) => (
+              <li
+                key={specialty.id}
+                // ✅ UPDATED: Dynamic primary color for the border and text. 
+                // We avoid bg-opacity here because Hex CSS vars break Tailwind opacity classes.
+                className="px-3 py-1 border border-brand-primary text-brand-primary text-xs font-semibold rounded-full"
+              >
+                {specialty.title}
+              </li>
+            ))}
+          </ul>
+        )}
+
+        <div className="mt-auto pt-4 border-t border-gray-100">
+          <Link
+            href={`/doctors/${doctor.slug}`}
+            // ✅ UPDATED: Dynamic background color. 
+            // PRO-TIP: We use hover:brightness-110 instead of a specific color variant
+            className="block w-full text-center px-4 py-2 bg-brand-primary text-white rounded-lg font-medium hover:brightness-110 transition-all"
+            aria-label={`View full profile of ${doctor.fullName}`}
           >
-            View Professional Profile
-            <span className="ml-2 transition-transform group-hover:translate-x-1">→</span>
+            View Profile
           </Link>
         </div>
       </div>
-    </div>
+    </article>
   )
 }

@@ -1,56 +1,90 @@
-import { mongooseAdapter } from '@payloadcms/db-mongodb'
+// src/payload.config.ts
+import { buildConfig } from 'payload'
+import { postgresAdapter } from '@payloadcms/db-postgres'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import path from 'path'
-import { buildConfig } from 'payload'
 import { fileURLToPath } from 'url'
-import sharp from 'sharp'
-import { resendAdapter } from '@payloadcms/email-resend' // 1. Importa el adaptador
-
-import  {Users } from './collections/Users'
-import  {Media } from './collections/Media'
-import Doctors from './collections/Doctors'
-import Procedures from './collections/Procedures'
-import Facilities from './collections/Facilities'
-import Leads from './collections/Leads'
-import Specialties from './collections/Specialties'
+import { Media } from './collections/Media'
+import { Specialties } from './collections/Specialties'
+import { Doctors } from './collections/Doctors'
 import { Certificates } from './collections/Certificates'
+import { Facilities } from './collections/Facilities'
 import { Institutions } from './collections/Institutions'
+import { Leads } from './collections/Leads'
+import { Procedures} from './collections/Procedures'
 
-// Import Globals (The missing piece)
-import { WhyDestination } from './globals/WhyDestination'
+// Import core collections
+import { Users } from './collections/Users'
 
+import { SiteSettings } from './globals/SiteSettings'
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
+// ============================================================================
+// ENTERPRISE ENVIRONMENT VALIDATION
+// Fail fast if critical secrets are missing in CI/CD or local environments
+// ============================================================================
+const assertEnvironment = () => {
+  if (!process.env.DATABASE_URI) throw new Error('FATAL: DATABASE_URI is missing')
+  if (!process.env.PAYLOAD_SECRET) throw new Error('FATAL: PAYLOAD_SECRET is missing')
+}
+
+assertEnvironment()
+
+/**
+ * Enterprise Payload CMS Configuration for Vzsoluciones
+ * Architecture: Headless CMS powered by Serverless PostgreSQL (Neon)
+ */
 export default buildConfig({
+  editor: lexicalEditor({}),
+  
+  secret: process.env.PAYLOAD_SECRET as string,
+  
   admin: {
     user: Users.slug,
-    importMap: {
-      baseDir: path.resolve(dirname),
+    meta: {
+      titleSuffix: '- Queretaro Medical Admin',
     },
   },
-  collections: [Users, Media, Doctors, Procedures, Facilities, Leads, Specialties, Certificates,Institutions],
-  editor: lexicalEditor({}), // <-- ESTA LÍNEA ES OBLIGATORIA
-  
-// REGISTERING THE GLOBALS ARRAY
-  // This is where you define single-instance configurations
-  globals: [
-    WhyDestination,
-    // You can add ThemeConfig, HeaderConfig, etc., here later
+
+  collections: [
+    Users,
+    Media,        // 1. Dependency
+    Specialties,  // 2. Dependency
+    Doctors,      // 3. Main Entity
+    Certificates,
+    Facilities,
+    Institutions,
+    Leads,
+    Procedures
   ],
 
-  secret: process.env.PAYLOAD_SECRET || '',
+  globals: [
+    SiteSettings, // ✅ Registra el Global aquí
+  ],
+
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
-  db: mongooseAdapter({
-    url: process.env.DATABASE_URL || '',
+
+  // ============================================================================
+  // DATABASE ADAPTER: Serverless PostgreSQL (Neon)
+  // Configured for strict relational integrity and massive SSG build concurrency.
+  // ============================================================================
+// ==========================================================================
+  // ENTERPRISE DATABASE CONFIGURATION
+  // Ensure this is INSIDE the buildConfig object!
+  // ==========================================================================
+  db: postgresAdapter({
+    pool: {
+      connectionString: process.env.DATABASE_URI || '',
+      max: 10,
+      idleTimeoutMillis: 30000,
+      connectionTimeoutMillis: 5000,
+      allowExitOnIdle: false,
+    },
+    // MUST be false in production environments (where we use formal migration files).
+    push: process.env.NODE_ENV !== 'production',
   }),
-  sharp,
-  plugins: [],
-  email: resendAdapter({
-    defaultFromAddress: 'onboarding@resend.dev',
-    defaultFromName: 'Queretaro Medical Notifications',
-    apiKey: process.env.RESEND_API_KEY || '',
-  }),
+  
 })

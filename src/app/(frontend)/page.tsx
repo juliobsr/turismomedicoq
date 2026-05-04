@@ -161,7 +161,7 @@ export default async function HomePage({
     </div>
     
     <h3 className="text-xl font-black text-gray-900 group-hover:text-blue-600 transition-colors">
-      Dr. {doctor.name}
+      {doctor.fullName}
     </h3>
   </div>
 
@@ -170,7 +170,7 @@ export default async function HomePage({
   {profilePic?.url ? (
                       <Image
                         src={profilePic.url}
-                        alt={doctor.name}
+                        alt={doctor.fullName}
                         fill
                         className="object-cover transition-transform duration-500 group-hover:scale-105"
                       />
