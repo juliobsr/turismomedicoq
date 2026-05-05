@@ -34,7 +34,7 @@ const rawCompanyName = companyName || 'Queretaro Medical'
   const restOfName = nameWords.slice(1).join(' ')
 
   return (
-    <header className="border-b border-gray-100 sticky top-0 z-40 w-full backdrop-blur-md bg-brand-bg/90">
+    <header className="border-b border-gray-100 sticky top-0 z-40 w-full backdrop-blur-md bg-white">
       <nav className="mx-auto flex max-w-7xl items-center justify-between p-4 lg:px-8" aria-label="Global Navigation">
         
         {/* Logo Section */}
@@ -42,11 +42,11 @@ const rawCompanyName = companyName || 'Queretaro Medical'
           <Link href="/" className="-m-1.5 p-1.5 flex items-center gap-2">
             <span className="sr-only">{companyName}</span>
             {/* ✅ UPDATED: Dynamic brand-primary background */}
-            <div className="h-8 w-8 bg-brand-primary rounded-lg flex items-center justify-center text-white font-bold text-xl">
+            <div className="h-8 w-8 p-6 bg-brand-primary rounded-lg flex items-center justify-center text-white font-bold text-xl">
               {logoInitials}
             </div>
             <span className="font-extrabold text-xl tracking-tight text-brand-text">
-              {firstWord} <span className="text-brand-primary">{restOfName}</span>
+              {firstWord.toUpperCase()} <span className="text-brand-primary">{restOfName}</span>
             </span>
           </Link>
         </div>

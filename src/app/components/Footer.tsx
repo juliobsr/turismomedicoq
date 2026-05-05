@@ -42,7 +42,7 @@ export const Footer = ({ settings }: FooterProps) => {
   const restOfName = nameWords.slice(1).join(' ')
 
   return (
-    <footer className="bg-blue-900 border-t border-gray-100 pt-16 pb-8 transition-colors duration-300" aria-labelledby="footer-heading">
+    <footer className="bg-gray-900 border-t border-gray-100 pt-16 pb-8 transition-colors duration-300" aria-labelledby="footer-heading">
       <h2 id="footer-heading" className="sr-only">Footer</h2>
       
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -53,11 +53,11 @@ export const Footer = ({ settings }: FooterProps) => {
           {/* =============================================================== */}
           <div className="space-y-8 xl:col-span-1">
             <Link href="/" className="flex items-center gap-2">
-              <div className="h-8 w-8 bg-brand-accent rounded-lg flex items-center justify-center text-white font-bold text-lg tracking-wider" aria-hidden="true">
+              <div className="h-8 w-8 p-6 bg-brand-primary rounded-lg flex items-center justify-center text-white font-bold text-lg tracking-wider" aria-hidden="true">
                 {logoInitials}
               </div>
-              <span className="font-extrabold text-xl tracking-tight text-black">
-                {firstWord}
+              <span className="font-extrabold text-xl tracking-tight text-brand-primary">
+                {firstWord.toUpperCase()}
                 {restOfName && <span className="text-white ml-1">{restOfName}</span>}
               </span>
             </Link>
@@ -83,7 +83,7 @@ export const Footer = ({ settings }: FooterProps) => {
           <div className="mt-16 grid grid-cols-2 gap-8 xl:col-span-2 xl:mt-0">
             <div className="md:grid md:grid-cols-2 md:gap-8">
               <div>
-                <h3 className="text-sm font-bold leading-6 text-brand-text">Services</h3>
+                <h3 className="text-sm font-bold leading-6 text-brand-primary">SERVICES</h3>
                 <nav className="mt-6 space-y-4">
                   <Link href="/doctors" className="text-sm leading-6 text-gray-200 hover:text-brand-primary transition-colors">Medical Specialists</Link>
                   <Link href="/facilities" className="block text-sm leading-6 text-gray-200 hover:text-brand-primary transition-colors">Hospitals & Clinics</Link>
@@ -91,7 +91,7 @@ export const Footer = ({ settings }: FooterProps) => {
                 </nav>
               </div>
               <div className="mt-10 md:mt-0">
-                <h3 className="text-sm font-bold leading-6 text-brand-text">Company</h3>
+                <h3 className="text-sm font-bold leading-6 text-brand-primary">COMPANY</h3>
                 <nav className="mt-6 space-y-4">
                   <Link href="/about" className="block text-sm leading-6 text-gray-200 hover:text-brand-primary transition-colors">About Us</Link>
                   <Link href="/faq" className="block text-sm leading-6 text-gray-200 hover:text-brand-primary transition-colors">FAQ</Link>
@@ -105,7 +105,7 @@ export const Footer = ({ settings }: FooterProps) => {
             {/* =============================================================== */}
             <div className="md:grid md:grid-cols-1 md:gap-8">
               <div>
-                <h3 className="text-sm font-bold leading-6 text-brand-text">Reach Out</h3>
+                <h3 className="text-sm font-bold leading-6 text-brand-primary">REACH OUT</h3>
                 {/* 
                   The <address> tag is crucial for Local SEO. 
                   It must only contain contact info.

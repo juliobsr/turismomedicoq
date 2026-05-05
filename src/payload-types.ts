@@ -228,6 +228,8 @@ export interface Doctor {
   } | null;
   metaTitle?: string | null;
   metaDescription?: string | null;
+  phone?: string | null;
+  email?: string | null;
   isActive?: boolean | null;
   updatedAt: string;
   createdAt: string;
@@ -290,7 +292,7 @@ export interface Procedure {
   name: string;
   slug: string;
   specialty: string | Specialty;
-  coverImage: string | ProceduresMedia;
+  coverImage?: (string | null) | ProceduresMedia;
   /**
    * Used for procedure cards and SEO Meta Description (Max 160 chars).
    */
@@ -410,22 +412,23 @@ export interface Facility {
     [k: string]: unknown;
   };
   /**
-   * City where the facility is located (e.g., Hermosillo, Ciudad Obregón).
+   * Location city.
    */
   city: string;
-  /**
-   * Select official accreditations (e.g., JCI, ISO) from the database.
-   */
-  accreditations?: (string | Certificate)[] | null;
   specialtiesOffered: (string | Specialty)[];
-  gallery: {
-    heroImage: string | FacilitiesMedia;
-    /**
-     * Showcase rooms, medical equipment, and amenities.
-     */
-    infrastructureGallery?: (string | FacilitiesMedia)[] | null;
-    id?: string | null;
-  }[];
+  /**
+   * List of specialists practicing at this facility.
+   */
+  doctors?: (string | Doctor)[] | null;
+  accreditations?: (string | Certificate)[] | null;
+  /**
+   * Main image for the facility header and cards.
+   */
+  heroImage: string | FacilitiesMedia;
+  /**
+   * Showcase photos of rooms and equipment.
+   */
+  infrastructureGallery?: (string | FacilitiesMedia)[] | null;
   isActive?: boolean | null;
   updatedAt: string;
   createdAt: string;
@@ -655,6 +658,24 @@ export interface Lead {
    */
   folio?: string | null;
   status?: ('new' | 'contacted' | 'scheduled' | 'completed' | 'cancelled') | null;
+  /**
+   * Internal notes for lead follow-up. Not visible to the patient.
+   */
+  contactNotes?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   name: string;
   email: string;
   phone: string;
@@ -832,6 +853,8 @@ export interface DoctorsSelect<T extends boolean = true> {
   biography?: T;
   metaTitle?: T;
   metaDescription?: T;
+  phone?: T;
+  email?: T;
   isActive?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -858,15 +881,11 @@ export interface FacilitiesSelect<T extends boolean = true> {
   slug?: T;
   description?: T;
   city?: T;
-  accreditations?: T;
   specialtiesOffered?: T;
-  gallery?:
-    | T
-    | {
-        heroImage?: T;
-        infrastructureGallery?: T;
-        id?: T;
-      };
+  doctors?: T;
+  accreditations?: T;
+  heroImage?: T;
+  infrastructureGallery?: T;
   isActive?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -892,6 +911,7 @@ export interface InstitutionsSelect<T extends boolean = true> {
 export interface LeadsSelect<T extends boolean = true> {
   folio?: T;
   status?: T;
+  contactNotes?: T;
   name?: T;
   email?: T;
   phone?: T;

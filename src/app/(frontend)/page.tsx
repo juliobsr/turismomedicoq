@@ -147,27 +147,27 @@ export default async function HomePage({
               : null;
 
             return (
-              <Link href={`/doctors/${doctor.id}`} key={doctor.id} className="group">
+              <Link href={`/doctors/${doctor.slug}`} key={doctor.slug} className="group">
                 <div className="group bg-white rounded-3xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col">
   
-  {/* 1. INFO DEL DOCTOR: Primero en móvil, Segundo en Desktop */}
-  <div className="p-6 order-1 md:order-2">
-    <div className="flex flex-wrap gap-2 mb-3">
-      {Array.isArray(doctor.specialty) && doctor.specialty.map((spec: any) => (
-        <span key={spec.id} className="text-[10px] font-bold uppercase tracking-wider text-blue-600 bg-blue-50 px-2 py-1 rounded-md">
-          {typeof spec === 'object' ? spec.name : 'Specialist'}
-        </span>
-      ))}
-    </div>
-    
-    <h3 className="text-xl font-black text-gray-900 group-hover:text-blue-600 transition-colors">
-      {doctor.fullName}
-    </h3>
-  </div>
+            {/* 1. INFO DEL DOCTOR: Primero en móvil, Segundo en Desktop */}
+            <div className="p-6 order-1 md:order-2">
+              <div className="flex flex-wrap gap-2 mb-3">
+                {Array.isArray(doctor.specialty) && doctor.specialty.map((spec: any) => (
+                  <span key={spec.id} className="text-[10px] font-bold uppercase tracking-wider text-blue-600 bg-blue-50 px-2 py-1 rounded-md">
+                    {typeof spec === 'object' ? spec.name : 'Specialist'}
+                  </span>
+                ))}
+              </div>
+              
+              <h3 className="text-xl font-black text-gray-900 group-hover:text-blue-600 transition-colors">
+                {doctor.fullName}
+              </h3>
+            </div>
 
-  {/* 2. IMAGEN: Segundo en móvil, Primero en Desktop */}
-  <div className="relative aspect-[3/4] w-full overflow-hidden bg-gray-100 order-2 md:order-1">
-  {profilePic?.url ? (
+            {/* 2. IMAGEN: Segundo en móvil, Primero en Desktop */}
+            <div className="relative aspect-[3/4] w-full overflow-hidden bg-gray-100 order-2 md:order-1">
+            {profilePic?.url ? (
                       <Image
                         src={profilePic.url}
                         alt={doctor.fullName}
@@ -175,21 +175,21 @@ export default async function HomePage({
                         className="object-cover transition-transform duration-500 group-hover:scale-105"
                       />
 
-    ) : (
-      <div className="flex items-center justify-center h-full text-gray-400 font-bold uppercase text-xs">No Photo</div>
-    )}
-  </div>
+            ) : (
+              <div className="flex items-center justify-center h-full text-gray-400 font-bold uppercase text-xs">No Photo</div>
+            )}
+              </div>
 
-  {/* 3. BOTÓN: Siempre al final */}
-  <div className="p-6 pt-0 mt-2 order-3">
-    <Link 
-      href={`/doctors/${doctor.id}`}
-      className="block w-full text-center bg-gray-900 text-white text-sm font-bold py-3 rounded-xl hover:bg-blue-600 transition-colors shadow-sm"
-    >
-      View Profile
-    </Link>
-  </div>
-</div>
+            {/* 3. BOTÓN: Siempre al final */}
+            <div className="p-6 pt-0 mt-2 order-3">
+              <Link 
+                href={`/doctors/${doctor.slug}`}
+                className="block w-full text-center bg-gray-900 text-white text-sm font-bold py-3 rounded-xl hover:bg-blue-600 transition-colors shadow-sm"
+              >
+                View Profile
+              </Link>
+            </div>
+          </div>
               </Link>
             );
           })}

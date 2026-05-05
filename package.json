@@ -1,7 +1,7 @@
 {
-  "name": "",
+  "name": "medical-tourism",
   "version": "1.0.0",
-  "description": "A blank template to get started with Payload 3.0",
+  "description": "Enterprise Medical Tourism Platform - Headless Payload CMS v3 + Next.js",
   "license": "MIT",
   "type": "module",
   "scripts": {
@@ -18,22 +18,24 @@
     "test:int": "cross-env NODE_OPTIONS=--no-deprecation vitest run --config ./vitest.config.mts"
   },
   "dependencies": {
-    "@heroicons/react": "^2.2.0",
-    "@payloadcms/db-postgres": "^3.84.1",
-    "@payloadcms/email-resend": "^3.82.0",
-    "@payloadcms/next": "3.81.0",
-    "@payloadcms/richtext-lexical": "^3.81.0",
-    "@payloadcms/ui": "3.81.0",
-    "cross-env": "^7.0.3",
+    "@heroicons/react": "2.2.0",
+    "@payloadcms/db-postgres": "3.84.1",
+    "@payloadcms/email-resend": "3.84.1",
+    "@payloadcms/next": "3.84.1",
+    "@payloadcms/richtext-lexical": "3.84.1",
+    "@payloadcms/ui": "3.84.1",
+    "@tailwindcss/typography": "0.5.19",
+    "cross-env": "7.0.3",
     "dotenv": "16.4.7",
-    "graphql": "^16.8.1",
+    "graphql": "16.8.1",
     "next": "16.2.1",
-    "payload": "3.81.0",
-    "pg": "^8.20.0",
+    "payload": "3.84.1",
+    "pg": "8.20.0",
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "sharp": "0.34.2",
-    "zod": "^4.4.2"
+    "yet-another-react-lightbox": "3.32.0",
+    "zod": "4.4.2"
   },
   "devDependencies": {
     "@playwright/test": "1.58.2",
@@ -60,10 +62,20 @@
     "pnpm": "^9 || ^10"
   },
   "pnpm": {
+    "overrides": {
+      "@payloadcms/ui": "$@payloadcms/ui",
+      "react": "$react",
+      "react-dom": "$react-dom"
+    },
     "onlyBuiltDependencies": [
       "sharp",
       "esbuild",
       "unrs-resolver"
     ]
+  },
+  "overrides": {
+    "@payloadcms/ui": "$@payloadcms/ui",
+    "react": "$react",
+    "react-dom": "$react-dom"
   }
 }

@@ -127,6 +127,19 @@ export const Doctors: CollectionConfig = {
             },
           ],
         },
+        {
+          label: 'Contact Info',
+          fields: [
+            {
+              name: 'phone',
+              type: 'text',
+            },
+            {
+              name: 'email',
+              type: 'text',
+            },
+          ],
+        },
       ],
     },
     {

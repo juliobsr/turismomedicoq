@@ -4,8 +4,13 @@ import type {
   CollectionBeforeChangeHook, 
   CollectionAfterChangeHook 
 } from 'payload'
+import { notifyLeadCreation } from '../hooks/notifyLeadCreation';
 import crypto from 'crypto'
-
+import {
+  lexicalEditor,
+  HTMLConverterFeature,
+  lexicalHTML,
+} from '@payloadcms/richtext-lexical'
 // 1. STRICT TYPING: Define the expected shape of the Lead document
 interface LeadDocument {
   id?: string;
@@ -34,59 +39,7 @@ const generateSecureFolio: CollectionBeforeChangeHook = ({ data, operation }) =>
   return data;
 }
 
-const sendNotificationEmails: CollectionAfterChangeHook = async ({ doc, operation, req }) => {
-  if (operation === 'create') {
-    const lead = doc as LeadDocument; // Type assertion for strict TS
 
-    try {
-      // 1. Internal Staff Notification
-      await req.payload.sendEmail({
-        to: process.env.ADMIN_EMAIL || 'jcvaldez@outlook.com', 
-        from: 'onboarding@resend.dev',
-        subject: `[ACTION REQUIRED] New Patient Inquiry: ${lead.name} - Folio: ${lead.folio}`,
-        html: `
-          <div style="font-family: sans-serif;">
-            <h2>New Patient Lead Alert</h2>
-            <p>A new request has been submitted. Please review the admin panel.</p>
-            <ul>
-              <li><strong>Patient:</strong> ${lead.name}</li>
-              <li><strong>Folio:</strong> ${lead.folio}</li>
-              <li><strong>Contact:</strong> ${lead.phone} | ${lead.email}</li>
-            </ul>
-          </div>
-        `,
-      });
-
-      // 2. Patient Confirmation (Fixed dynamic email routing)
-      await req.payload.sendEmail({
-        to: lead.email, // DYNAMIC: Sends directly to the patient's submitted email
-        from: 'Queretaro Medical <onboarding@resend.dev>',
-        subject: `We've received your request - Folio: ${lead.folio}`,
-        html: `
-          <div style="font-family: sans-serif; max-width: 600px; margin: auto; border: 1px solid #eee; padding: 20px;">
-            <h2 style="color: #2563eb;">Queretaro Medical</h2>
-            <p>Dear <strong>${lead.name}</strong>,</p>
-            <p>Thank you for reaching out to us. We have successfully received your consultation request.</p>
-            <div style="background-color: #f8fafc; padding: 15px; border-radius: 8px; text-align: center; margin: 20px 0;">
-              <p style="margin: 0; color: #64748b; font-size: 14px;">YOUR TRACKING FOLIO</p>
-              <h3 style="margin: 5px 0; color: #1e293b; font-size: 24px; letter-spacing: 2px;">${lead.folio}</h3>
-            </div>
-            <p>Our medical coordinator will contact you shortly via phone or email to finalize the details of your appointment.</p>
-            <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;" />
-            <p style="font-size: 12px; color: #94a3b8;">
-              This is an automated message, please do not reply directly to this email.
-            </p>
-          </div>
-        `,
-      });
-
-      req.payload.logger.info(`Successfully dispatched notification emails for Lead Folio: ${lead.folio}`);
-    } catch (error) {
-      // Avoid breaking the API response if the email provider (Resend) fails
-      req.payload.logger.error(`Critical error sending emails for Lead ${lead.folio}:`, error);
-    }
-  }
-}
 
 /**
  * Enterprise Collection: Leads (Patient Inquiries)
@@ -97,7 +50,7 @@ export const Leads: CollectionConfig = {
   admin: {
     useAsTitle: 'name', 
     group: 'Medical Directory',
-    defaultColumns: ['folio', 'name', 'status', 'createdAt'],
+    defaultColumns: ['folio', 'name','doctor', 'status', 'createdAt'],
   },
   
   // 2. SECURITY: Hardened access control for Medical PII
@@ -112,7 +65,7 @@ export const Leads: CollectionConfig = {
 
   hooks: {
     beforeChange: [generateSecureFolio],
-    afterChange: [sendNotificationEmails],
+    afterChange: [notifyLeadCreation],
   },
 
   fields: [
@@ -142,6 +95,25 @@ export const Leads: CollectionConfig = {
       ],
     },
     {
+      name: 'contactNotes',
+      type: 'richText',
+      editor: lexicalEditor({
+        features: ({ defaultFeatures }) => [
+          ...defaultFeatures,
+          // We add HTML conversion in case we need to export these notes later
+          HTMLConverterFeature(),
+        ],
+      }),
+      access: {
+        // CRITICAL: This ensures the data is NEVER sent to the frontend
+        read: ({ req: { user } }) => Boolean(user), 
+      },
+      admin: {
+        position: 'sidebar', // Keeps the main layout clean for contact data
+        description: 'Internal notes for lead follow-up. Not visible to the patient.',
+      },
+    },
+    {
       name: 'name', 
       type: 'text',
       required: true,
@@ -167,9 +139,11 @@ export const Leads: CollectionConfig = {
     {
       name: 'notes',
       type: 'textarea',
+      label: 'Patient Notes'
     },
   ],
   timestamps: true, // Auto-generates createdAt for funnel tracking
+  
 }
 
 export default Leads

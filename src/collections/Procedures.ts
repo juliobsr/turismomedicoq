@@ -53,7 +53,7 @@ export const Procedures: CollectionConfig = {
               name: 'coverImage',
               type: 'relationship',
               relationTo: 'procedures-media',
-              required: true,
+              required: false,
             },
             {
               name: 'shortSummary',

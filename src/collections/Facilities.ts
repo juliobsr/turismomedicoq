@@ -1,10 +1,8 @@
-// src/collections/Facilities.ts
 import type { CollectionConfig } from 'payload'
-
+import { lexicalEditor } from '@payloadcms/richtext-lexical'
 /**
- * Enterprise Collection: Facilities (Hospitals & Clinics)
- * Architecture: Relational PostgreSQL table via Drizzle ORM.
- * Purpose: Directory of medical centers for Next.js SSG. Crucial for patient trust.
+ * Enterprise Collection: Facilities
+ * Refactored for High-Performance Filtering and Relational Integrity.
  */
 export const Facilities: CollectionConfig = {
   slug: 'facilities',
@@ -14,9 +12,7 @@ export const Facilities: CollectionConfig = {
     defaultColumns: ['name', 'city', 'isActive'],
   },
   access: {
-    // SECURITY: Public read is mandatory for Next.js build time (SSG)
-    read: () => true,
-    // Only authenticated Vzsoluciones staff can mutate infrastructure data
+    read: () => true, // Essential for SSG/ISR in Next.js
     create: ({ req: { user } }) => Boolean(user),
     update: ({ req: { user } }) => Boolean(user),
     delete: ({ req: { user } }) => Boolean(user),
@@ -35,81 +31,78 @@ export const Facilities: CollectionConfig = {
               label: 'Facility Name',
             },
             {
-              // SEO CRITICAL: Unique URL identifier (e.g., 'hospital-san-jose')
               name: 'slug',
               type: 'text',
               required: true,
               unique: true,
-              index: true, // SQL Index for O(1) lookups in Next.js dynamic routes
+              index: true, // SQL Index for high-speed dynamic routing
             },
             {
               name: 'description',
-              type: 'richText', // Stored as JSONB in PostgreSQL
+              type: 'richText',
               required: true,
+              
             },
             {
               name: 'city',
               type: 'text',
               required: true,
+              index: true, // Optimized for City-based filtering
               admin: {
-                description: 'City where the facility is located (e.g., Hermosillo, Ciudad Obregón).',
+                description: 'Location city.',
               },
             },
           ],
         },
         {
-          label: 'Medical & Trust',
+          label: 'Medical Network',
           fields: [
             {
-              // STRICT RELATIONSHIP: Replaced raw text array with a Postgres Foreign Key mapping
-              // Links directly to our Certificates collection to display official logos
-              name: 'accreditations',
-              type: 'relationship',
-              relationTo: 'certificates',
-              hasMany: true,
-              admin: {
-                description: 'Select official accreditations (e.g., JCI, ISO) from the database.',
-              },
-            },
-            {
-              // STRICT RELATIONSHIP: What specialties are treated here?
               name: 'specialtiesOffered',
               type: 'relationship',
               relationTo: 'specialties',
               hasMany: true,
               required: true,
+              index: true, // Critical for Specialty filtering
+            },
+            {
+              name: 'doctors',
+              type: 'relationship',
+              relationTo: 'doctors',
+              hasMany: true,
+              index: true, // Enables filtering Hospitals by specific Doctors
+              admin: {
+                description: 'List of specialists practicing at this facility.',
+              },
+            },
+            {
+              name: 'accreditations',
+              type: 'relationship',
+              relationTo: 'certificates',
+              hasMany: true,
             },
           ],
         },
         {
-          label: 'Media Gallery',
+          label: 'Media & SEO',
           fields: [
             {
-              // ARCHITECTURE FIX: Payload 'upload' cannot be hasMany. 
-              // We use an array to build a robust gallery with SEO captions.
-              name: 'gallery',
-              type: 'array',
+              name: 'heroImage',
+              type: 'relationship',
+              relationTo: 'facilities-media',
               required: true,
-              minRows: 1,
-              fields: [
-                // Hero image for the facility page
-    {
-      name: 'heroImage',
-      type: 'relationship',
-      relationTo: 'facilities-media',
-      required: true,
-    },
-    // Gallery of the infrastructure
-    {
-      name: 'infrastructureGallery',
-      type: 'relationship',
-      relationTo: 'facilities-media',
-      hasMany: true,
-      admin: {
-        description: 'Showcase rooms, medical equipment, and amenities.',
-      },
-    },
-              ],
+              admin: {
+                description: 'Main image for the facility header and cards.',
+              },
+            },
+            {
+              name: 'infrastructureGallery',
+              type: 'relationship',
+              relationTo: 'facilities-media',
+              hasMany: true,
+              admin: {
+                description: 'Showcase photos of rooms and equipment.',
+              },
             },
           ],
         },
@@ -124,7 +117,7 @@ export const Facilities: CollectionConfig = {
       },
     },
   ],
-  timestamps: true, // Automates 'createdAt' and 'updatedAt' for Next.js Cache Invalidation
+  timestamps: true,
 }
 
 export default Facilities

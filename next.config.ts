@@ -8,7 +8,7 @@ import type { NextConfig } from 'next';
  */
 const nextConfig: NextConfig = {
   // 1. CORE PERFORMANCE & SECURITY
-  reactStrictMode: true,
+  reactStrictMode: false,
 
   // 2. CSS/SSR RESOLUTION FIX
   // We explicitly tell Next.js to transpile this specific package.

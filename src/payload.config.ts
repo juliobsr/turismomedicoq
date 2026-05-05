@@ -16,7 +16,7 @@ import { Facilities } from './collections/Facilities'
 import { Institutions } from './collections/Institutions'
 import { Leads } from './collections/Leads'
 import { Procedures} from './collections/Procedures'
-
+import { resendAdapter } from '@payloadcms/email-resend'
 // Import core collections
 import { Users } from './collections/Users'
 
@@ -40,7 +40,7 @@ assertEnvironment()
  * Architecture: Headless CMS powered by Serverless PostgreSQL (Neon)
  */
 export default buildConfig({
-  editor: lexicalEditor({}),
+  editor: lexicalEditor(),
   
   secret: process.env.PAYLOAD_SECRET as string,
   
@@ -96,5 +96,14 @@ export default buildConfig({
     // MUST be false in production environments (where we use formal migration files).
     push: process.env.NODE_ENV !== 'production',
   }),
-  
+  /**
+   * ENTERPRISE EMAIL DISPATCHER
+   * Provider: Resend
+   * Note: Using onboarding domain for development phase.
+   */
+  email: resendAdapter({
+    apiKey: process.env.RESEND_API_KEY || '',
+    defaultFromAddress: process.env.RESEND_SENDER_EMAIL || 'onboarding@resend.dev',
+    defaultFromName: process.env.RESEND_SENDER_NAME || 'Queretaro Medical',
+  }),
 })

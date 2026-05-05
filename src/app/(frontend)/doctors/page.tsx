@@ -15,27 +15,56 @@ interface DoctorsDirectoryProps {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }
 
+
 // ============================================================================
-// DYNAMIC SEO METADATA
+// DYNAMIC SEO METADATA (ENTERPRISE GRADE)
 // ============================================================================
 export async function generateMetadata({ searchParams }: DoctorsDirectoryProps): Promise<Metadata> {
   const resolvedParams = await searchParams
   const specialtySlug = typeof resolvedParams.specialty === 'string' ? resolvedParams.specialty : undefined
 
-  // ✅ 2. Fetch globals for SEO. (Cached instantly, 0ms overhead)
+  // ✅ Fetch globals for SEO. (Cached instantly, 0ms overhead)
   const settings = await getSiteSettings()
-  const companyName = settings?.companyName || 'Medical Tourism'
+  const companyName = settings?.companyName || 'Medical Directory'
 
-  let title = `Our Medical Specialists | ${companyName}`
-  
+  // Default SEO setup
+  let title = `Our Medical Specialists `
+  let description = `Browse the comprehensive directory of board-certified surgeons and medical specialists at ${companyName}.`
+  let canonicalUrl = '/doctors'
+
+  // Dynamic SEO when a specialty filter is applied
   if (specialtySlug) {
-    const formattedTitle = specialtySlug.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')
+    const formattedTitle = specialtySlug
+      .split('-')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ')
+      
     title = `${formattedTitle} Specialists | ${companyName}`
+    description = `Find the top-rated ${formattedTitle} specialists and board-certified doctors at ${companyName}. Secure your consultation today.`
+    canonicalUrl = `/doctors?specialty=${specialtySlug}`
   }
 
   return {
     title,
-    description: `Browse the directory of board-certified surgeons and medical specialists at ${companyName}.`,
+    description,
+    // 🚀 ALERTS GOOGLE TO AVOID DUPLICATE CONTENT PENALTIES
+    alternates: {
+      canonical: canonicalUrl,
+    },
+    // 🚀 SOCIAL MEDIA SHARING CARDS
+    openGraph: {
+      title,
+      description,
+      type: 'website',
+      siteName: companyName,
+      // You can also map a global fallback image from settings here
+      // images: settings?.ogImage?.url ? [{ url: settings.ogImage.url }] : [],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+    }
   }
 }
 
@@ -90,7 +119,7 @@ export default async function DoctorsDirectoryPage({ searchParams }: DoctorsDire
   ])
 
   const doctors = doctorsResponse.docs
-  const companyName = settings?.companyName || 'Queretaro Medical'
+  const companyName = settings?.companyName 
 
   return (
     <main className="min-h-screen bg-brand-bg py-16 transition-colors duration-300">
