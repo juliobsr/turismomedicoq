@@ -7,7 +7,7 @@ import Zoom from 'yet-another-react-lightbox/plugins/zoom';
 import Fullscreen from 'yet-another-react-lightbox/plugins/fullscreen';
 import 'yet-another-react-lightbox/styles.css';
 
-import type { Media } from '@/payload-types';
+import type { MedicalAsset } from '@/payload-types';
 
 /**
  * Enterprise Interface for FacilityGallery
@@ -15,7 +15,7 @@ import type { Media } from '@/payload-types';
  * if depth is not sufficient. We account for this possibility.
  */
 interface FacilityGalleryProps {
-  images: (string | Media)[];
+  images: (string | MedicalAsset)[];
 }
 
 /**
@@ -31,7 +31,7 @@ export const FacilityGallery = ({ images = [] }: FacilityGalleryProps) => {
 
   // 1. DATA SANITIZATION: Filter out unpopulated string IDs and ensure valid Media objects
   const validImages = useMemo(() => {
-    return images.filter((item): item is Media => typeof item !== 'string' && !!item.url);
+    return images.filter((item): item is MedicalAsset => typeof item !== 'string' && !!item.url);
   }, [images]);
 
   const imageCount = validImages.length;

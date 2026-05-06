@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Facility, Media, Specialty } from '@/payload-types';
+import { Facility, MedicalAsset, Specialty } from '@/payload-types';
 
 /**
  * Enterprise Interface for FacilityCard
@@ -31,7 +31,7 @@ export default function FacilityCard({ facility, priority = false }: FacilityCar
   } = facility;
 
   // Type Casting for the Media object (assuming Depth 1)
-  const image = heroImage as Media | undefined;
+  const image = heroImage as MedicalAsset | undefined;
   
   // Extracting and limiting specialties for UI consistency
   const displayedSpecialties = (specialtiesOffered as Specialty[] | undefined)?.slice(0, 3);
