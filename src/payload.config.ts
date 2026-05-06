@@ -103,16 +103,18 @@ export default buildConfig({
   // ==========================================================================
   db: postgresAdapter({
     pool: {
+      // 🚀 TECH LEAD TIP: Standard Neon connection string for Serverless/Build
       connectionString: process.env.DATABASE_URI || '',
+      /**
+       * SSL is mandatory for Neon. 
+       * 'rejectUnauthorized: false' is common for cloud providers, 
+       * but ensure your string has ?sslmode=require
+       */
+      ssl: true,
+      // Lowering pool limits during build to avoid exhausting Neon connections
       max: 10,
-      idleTimeoutMillis: 30000,
-      connectionTimeoutMillis: 5000,
-      allowExitOnIdle: false,
+      connectionTimeoutMillis: 10000, // 10s timeout to allow Neon to wake up
     },
-    idType: 'uuid',
-    // MUST be false in production environments (where we use formal migration files).
-    push: process.env.NODE_ENV !== 'production',
-    //push: false,
   }),
   /**
    * ENTERPRISE EMAIL DISPATCHER

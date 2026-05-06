@@ -108,7 +108,7 @@ export interface Config {
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
   };
   db: {
-    defaultIDType: string;
+    defaultIDType: number;
   };
   fallbackLocale: null;
   globals: {
@@ -154,7 +154,7 @@ export interface UserAuthOperations {
  * via the `definition` "users".
  */
 export interface User {
-  id: string;
+  id: number;
   roles: ('admin' | 'doctor' | 'patient')[];
   fullName: string;
   updatedAt: string;
@@ -181,7 +181,7 @@ export interface User {
  * via the `definition` "specialties".
  */
 export interface Specialty {
-  id: string;
+  id: number;
   title: string;
   slug: string;
   /**
@@ -196,27 +196,27 @@ export interface Specialty {
  * via the `definition` "doctors".
  */
 export interface Doctor {
-  id: string;
+  id: number;
   fullName: string;
   slug: string;
   medicalLicense?: string | null;
   /**
    * Primary headshot for directory cards.
    */
-  profilePicture: string | DoctorsMedia;
+  profilePicture: number | DoctorsMedia;
   /**
    * Photos of the doctor's office or consultation rooms.
    */
-  officeGallery?: (string | DoctorsMedia)[] | null;
-  specialties?: (string | Specialty)[] | null;
+  officeGallery?: (number | DoctorsMedia)[] | null;
+  specialties?: (number | Specialty)[] | null;
   /**
    * Select the specific procedures this doctor is authorized to perform.
    */
-  procedures?: (string | Procedure)[] | null;
+  procedures?: (number | Procedure)[] | null;
   /**
    * Hospitals or clinics where this specialist attends patients.
    */
-  facilities?: (string | Facility)[] | null;
+  facilities?: (number | Facility)[] | null;
   biography?: {
     root: {
       type: string;
@@ -245,7 +245,7 @@ export interface Doctor {
  * via the `definition` "doctors-media".
  */
 export interface DoctorsMedia {
-  id: string;
+  id: number;
   /**
    * Crucial for SEO and Accessibility. Describe the image content.
    */
@@ -294,11 +294,11 @@ export interface DoctorsMedia {
  * via the `definition` "procedures".
  */
 export interface Procedure {
-  id: string;
+  id: number;
   name: string;
   slug: string;
-  specialty: string | Specialty;
-  coverImage?: (string | null) | ProceduresMedia;
+  specialty: number | Specialty;
+  coverImage?: (number | null) | ProceduresMedia;
   /**
    * Used for procedure cards and SEO Meta Description (Max 160 chars).
    */
@@ -350,7 +350,7 @@ export interface Procedure {
  * via the `definition` "procedures-media".
  */
 export interface ProceduresMedia {
-  id: string;
+  id: number;
   /**
    * Crucial for SEO and Accessibility. Describe the image content.
    */
@@ -399,7 +399,7 @@ export interface ProceduresMedia {
  * via the `definition` "facilities".
  */
 export interface Facility {
-  id: string;
+  id: number;
   name: string;
   slug: string;
   description: {
@@ -421,20 +421,20 @@ export interface Facility {
    * Location city.
    */
   city: string;
-  specialtiesOffered: (string | Specialty)[];
+  specialtiesOffered: (number | Specialty)[];
   /**
    * List of specialists practicing at this facility.
    */
-  doctors?: (string | Doctor)[] | null;
-  accreditations?: (string | Certificate)[] | null;
+  doctors?: (number | Doctor)[] | null;
+  accreditations?: (number | Certificate)[] | null;
   /**
    * Main image for the facility header and cards.
    */
-  heroImage: string | FacilitiesMedia;
+  heroImage: number | FacilitiesMedia;
   /**
    * Showcase photos of rooms and equipment.
    */
-  infrastructureGallery?: (string | FacilitiesMedia)[] | null;
+  infrastructureGallery?: (number | FacilitiesMedia)[] | null;
   isActive?: boolean | null;
   updatedAt: string;
   createdAt: string;
@@ -444,7 +444,7 @@ export interface Facility {
  * via the `definition` "certificates".
  */
 export interface Certificate {
-  id: string;
+  id: number;
   /**
    * e.g., Board Certified Plastic Surgeon, Joint Commission International.
    */
@@ -457,7 +457,7 @@ export interface Certificate {
    * Public link to verify this accreditation online.
    */
   verificationUrl?: string | null;
-  logo: string | CertificatesMedia;
+  logo: number | CertificatesMedia;
   /**
    * Uncheck to hide this certificate from the frontend without deleting it.
    */
@@ -470,7 +470,7 @@ export interface Certificate {
  * via the `definition` "certificates-media".
  */
 export interface CertificatesMedia {
-  id: string;
+  id: number;
   /**
    * Crucial for SEO and Accessibility. Describe the image content.
    */
@@ -519,7 +519,7 @@ export interface CertificatesMedia {
  * via the `definition` "facilities-media".
  */
 export interface FacilitiesMedia {
-  id: string;
+  id: number;
   /**
    * Crucial for SEO and Accessibility. Describe the image content.
    */
@@ -568,7 +568,7 @@ export interface FacilitiesMedia {
  * via the `definition` "institutions".
  */
 export interface Institution {
-  id: string;
+  id: number;
   /**
    * The official name of the medical network or institution.
    */
@@ -592,7 +592,7 @@ export interface Institution {
     };
     [k: string]: unknown;
   };
-  logo: string | InstitutionsMedia;
+  logo: number | InstitutionsMedia;
   /**
    * Official external website URL (e.g., https://www.institucion.com). Ensure to include https://
    */
@@ -609,7 +609,7 @@ export interface Institution {
  * via the `definition` "institutions-media".
  */
 export interface InstitutionsMedia {
-  id: string;
+  id: number;
   /**
    * Crucial for SEO and Accessibility. Describe the image content.
    */
@@ -658,7 +658,7 @@ export interface InstitutionsMedia {
  * via the `definition` "leads".
  */
 export interface Lead {
-  id: string;
+  id: number;
   /**
    * Auto-generated secure tracking identifier.
    */
@@ -685,8 +685,8 @@ export interface Lead {
   name: string;
   email: string;
   phone: string;
-  doctor: string | Doctor;
-  procedure?: (string | null) | Procedure;
+  doctor: number | Doctor;
+  procedure?: (number | null) | Procedure;
   notes?: string | null;
   updatedAt: string;
   createdAt: string;
@@ -698,7 +698,7 @@ export interface Lead {
  * via the `definition` "medical-assets".
  */
 export interface MedicalAsset {
-  id: string;
+  id: number;
   /**
    * Crucial for SEO and Accessibility. Describe the image content.
    */
@@ -747,7 +747,7 @@ export interface MedicalAsset {
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
-  id: string;
+  id: number;
   key: string;
   data:
     | {
@@ -764,68 +764,68 @@ export interface PayloadKv {
  * via the `definition` "payload-locked-documents".
  */
 export interface PayloadLockedDocument {
-  id: string;
+  id: number;
   document?:
     | ({
         relationTo: 'users';
-        value: string | User;
+        value: number | User;
       } | null)
     | ({
         relationTo: 'specialties';
-        value: string | Specialty;
+        value: number | Specialty;
       } | null)
     | ({
         relationTo: 'doctors';
-        value: string | Doctor;
+        value: number | Doctor;
       } | null)
     | ({
         relationTo: 'certificates';
-        value: string | Certificate;
+        value: number | Certificate;
       } | null)
     | ({
         relationTo: 'facilities';
-        value: string | Facility;
+        value: number | Facility;
       } | null)
     | ({
         relationTo: 'institutions';
-        value: string | Institution;
+        value: number | Institution;
       } | null)
     | ({
         relationTo: 'leads';
-        value: string | Lead;
+        value: number | Lead;
       } | null)
     | ({
         relationTo: 'procedures';
-        value: string | Procedure;
+        value: number | Procedure;
       } | null)
     | ({
         relationTo: 'doctors-media';
-        value: string | DoctorsMedia;
+        value: number | DoctorsMedia;
       } | null)
     | ({
         relationTo: 'facilities-media';
-        value: string | FacilitiesMedia;
+        value: number | FacilitiesMedia;
       } | null)
     | ({
         relationTo: 'institutions-media';
-        value: string | InstitutionsMedia;
+        value: number | InstitutionsMedia;
       } | null)
     | ({
         relationTo: 'certificates-media';
-        value: string | CertificatesMedia;
+        value: number | CertificatesMedia;
       } | null)
     | ({
         relationTo: 'procedures-media';
-        value: string | ProceduresMedia;
+        value: number | ProceduresMedia;
       } | null)
     | ({
         relationTo: 'medical-assets';
-        value: string | MedicalAsset;
+        value: number | MedicalAsset;
       } | null);
   globalSlug?: string | null;
   user: {
     relationTo: 'users';
-    value: string | User;
+    value: number | User;
   };
   updatedAt: string;
   createdAt: string;
@@ -835,10 +835,10 @@ export interface PayloadLockedDocument {
  * via the `definition` "payload-preferences".
  */
 export interface PayloadPreference {
-  id: string;
+  id: number;
   user: {
     relationTo: 'users';
-    value: string | User;
+    value: number | User;
   };
   key?: string | null;
   value?:
@@ -858,7 +858,7 @@ export interface PayloadPreference {
  * via the `definition` "payload-migrations".
  */
 export interface PayloadMigration {
-  id: string;
+  id: number;
   name?: string | null;
   batch?: number | null;
   updatedAt: string;
@@ -1377,7 +1377,7 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
  * via the `definition` "site-settings".
  */
 export interface SiteSetting {
-  id: string;
+  id: number;
   /**
    * The official name of the business. Used in SEO meta tags and footers.
    */
@@ -1422,10 +1422,10 @@ export interface SiteSetting {
  * via the `definition` "patient-journey".
  */
 export interface PatientJourney {
-  id: string;
+  id: number;
   heroTitle: string;
   heroDescription: string;
-  heroCover: string | MedicalAsset;
+  heroCover: number | MedicalAsset;
   steps: {
     /**
      * e.g., "Arrival", "Surgery", "Recovery"
@@ -1436,7 +1436,7 @@ export interface PatientJourney {
      * e.g., "Day 1", "Days 2-4"
      */
     duration?: string | null;
-    image?: (string | null) | MedicalAsset;
+    image?: (number | null) | MedicalAsset;
     /**
      * Optional: Add multiple choices for this step (e.g., different recovery cities or hotels).
      */
@@ -1447,7 +1447,7 @@ export interface PatientJourney {
            */
           title: string;
           description: string;
-          image: string | MedicalAsset;
+          image: number | MedicalAsset;
           id?: string | null;
         }[]
       | null;
@@ -1469,11 +1469,11 @@ export interface PatientJourney {
  * via the `definition` "why-queretaro".
  */
 export interface WhyQueretaro {
-  id: string;
+  id: number;
   hero: {
     title: string;
     subtitle: string;
-    mainImage: string | MedicalAsset;
+    mainImage: number | MedicalAsset;
   };
   content: {
     sections: {
@@ -1502,7 +1502,7 @@ export interface WhyQueretaro {
         };
         [k: string]: unknown;
       };
-      sectionImage: string | MedicalAsset;
+      sectionImage: number | MedicalAsset;
       id?: string | null;
       blockName?: string | null;
       blockType: 'advantageSection';

@@ -32,12 +32,18 @@ const nextConfig: NextConfig = {
         hostname: 'images.unsplash.com',
       },
       {
+        protocol: 'https',
+        hostname: 'https://turismomedicoq-7zodzx3g2-juliobsrs-projects.vercel.app/', // Replace with your actual Vercel URL
+        pathname: '/media/**',
+      },
+      {
         protocol: 'http',
         hostname: 'localhost',
         port: '3000',
       },
     ],
   },
+  
 };
 
 // devBundleServerPackages: false optimizes local memory usage
