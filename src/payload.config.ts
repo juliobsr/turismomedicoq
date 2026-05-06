@@ -4,11 +4,14 @@ import { postgresAdapter } from '@payloadcms/db-postgres'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import path from 'path'
 import { fileURLToPath } from 'url'
-import { DoctorsMedia } from './collections/media/DoctorsMedia';
-import { FacilitiesMedia } from './collections/media/FacilitiesMedia';
-import { InstitutionsMedia } from './collections/media/InstitutionsMedia';
-import { CertificatesMedia } from './collections/media/CertificatesMedia';
-import { ProceduresMedia } from './collections/media/ProceduresMedia';
+import { DoctorsMedia } from './collections/Media/DoctorsMedia';
+import { FacilitiesMedia } from './collections/Media/FacilitiesMedia';
+import { InstitutionsMedia } from './collections/Media/InstitutionsMedia';
+import { CertificatesMedia } from './collections/Media/CertificatesMedia';
+import { ProceduresMedia } from './collections/Media/ProceduresMedia';
+import { GlobalMedia } from './collections/Media/GlobalsMedia'
+import { PatientJourney } from './globals/PatientJourney'
+import { WhyQueretaro } from './globals/WhyQueretaro'
 import { Specialties } from './collections/Specialties'
 import { Doctors } from './collections/Doctors'
 import { Certificates } from './collections/Certificates'
@@ -21,6 +24,17 @@ import { resendAdapter } from '@payloadcms/email-resend'
 import { Users } from './collections/Users'
 
 import { SiteSettings } from './globals/SiteSettings'
+
+console.log('--- PAYLOAD BOOT SEQUENCE ---');
+console.log('1. Is GlobalsMedia object loaded?:', !!GlobalMedia);
+if (GlobalMedia) {
+  console.log('2. Registered Slug:', GlobalMedia.slug);
+} else {
+  console.error('❌ FATAL: GlobalsMedia is undefined! Check export/import pathing.');
+}
+console.log('-----------------------------');
+
+
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
@@ -47,7 +61,7 @@ export default buildConfig({
   admin: {
     user: Users.slug,
     meta: {
-      titleSuffix: '- Queretaro Medical Admin',
+      titleSuffix: '- Admin',
     },
   },
 
@@ -65,11 +79,14 @@ export default buildConfig({
     FacilitiesMedia,
     InstitutionsMedia,
     CertificatesMedia,
-    ProceduresMedia
+    ProceduresMedia,
+    GlobalMedia
   ],
 
   globals: [
     SiteSettings, // ✅ Registra el Global aquí
+    PatientJourney, // ✅ Registra el Global aquí
+    WhyQueretaro, // 
   ],
 
   typescript: {
@@ -95,6 +112,7 @@ export default buildConfig({
     idType: 'uuid',
     // MUST be false in production environments (where we use formal migration files).
     push: process.env.NODE_ENV !== 'production',
+    //push: false,
   }),
   /**
    * ENTERPRISE EMAIL DISPATCHER

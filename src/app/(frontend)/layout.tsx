@@ -100,6 +100,7 @@ export default async function FrontendLayout({
         <Header 
           companyName={settings?.companyName}
           contactPhone={settings?.contactPhone} 
+          displayPhone = {settings?.displayPhone}
         />
         
         {/* Main Content Area */}

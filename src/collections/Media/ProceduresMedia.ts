@@ -1,3 +1,3 @@
-// src/collections/media/ProceduresMedia.ts
+// src/collections/Media/ProceduresMedia.ts
 import { createMediaCollection } from './BaseMedia';
 export const ProceduresMedia = createMediaCollection('procedures-media', 'Procedures Image', 'procedures');

@@ -35,7 +35,7 @@ const rawCompanyName = companyName || 'Queretaro Medical'
 
   return (
     <header className="border-b border-gray-100 sticky top-0 z-40 w-full backdrop-blur-md bg-white">
-      <nav className="mx-auto flex max-w-7xl items-center justify-between p-4 lg:px-8" aria-label="Global Navigation">
+      <nav className="mx-auto flex max-w-8xl items-center justify-between p-4 lg:px-8" aria-label="Global Navigation">
         
         {/* Logo Section */}
         <div className="flex lg:flex-1">
@@ -71,7 +71,10 @@ const rawCompanyName = companyName || 'Queretaro Medical'
           <Link href="/facilities" className="text-sm font-semibold leading-6 text-brand-text hover:text-brand-primary transition-colors">
             Hospitals
           </Link>
-          <Link href="/about" className="text-sm font-semibold leading-6 text-brand-text hover:text-brand-primary transition-colors">
+          <Link href="/patient-journey" className="text-sm font-semibold leading-6 text-brand-text hover:text-brand-primary transition-colors">
+            How it Works?
+          </Link>
+          <Link href="/why-queretaro" className="text-sm font-semibold leading-6 text-brand-text hover:text-brand-primary transition-colors">
             Why Queretaro?
           </Link>
         </div>

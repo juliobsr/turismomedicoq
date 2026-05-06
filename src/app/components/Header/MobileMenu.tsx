@@ -101,6 +101,12 @@ export const MobileMenu = ({
               <Link href="/facilities" className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-brand-text hover:bg-gray-50 hover:text-brand-primary transition-colors">
                 Hospitals
               </Link>
+              <Link href="/facilities" className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-brand-text hover:bg-gray-50 hover:text-brand-primary transition-colors">
+                Hospitals
+              </Link>
+              <Link href="/facilities" className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-brand-text hover:bg-gray-50 hover:text-brand-primary transition-colors">
+                Hospitals
+              </Link>
               <Link href="/about" className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-brand-text hover:bg-gray-50 hover:text-brand-primary transition-colors">
                 Why Queretaro?
               </Link>

@@ -1,4 +1,3 @@
-// src/actions/submitLead.ts
 'use server'
 
 import { getPayload } from 'payload'
@@ -6,28 +5,31 @@ import configPromise from '@payload-config'
 import { z } from 'zod'
 
 // ============================================================================
-// ENTERPRISE SECURITY: Strict Validation Schema via Zod
-// Prevents SQL Injection and ensures data integrity before hitting Postgres.
+// ENTERPRISE SECURITY: Contextual Lead Schema
 // ============================================================================
 const leadSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters long.'),
   email: z.string().email('Please provide a valid email address.'),
   phone: z.string().min(10, 'Phone number must be at least 10 digits.'),
-  doctor: z.string().uuid('Invalid Doctor Reference.'), // Matches our Neon DB UUID strategy
+  doctorId: z.string().uuid('Invalid Doctor Reference.'),
+  
+  // 🚀 ENTERPRISE UX: Handle "General Consultation" explicitly
+  // We accept a UUID, the string 'general', or empty string, then transform it.
+  procedureId: z.union([
+    z.string().uuid(),
+    z.literal('general'),
+    z.literal('')
+  ]).optional(),
+  
   notes: z.string().max(500, 'Notes cannot exceed 500 characters.').optional(),
 })
 
-// Define the response type for absolute TypeScript safety in the Client Component
 export type SubmitLeadState = {
   success: boolean
   message: string
   errors?: Record<string, string[]>
 }
 
-/**
- * Enterprise Server Action: submitLeadAction
- * Purpose: Securely captures patient data, validates it, and inserts it into Payload.
- */
 export async function submitLeadAction(
   prevState: SubmitLeadState | null,
   formData: FormData
@@ -36,11 +38,11 @@ export async function submitLeadAction(
     name: formData.get('name'),
     email: formData.get('email'),
     phone: formData.get('phone'),
-    doctor: formData.get('doctor'),
+    doctorId: formData.get('doctorId'),
+    procedureId: formData.get('procedureId'),
     notes: formData.get('notes'),
   }
 
-  // Cryptographic Validation
   const validatedData = leadSchema.safeParse(rawData)
 
   if (!validatedData.success) {
@@ -52,19 +54,23 @@ export async function submitLeadAction(
   }
 
   try {
-    // Connect to Payload's Local API (Bypassing HTTP for zero-latency)
     const payload = await getPayload({ config: configPromise })
+    const { procedureId, ...restData } = validatedData.data;
 
-    // Perform the Database Insertion
+    // Check if it's a specific procedure or a general consultation
+    const isSpecificProcedure = procedureId && procedureId !== 'general';
+
     await payload.create({
       collection: 'leads',
       data: {
-        name: validatedData.data.name,
-        email: validatedData.data.email,
-        phone: validatedData.data.phone,
-        doctor: validatedData.data.doctor, // Relationship ID
-        notes: validatedData.data.notes || '',
-        status: 'new', // Default pipeline status
+        name: restData.name,
+        email: restData.email,
+        phone: restData.phone,
+        doctor: restData.doctorId,
+        // Only attach the procedure relationship if a valid UUID was sent
+        ...(isSpecificProcedure && { procedure: procedureId }),
+        notes: restData.notes || '',
+        status: 'new',
       },
     })
 
@@ -74,9 +80,6 @@ export async function submitLeadAction(
     }
   } catch (error) {
     console.error('[SERVER ACTION ERROR] Failed to create Lead:', error)
-    return { 
-      success: false, 
-      message: 'An internal server error occurred. Please try again later.' 
-    }
+    return { success: false, message: 'An internal server error occurred.' }
   }
 }

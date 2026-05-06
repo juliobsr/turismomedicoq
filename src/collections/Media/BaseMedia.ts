@@ -1,5 +1,5 @@
-import { CollectionConfig } from 'payload/types';
-
+import { CollectionConfig } from 'payload';
+import path from 'path';
 /**
  * Enterprise Base Media Configuration
  * Purpose: Provides standard upload settings, access control, and SEO fields.

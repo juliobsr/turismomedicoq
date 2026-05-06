@@ -50,7 +50,7 @@ export const Leads: CollectionConfig = {
   admin: {
     useAsTitle: 'name', 
     group: 'Medical Directory',
-    defaultColumns: ['folio', 'name','doctor', 'status', 'createdAt'],
+    defaultColumns: ['folio', 'name','doctor','procedure', 'status', 'createdAt'],
   },
   
   // 2. SECURITY: Hardened access control for Medical PII
@@ -130,11 +130,25 @@ export const Leads: CollectionConfig = {
       required: true,
     },
     {
-      // RELATIONSHIP: Links the patient inquiry directly to the target Specialist
-      name: 'doctor',
-      type: 'relationship',
-      relationTo: 'doctors',
-      required: true,
+      type: 'row',
+      fields: [
+        {
+          // RELATIONSHIP 1: The Specialist
+          name: 'doctor',
+          type: 'relationship',
+          relationTo: 'doctors',
+          required: true,
+          admin: { width: '50%' }
+        },
+        {
+          // RELATIONSHIP 2: The Treatment (NEW)
+          name: 'procedure',
+          type: 'relationship',
+          relationTo: 'procedures',
+          required: false,
+          admin: { width: '50%' }
+        },
+      ]
     },
     {
       name: 'notes',

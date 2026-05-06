@@ -80,6 +80,7 @@ export interface Config {
     'institutions-media': InstitutionsMedia;
     'certificates-media': CertificatesMedia;
     'procedures-media': ProceduresMedia;
+    'medical-assets': MedicalAsset;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -100,6 +101,7 @@ export interface Config {
     'institutions-media': InstitutionsMediaSelect<false> | InstitutionsMediaSelect<true>;
     'certificates-media': CertificatesMediaSelect<false> | CertificatesMediaSelect<true>;
     'procedures-media': ProceduresMediaSelect<false> | ProceduresMediaSelect<true>;
+    'medical-assets': MedicalAssetsSelect<false> | MedicalAssetsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -111,9 +113,13 @@ export interface Config {
   fallbackLocale: null;
   globals: {
     'site-settings': SiteSetting;
+    'patient-journey': PatientJourney;
+    'why-queretaro': WhyQueretaro;
   };
   globalsSelect: {
     'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
+    'patient-journey': PatientJourneySelect<false> | PatientJourneySelect<true>;
+    'why-queretaro': WhyQueretaroSelect<false> | WhyQueretaroSelect<true>;
   };
   locale: null;
   widgets: {
@@ -680,9 +686,61 @@ export interface Lead {
   email: string;
   phone: string;
   doctor: string | Doctor;
+  procedure?: (string | null) | Procedure;
   notes?: string | null;
   updatedAt: string;
   createdAt: string;
+}
+/**
+ * Media assets exclusively for global pages like the Patient Journey.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "medical-assets".
+ */
+export interface MedicalAsset {
+  id: string;
+  /**
+   * Crucial for SEO and Accessibility. Describe the image content.
+   */
+  alt: string;
+  caption?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
+  focalX?: number | null;
+  focalY?: number | null;
+  sizes?: {
+    thumbnail?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+    hero?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+    card?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+  };
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -759,6 +817,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'procedures-media';
         value: string | ProceduresMedia;
+      } | null)
+    | ({
+        relationTo: 'medical-assets';
+        value: string | MedicalAsset;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -916,6 +978,7 @@ export interface LeadsSelect<T extends boolean = true> {
   email?: T;
   phone?: T;
   doctor?: T;
+  procedure?: T;
   notes?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -1218,6 +1281,59 @@ export interface ProceduresMediaSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "medical-assets_select".
+ */
+export interface MedicalAssetsSelect<T extends boolean = true> {
+  alt?: T;
+  caption?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  url?: T;
+  thumbnailURL?: T;
+  filename?: T;
+  mimeType?: T;
+  filesize?: T;
+  width?: T;
+  height?: T;
+  focalX?: T;
+  focalY?: T;
+  sizes?:
+    | T
+    | {
+        thumbnail?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        hero?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        card?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+      };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv_select".
  */
 export interface PayloadKvSelect<T extends boolean = true> {
@@ -1303,6 +1419,104 @@ export interface SiteSetting {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "patient-journey".
+ */
+export interface PatientJourney {
+  id: string;
+  heroTitle: string;
+  heroDescription: string;
+  heroCover: string | MedicalAsset;
+  steps: {
+    /**
+     * e.g., "Arrival", "Surgery", "Recovery"
+     */
+    title: string;
+    description: string;
+    /**
+     * e.g., "Day 1", "Days 2-4"
+     */
+    duration?: string | null;
+    image?: (string | null) | MedicalAsset;
+    /**
+     * Optional: Add multiple choices for this step (e.g., different recovery cities or hotels).
+     */
+    options?:
+      | {
+          /**
+           * e.g., "Recovery in Bernal"
+           */
+          title: string;
+          description: string;
+          image: string | MedicalAsset;
+          id?: string | null;
+        }[]
+      | null;
+    id?: string | null;
+  }[];
+  /**
+   * Overrides the default SEO title. Keep under 60 characters.
+   */
+  metaTitle?: string | null;
+  /**
+   * Meta description for Google search results. Keep under 160 characters.
+   */
+  metaDescription?: string | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "why-queretaro".
+ */
+export interface WhyQueretaro {
+  id: string;
+  hero: {
+    title: string;
+    subtitle: string;
+    mainImage: string | MedicalAsset;
+  };
+  content: {
+    sections: {
+      layout?: ('imageLeft' | 'imageRight') | null;
+      /**
+       * URL-friendly identifier for the sticky nav (e.g., "safety", "connectivity").
+       */
+      anchorSlug: string;
+      title: string;
+      /**
+       * A punchy, aggressive subtitle to catch attention.
+       */
+      highlightSubtitle: string;
+      content: {
+        root: {
+          type: string;
+          children: {
+            type: any;
+            version: number;
+            [k: string]: unknown;
+          }[];
+          direction: ('ltr' | 'rtl') | null;
+          format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+          indent: number;
+          version: number;
+        };
+        [k: string]: unknown;
+      };
+      sectionImage: string | MedicalAsset;
+      id?: string | null;
+      blockName?: string | null;
+      blockType: 'advantageSection';
+    }[];
+  };
+  seo: {
+    metaTitle: string;
+    metaDescription: string;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "site-settings_select".
  */
 export interface SiteSettingsSelect<T extends boolean = true> {
@@ -1323,6 +1537,79 @@ export interface SiteSettingsSelect<T extends boolean = true> {
   accentColor?: T;
   backgroundColor?: T;
   textColor?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "patient-journey_select".
+ */
+export interface PatientJourneySelect<T extends boolean = true> {
+  heroTitle?: T;
+  heroDescription?: T;
+  heroCover?: T;
+  steps?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        duration?: T;
+        image?: T;
+        options?:
+          | T
+          | {
+              title?: T;
+              description?: T;
+              image?: T;
+              id?: T;
+            };
+        id?: T;
+      };
+  metaTitle?: T;
+  metaDescription?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "why-queretaro_select".
+ */
+export interface WhyQueretaroSelect<T extends boolean = true> {
+  hero?:
+    | T
+    | {
+        title?: T;
+        subtitle?: T;
+        mainImage?: T;
+      };
+  content?:
+    | T
+    | {
+        sections?:
+          | T
+          | {
+              advantageSection?:
+                | T
+                | {
+                    layout?: T;
+                    anchorSlug?: T;
+                    title?: T;
+                    highlightSubtitle?: T;
+                    content?: T;
+                    sectionImage?: T;
+                    id?: T;
+                    blockName?: T;
+                  };
+            };
+      };
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

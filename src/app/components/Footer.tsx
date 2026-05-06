@@ -87,7 +87,7 @@ export const Footer = ({ settings }: FooterProps) => {
                 <nav className="mt-6 space-y-4">
                   <Link href="/doctors" className="text-sm leading-6 text-gray-200 hover:text-brand-primary transition-colors">Medical Specialists</Link>
                   <Link href="/facilities" className="block text-sm leading-6 text-gray-200 hover:text-brand-primary transition-colors">Hospitals & Clinics</Link>
-                  <Link href="/concierge" className="block text-sm leading-6 text-gray-200 hover:text-brand-primary transition-colors">Travel Concierge</Link>
+                  <Link href="/patient-journey" className="block text-sm leading-6 text-gray-200 hover:text-brand-primary transition-colors">Travel Concierge</Link>
                 </nav>
               </div>
               <div className="mt-10 md:mt-0">
