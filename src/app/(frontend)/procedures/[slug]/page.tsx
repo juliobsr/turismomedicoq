@@ -5,7 +5,7 @@ import { notFound } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
 import type { Metadata } from 'next'
-import type { Procedure, Media, Doctor, Facility } from '@/payload-types'
+import type { Procedure, MedicalAsset, Doctor, Facility } from '@/payload-types'
 
 // Core Utilities & Components
 import { getSiteSettings } from '@/lib/globals'
@@ -58,20 +58,20 @@ export async function generateMetadata({ params }: ProcedurePageProps): Promise<
   if (!procedure) return {}
 
   const companyName = settings?.companyName || 'Medical Network'
-  const coverImage = (procedure.coverImage as Media)?.url
+  const coverImage = (procedure.coverImage as MedicalAsset)?.url
   
   // Safe Fallback Title
-  const pageTitle = procedure.metaTitle || `${procedure.name} in Mexico | ${companyName}`
+  const pageTitle = procedure.name || `${procedure.name} in Mexico | ${companyName}`
 
   return {
     title: pageTitle,
-    description: procedure.metaDescription || procedure.shortSummary,
+    description: procedure.shortSummary || procedure.shortSummary,
     alternates: {
       canonical: `/procedures/${resolvedParams.slug}`,
     },
     openGraph: {
       title: pageTitle,
-      description: procedure.metaDescription || procedure.shortSummary,
+      description: procedure.shortSummary || procedure.shortSummary,
       type: 'article',
       siteName: companyName,
       images: coverImage ? [{ url: coverImage }] : [],
@@ -145,7 +145,7 @@ export default async function ProcedurePage({ params }: ProcedurePageProps) {
   const availableFacilities = Array.from(facilitiesMap.values())
 
   // Visual Branding Fallbacks
-  const coverImage = procedure.coverImage as Media | undefined
+  const coverImage = procedure.coverImage as MedicalAsset | undefined
   const brandPrimaryColor = settings?.primaryColor || '#1e3a8a'
 
   // ==========================================================================
@@ -301,7 +301,7 @@ export default async function ProcedurePage({ params }: ProcedurePageProps) {
             {performingDoctors.length > 0 ? (
               <ul className="space-y-4">
                 {performingDoctors.map(doctor => {
-                  const docImg = doctor.profilePicture as Media | undefined
+                  const docImg = doctor.profilePicture as MedicalAsset | undefined
                   return (
                     <li key={doctor.id}>
                       <Link 
