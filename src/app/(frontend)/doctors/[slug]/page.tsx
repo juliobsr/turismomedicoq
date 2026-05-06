@@ -5,7 +5,7 @@ import { notFound } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
 import type { Metadata } from 'next'
-import type { Doctor, Media, Specialty, Procedure, Facility } from '@/payload-types'
+import type { Doctor, MedicalAsset, Specialty, Procedure, Facility } from '@/payload-types'
 
 // Services & Context
 import { getSiteSettings } from '@/lib/globals'
@@ -68,7 +68,7 @@ export async function generateMetadata({ params }: DoctorProfileProps): Promise<
   if (!doctor) return {}
 
   const companyName = settings?.companyName || 'Queretaro Medical'
-  const primaryImage = (doctor.profilePicture as Media)?.url || (doctor.officeGallery?.[0] as Media)?.url
+  const primaryImage = (doctor.profilePicture as MedicalAsset)?.url || (doctor.officeGallery?.[0] as MedicalAsset)?.url
   
   // SEO Safe Fallback Title
   const pageTitle = doctor.metaTitle 
@@ -118,7 +118,7 @@ export default async function DoctorProfilePage({ params }: DoctorProfileProps) 
   const brandPrimaryColor = settings?.primaryColor || '#1e3a8a' // default: bg-blue-900
 
   // Relationship extraction
-  const profilePicture = doctor.profilePicture as Media | undefined
+  const profilePicture = doctor.profilePicture as MedicalAsset | undefined
   const specialties = doctor.specialties as Specialty[] | undefined
   const proceduresRaw = doctor.procedures as Procedure[] | undefined
   const facilities = doctor.facilities as Facility[] | undefined
@@ -144,7 +144,7 @@ export default async function DoctorProfilePage({ params }: DoctorProfileProps) 
     '@context': 'https://schema.org',
     '@type': 'Physician',
     name: doctor.fullName,
-    image: profilePicture?.url || (doctor.officeGallery?.[0] as Media)?.url,
+    image: profilePicture?.url || (doctor.officeGallery?.[0] as MedicalAsset)?.url,
     medicalSpecialty: specialties?.map(s => s.title).join(', '),
     description: doctor.metaDescription || `Medical specialist profile for ${doctor.fullName}`,
     address: {
