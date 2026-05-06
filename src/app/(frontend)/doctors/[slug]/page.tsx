@@ -153,7 +153,9 @@ export default async function DoctorProfilePage({ params }: DoctorProfileProps) 
       addressCountry: 'MX'
     }
   }
-
+  const galleryImages = doctor.officeGallery 
+  ? (doctor.officeGallery as any[]).filter(img => typeof img === 'object') 
+  : [];
   return (
     <main className="min-h-screen bg-white">
       {/* 🚀 Injected Structured Data */}
