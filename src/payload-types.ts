@@ -334,6 +334,9 @@ export interface Procedure {
    */
   surgeryDuration: string;
   anesthesiaType?: ('general' | 'local_sedation' | 'local') | null;
+  /**
+   * Provide common questions regarding this medical procedure.
+   */
   faqs?:
     | {
         question: string;

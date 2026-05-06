@@ -14,7 +14,7 @@
         },
         "parent_id": {
           "name": "parent_id",
-          "type": "uuid",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true
         },
@@ -27,10 +27,9 @@
         },
         "id": {
           "name": "id",
-          "type": "uuid",
+          "type": "serial",
           "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
+          "notNull": true
         }
       },
       "indexes": {
@@ -98,7 +97,7 @@
         },
         "_parent_id": {
           "name": "_parent_id",
-          "type": "uuid",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true
         },
@@ -180,10 +179,9 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "uuid",
+          "type": "serial",
           "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
+          "notNull": true
         },
         "full_name": {
           "name": "full_name",
@@ -309,10 +307,9 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "uuid",
+          "type": "serial",
           "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
+          "notNull": true
         },
         "title": {
           "name": "title",
@@ -407,10 +404,9 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "uuid",
+          "type": "serial",
           "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
+          "notNull": true
         },
         "full_name": {
           "name": "full_name",
@@ -432,7 +428,7 @@
         },
         "profile_picture_id": {
           "name": "profile_picture_id",
-          "type": "uuid",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true
         },
@@ -589,7 +585,7 @@
         },
         "parent_id": {
           "name": "parent_id",
-          "type": "uuid",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true
         },
@@ -601,25 +597,25 @@
         },
         "doctors_media_id": {
           "name": "doctors_media_id",
-          "type": "uuid",
+          "type": "integer",
           "primaryKey": false,
           "notNull": false
         },
         "specialties_id": {
           "name": "specialties_id",
-          "type": "uuid",
+          "type": "integer",
           "primaryKey": false,
           "notNull": false
         },
         "procedures_id": {
           "name": "procedures_id",
-          "type": "uuid",
+          "type": "integer",
           "primaryKey": false,
           "notNull": false
         },
         "facilities_id": {
           "name": "facilities_id",
-          "type": "uuid",
+          "type": "integer",
           "primaryKey": false,
           "notNull": false
         }
@@ -810,10 +806,9 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "uuid",
+          "type": "serial",
           "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
+          "notNull": true
         },
         "name": {
           "name": "name",
@@ -835,7 +830,7 @@
         },
         "logo_id": {
           "name": "logo_id",
-          "type": "uuid",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true
         },
@@ -935,10 +930,9 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "uuid",
+          "type": "serial",
           "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
+          "notNull": true
         },
         "name": {
           "name": "name",
@@ -966,7 +960,7 @@
         },
         "hero_image_id": {
           "name": "hero_image_id",
-          "type": "uuid",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true
         },
@@ -1108,7 +1102,7 @@
         },
         "parent_id": {
           "name": "parent_id",
-          "type": "uuid",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true
         },
@@ -1120,25 +1114,25 @@
         },
         "specialties_id": {
           "name": "specialties_id",
-          "type": "uuid",
+          "type": "integer",
           "primaryKey": false,
           "notNull": false
         },
         "doctors_id": {
           "name": "doctors_id",
-          "type": "uuid",
+          "type": "integer",
           "primaryKey": false,
           "notNull": false
         },
         "certificates_id": {
           "name": "certificates_id",
-          "type": "uuid",
+          "type": "integer",
           "primaryKey": false,
           "notNull": false
         },
         "facilities_media_id": {
           "name": "facilities_media_id",
-          "type": "uuid",
+          "type": "integer",
           "primaryKey": false,
           "notNull": false
         }
@@ -1329,10 +1323,9 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "uuid",
+          "type": "serial",
           "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
+          "notNull": true
         },
         "name": {
           "name": "name",
@@ -1354,7 +1347,7 @@
         },
         "logo_id": {
           "name": "logo_id",
-          "type": "uuid",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true
         },
@@ -1475,10 +1468,9 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "uuid",
+          "type": "serial",
           "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
+          "notNull": true
         },
         "folio": {
           "name": "folio",
@@ -1520,13 +1512,13 @@
         },
         "doctor_id": {
           "name": "doctor_id",
-          "type": "uuid",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true
         },
         "procedure_id": {
           "name": "procedure_id",
-          "type": "uuid",
+          "type": "integer",
           "primaryKey": false,
           "notNull": false
         },
@@ -1659,7 +1651,7 @@
         },
         "_parent_id": {
           "name": "_parent_id",
-          "type": "uuid",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true
         },
@@ -1741,10 +1733,9 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "uuid",
+          "type": "serial",
           "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
+          "notNull": true
         },
         "name": {
           "name": "name",
@@ -1760,13 +1751,13 @@
         },
         "specialty_id": {
           "name": "specialty_id",
-          "type": "uuid",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true
         },
         "cover_image_id": {
           "name": "cover_image_id",
-          "type": "uuid",
+          "type": "integer",
           "primaryKey": false,
           "notNull": false
         },
@@ -1953,10 +1944,9 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "uuid",
+          "type": "serial",
           "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
+          "notNull": true
         },
         "alt": {
           "name": "alt",
@@ -2252,10 +2242,9 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "uuid",
+          "type": "serial",
           "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
+          "notNull": true
         },
         "alt": {
           "name": "alt",
@@ -2551,10 +2540,9 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "uuid",
+          "type": "serial",
           "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
+          "notNull": true
         },
         "alt": {
           "name": "alt",
@@ -2850,10 +2838,9 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "uuid",
+          "type": "serial",
           "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
+          "notNull": true
         },
         "alt": {
           "name": "alt",
@@ -3149,10 +3136,9 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "uuid",
+          "type": "serial",
           "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
+          "notNull": true
         },
         "alt": {
           "name": "alt",
@@ -3442,16 +3428,15 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.globals_media": {
-      "name": "globals_media",
+    "public.medical_assets": {
+      "name": "medical_assets",
       "schema": "",
       "columns": {
         "id": {
           "name": "id",
-          "type": "uuid",
+          "type": "serial",
           "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
+          "notNull": true
         },
         "alt": {
           "name": "alt",
@@ -3643,8 +3628,8 @@
         }
       },
       "indexes": {
-        "globals_media_updated_at_idx": {
-          "name": "globals_media_updated_at_idx",
+        "medical_assets_updated_at_idx": {
+          "name": "medical_assets_updated_at_idx",
           "columns": [
             {
               "expression": "updated_at",
@@ -3658,8 +3643,8 @@
           "method": "btree",
           "with": {}
         },
-        "globals_media_created_at_idx": {
-          "name": "globals_media_created_at_idx",
+        "medical_assets_created_at_idx": {
+          "name": "medical_assets_created_at_idx",
           "columns": [
             {
               "expression": "created_at",
@@ -3673,8 +3658,8 @@
           "method": "btree",
           "with": {}
         },
-        "globals_media_filename_idx": {
-          "name": "globals_media_filename_idx",
+        "medical_assets_filename_idx": {
+          "name": "medical_assets_filename_idx",
           "columns": [
             {
               "expression": "filename",
@@ -3688,8 +3673,8 @@
           "method": "btree",
           "with": {}
         },
-        "globals_media_sizes_thumbnail_sizes_thumbnail_filename_idx": {
-          "name": "globals_media_sizes_thumbnail_sizes_thumbnail_filename_idx",
+        "medical_assets_sizes_thumbnail_sizes_thumbnail_filename_idx": {
+          "name": "medical_assets_sizes_thumbnail_sizes_thumbnail_filename_idx",
           "columns": [
             {
               "expression": "sizes_thumbnail_filename",
@@ -3703,8 +3688,8 @@
           "method": "btree",
           "with": {}
         },
-        "globals_media_sizes_hero_sizes_hero_filename_idx": {
-          "name": "globals_media_sizes_hero_sizes_hero_filename_idx",
+        "medical_assets_sizes_hero_sizes_hero_filename_idx": {
+          "name": "medical_assets_sizes_hero_sizes_hero_filename_idx",
           "columns": [
             {
               "expression": "sizes_hero_filename",
@@ -3718,8 +3703,8 @@
           "method": "btree",
           "with": {}
         },
-        "globals_media_sizes_card_sizes_card_filename_idx": {
-          "name": "globals_media_sizes_card_sizes_card_filename_idx",
+        "medical_assets_sizes_card_sizes_card_filename_idx": {
+          "name": "medical_assets_sizes_card_sizes_card_filename_idx",
           "columns": [
             {
               "expression": "sizes_card_filename",
@@ -3747,10 +3732,9 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "uuid",
+          "type": "serial",
           "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
+          "notNull": true
         },
         "key": {
           "name": "key",
@@ -3795,10 +3779,9 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "uuid",
+          "type": "serial",
           "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
+          "notNull": true
         },
         "global_slug": {
           "name": "global_slug",
@@ -3893,7 +3876,7 @@
         },
         "parent_id": {
           "name": "parent_id",
-          "type": "uuid",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true
         },
@@ -3905,85 +3888,85 @@
         },
         "users_id": {
           "name": "users_id",
-          "type": "uuid",
+          "type": "integer",
           "primaryKey": false,
           "notNull": false
         },
         "specialties_id": {
           "name": "specialties_id",
-          "type": "uuid",
+          "type": "integer",
           "primaryKey": false,
           "notNull": false
         },
         "doctors_id": {
           "name": "doctors_id",
-          "type": "uuid",
+          "type": "integer",
           "primaryKey": false,
           "notNull": false
         },
         "certificates_id": {
           "name": "certificates_id",
-          "type": "uuid",
+          "type": "integer",
           "primaryKey": false,
           "notNull": false
         },
         "facilities_id": {
           "name": "facilities_id",
-          "type": "uuid",
+          "type": "integer",
           "primaryKey": false,
           "notNull": false
         },
         "institutions_id": {
           "name": "institutions_id",
-          "type": "uuid",
+          "type": "integer",
           "primaryKey": false,
           "notNull": false
         },
         "leads_id": {
           "name": "leads_id",
-          "type": "uuid",
+          "type": "integer",
           "primaryKey": false,
           "notNull": false
         },
         "procedures_id": {
           "name": "procedures_id",
-          "type": "uuid",
+          "type": "integer",
           "primaryKey": false,
           "notNull": false
         },
         "doctors_media_id": {
           "name": "doctors_media_id",
-          "type": "uuid",
+          "type": "integer",
           "primaryKey": false,
           "notNull": false
         },
         "facilities_media_id": {
           "name": "facilities_media_id",
-          "type": "uuid",
+          "type": "integer",
           "primaryKey": false,
           "notNull": false
         },
         "institutions_media_id": {
           "name": "institutions_media_id",
-          "type": "uuid",
+          "type": "integer",
           "primaryKey": false,
           "notNull": false
         },
         "certificates_media_id": {
           "name": "certificates_media_id",
-          "type": "uuid",
+          "type": "integer",
           "primaryKey": false,
           "notNull": false
         },
         "procedures_media_id": {
           "name": "procedures_media_id",
-          "type": "uuid",
+          "type": "integer",
           "primaryKey": false,
           "notNull": false
         },
-        "globals_media_id": {
-          "name": "globals_media_id",
-          "type": "uuid",
+        "medical_assets_id": {
+          "name": "medical_assets_id",
+          "type": "integer",
           "primaryKey": false,
           "notNull": false
         }
@@ -4229,11 +4212,11 @@
           "method": "btree",
           "with": {}
         },
-        "payload_locked_documents_rels_globals_media_id_idx": {
-          "name": "payload_locked_documents_rels_globals_media_id_idx",
+        "payload_locked_documents_rels_medical_assets_id_idx": {
+          "name": "payload_locked_documents_rels_medical_assets_id_idx",
           "columns": [
             {
-              "expression": "globals_media_id",
+              "expression": "medical_assets_id",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -4428,12 +4411,12 @@
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
-        "payload_locked_documents_rels_globals_media_fk": {
-          "name": "payload_locked_documents_rels_globals_media_fk",
+        "payload_locked_documents_rels_medical_assets_fk": {
+          "name": "payload_locked_documents_rels_medical_assets_fk",
           "tableFrom": "payload_locked_documents_rels",
-          "tableTo": "globals_media",
+          "tableTo": "medical_assets",
           "columnsFrom": [
-            "globals_media_id"
+            "medical_assets_id"
           ],
           "columnsTo": [
             "id"
@@ -4454,10 +4437,9 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "uuid",
+          "type": "serial",
           "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
+          "notNull": true
         },
         "key": {
           "name": "key",
@@ -4558,7 +4540,7 @@
         },
         "parent_id": {
           "name": "parent_id",
-          "type": "uuid",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true
         },
@@ -4570,7 +4552,7 @@
         },
         "users_id": {
           "name": "users_id",
-          "type": "uuid",
+          "type": "integer",
           "primaryKey": false,
           "notNull": false
         }
@@ -4677,10 +4659,9 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "uuid",
+          "type": "serial",
           "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
+          "notNull": true
         },
         "name": {
           "name": "name",
@@ -4754,10 +4735,9 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "uuid",
+          "type": "serial",
           "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
+          "notNull": true
         },
         "company_name": {
           "name": "company_name",
@@ -4900,7 +4880,7 @@
         },
         "image_id": {
           "name": "image_id",
-          "type": "uuid",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true
         }
@@ -4953,10 +4933,10 @@
         }
       },
       "foreignKeys": {
-        "patient_journey_steps_options_image_id_globals_media_id_fk": {
-          "name": "patient_journey_steps_options_image_id_globals_media_id_fk",
+        "patient_journey_steps_options_image_id_medical_assets_id_fk": {
+          "name": "patient_journey_steps_options_image_id_medical_assets_id_fk",
           "tableFrom": "patient_journey_steps_options",
-          "tableTo": "globals_media",
+          "tableTo": "medical_assets",
           "columnsFrom": [
             "image_id"
           ],
@@ -4998,7 +4978,7 @@
         },
         "_parent_id": {
           "name": "_parent_id",
-          "type": "uuid",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true
         },
@@ -5028,7 +5008,7 @@
         },
         "image_id": {
           "name": "image_id",
-          "type": "uuid",
+          "type": "integer",
           "primaryKey": false,
           "notNull": false
         }
@@ -5081,10 +5061,10 @@
         }
       },
       "foreignKeys": {
-        "patient_journey_steps_image_id_globals_media_id_fk": {
-          "name": "patient_journey_steps_image_id_globals_media_id_fk",
+        "patient_journey_steps_image_id_medical_assets_id_fk": {
+          "name": "patient_journey_steps_image_id_medical_assets_id_fk",
           "tableFrom": "patient_journey_steps",
-          "tableTo": "globals_media",
+          "tableTo": "medical_assets",
           "columnsFrom": [
             "image_id"
           ],
@@ -5120,10 +5100,9 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "uuid",
+          "type": "serial",
           "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
+          "notNull": true
         },
         "hero_title": {
           "name": "hero_title",
@@ -5141,7 +5120,7 @@
         },
         "hero_cover_id": {
           "name": "hero_cover_id",
-          "type": "uuid",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true
         },
@@ -5188,12 +5167,272 @@
         }
       },
       "foreignKeys": {
-        "patient_journey_hero_cover_id_globals_media_id_fk": {
-          "name": "patient_journey_hero_cover_id_globals_media_id_fk",
+        "patient_journey_hero_cover_id_medical_assets_id_fk": {
+          "name": "patient_journey_hero_cover_id_medical_assets_id_fk",
           "tableFrom": "patient_journey",
-          "tableTo": "globals_media",
+          "tableTo": "medical_assets",
           "columnsFrom": [
             "hero_cover_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.why_queretaro_blocks_advantage_section": {
+      "name": "why_queretaro_blocks_advantage_section",
+      "schema": "",
+      "columns": {
+        "_order": {
+          "name": "_order",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "_parent_id": {
+          "name": "_parent_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "_path": {
+          "name": "_path",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id": {
+          "name": "id",
+          "type": "varchar",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "layout": {
+          "name": "layout",
+          "type": "enum_why_queretaro_blocks_advantage_section_layout",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'imageLeft'"
+        },
+        "anchor_slug": {
+          "name": "anchor_slug",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "title": {
+          "name": "title",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "highlight_subtitle": {
+          "name": "highlight_subtitle",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "content": {
+          "name": "content",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "section_image_id": {
+          "name": "section_image_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "block_name": {
+          "name": "block_name",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "why_queretaro_blocks_advantage_section_order_idx": {
+          "name": "why_queretaro_blocks_advantage_section_order_idx",
+          "columns": [
+            {
+              "expression": "_order",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "why_queretaro_blocks_advantage_section_parent_id_idx": {
+          "name": "why_queretaro_blocks_advantage_section_parent_id_idx",
+          "columns": [
+            {
+              "expression": "_parent_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "why_queretaro_blocks_advantage_section_path_idx": {
+          "name": "why_queretaro_blocks_advantage_section_path_idx",
+          "columns": [
+            {
+              "expression": "_path",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "why_queretaro_blocks_advantage_section_section_image_idx": {
+          "name": "why_queretaro_blocks_advantage_section_section_image_idx",
+          "columns": [
+            {
+              "expression": "section_image_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "why_queretaro_blocks_advantage_section_section_image_id_medical_assets_id_fk": {
+          "name": "why_queretaro_blocks_advantage_section_section_image_id_medical_assets_id_fk",
+          "tableFrom": "why_queretaro_blocks_advantage_section",
+          "tableTo": "medical_assets",
+          "columnsFrom": [
+            "section_image_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "why_queretaro_blocks_advantage_section_parent_id_fk": {
+          "name": "why_queretaro_blocks_advantage_section_parent_id_fk",
+          "tableFrom": "why_queretaro_blocks_advantage_section",
+          "tableTo": "why_queretaro",
+          "columnsFrom": [
+            "_parent_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.why_queretaro": {
+      "name": "why_queretaro",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "hero_title": {
+          "name": "hero_title",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "hero_subtitle": {
+          "name": "hero_subtitle",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "hero_main_image_id": {
+          "name": "hero_main_image_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "seo_meta_title": {
+          "name": "seo_meta_title",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "seo_meta_description": {
+          "name": "seo_meta_description",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp(3) with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp(3) with time zone",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "why_queretaro_hero_hero_main_image_idx": {
+          "name": "why_queretaro_hero_hero_main_image_idx",
+          "columns": [
+            {
+              "expression": "hero_main_image_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "why_queretaro_hero_main_image_id_medical_assets_id_fk": {
+          "name": "why_queretaro_hero_main_image_id_medical_assets_id_fk",
+          "tableFrom": "why_queretaro",
+          "tableTo": "medical_assets",
+          "columnsFrom": [
+            "hero_main_image_id"
           ],
           "columnsTo": [
             "id"
@@ -5238,6 +5477,14 @@
         "local_sedation",
         "local"
       ]
+    },
+    "public.enum_why_queretaro_blocks_advantage_section_layout": {
+      "name": "enum_why_queretaro_blocks_advantage_section_layout",
+      "schema": "public",
+      "values": [
+        "imageLeft",
+        "imageRight"
+      ]
     }
   },
   "schemas": {},
@@ -5250,6 +5497,6 @@
     "tables": {},
     "columns": {}
   },
-  "id": "729b9beb-4625-491a-a169-9419479cd125",
+  "id": "ada93b79-90cd-4ddb-9e2c-11a6992ed125",
   "prevId": "00000000-0000-0000-0000-000000000000"
 }

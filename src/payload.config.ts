@@ -2,8 +2,11 @@
 import { buildConfig } from 'payload'
 import { postgresAdapter } from '@payloadcms/db-postgres'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
+import { vercelBlobStorage } from '@payloadcms/storage-vercel-blob'; // 🚀 NUEVO
 import path from 'path'
 import { fileURLToPath } from 'url'
+
+
 import { DoctorsMedia } from './collections/Media/DoctorsMedia';
 import { FacilitiesMedia } from './collections/Media/FacilitiesMedia';
 import { InstitutionsMedia } from './collections/Media/InstitutionsMedia';
@@ -19,6 +22,8 @@ import { Facilities } from './collections/Facilities'
 import { Institutions } from './collections/Institutions'
 import { Leads } from './collections/Leads'
 import { Procedures} from './collections/Procedures'
+
+
 import { resendAdapter } from '@payloadcms/email-resend'
 // Import core collections
 import { Users } from './collections/Users'
@@ -89,6 +94,29 @@ export default buildConfig({
     WhyQueretaro, // 
   ],
 
+  plugins: [
+
+    /**
+     * 🛡️ ESTRATEGIA DE ALMACENAMIENTO VZSOLUCIONES:
+     * Redirigimos todas las subidas de archivos a Vercel Blob.
+     * Esto garantiza que las fotos de doctores y quirófanos sean persistentes.
+     */
+    vercelBlobStorage({
+      enabled: !!process.env.BLOB_READ_WRITE_TOKEN, // Solo se activa si el token existe
+      collections: {
+        // ⚠️ IMPORTANTE: Pon aquí los SLUGS exactos de tus colecciones de Media
+        'medical-assets': true,
+        'certificates-media': true,
+        'doctors-media': true,
+        'facilities-media': true,
+        'institutions-media': true,
+        'procedures-media': true,
+      },
+      token: process.env.BLOB_READ_WRITE_TOKEN,
+    }),
+
+  ],
+
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
@@ -114,7 +142,10 @@ export default buildConfig({
       // Lowering pool limits during build to avoid exhausting Neon connections
       max: 10,
       connectionTimeoutMillis: 10000, // 10s timeout to allow Neon to wake up
+      
     },
+    push: process.env.NODE_ENV === 'development',
+    
   }),
   /**
    * ENTERPRISE EMAIL DISPATCHER

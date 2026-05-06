@@ -136,6 +136,9 @@ export const Procedures: CollectionConfig = {
                 { name: 'question', type: 'text', required: true },
                 { name: 'answer', type: 'textarea', required: true },
               ],
+              admin:{
+                description: "Provide common questions regarding this medical procedure."
+              }
             },
           ],
         },

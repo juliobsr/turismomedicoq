@@ -1,9 +1,9 @@
-import * as migration_20260505_231601_sync_globals_media from './20260505_231601_sync_globals_media';
+import * as migration_20260506_195733 from './20260506_195733';
 
 export const migrations = [
   {
-    up: migration_20260505_231601_sync_globals_media.up,
-    down: migration_20260505_231601_sync_globals_media.down,
-    name: '20260505_231601_sync_globals_media'
+    up: migration_20260506_195733.up,
+    down: migration_20260506_195733.down,
+    name: '20260506_195733'
   },
 ];

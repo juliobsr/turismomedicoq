@@ -5,23 +5,24 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
    CREATE TYPE "public"."enum_users_roles" AS ENUM('admin', 'doctor', 'patient');
   CREATE TYPE "public"."enum_leads_status" AS ENUM('new', 'contacted', 'scheduled', 'completed', 'cancelled');
   CREATE TYPE "public"."enum_procedures_anesthesia_type" AS ENUM('general', 'local_sedation', 'local');
+  CREATE TYPE "public"."enum_why_queretaro_blocks_advantage_section_layout" AS ENUM('imageLeft', 'imageRight');
   CREATE TABLE "users_roles" (
   	"order" integer NOT NULL,
-  	"parent_id" uuid NOT NULL,
+  	"parent_id" integer NOT NULL,
   	"value" "enum_users_roles",
-  	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL
+  	"id" serial PRIMARY KEY NOT NULL
   );
   
   CREATE TABLE "users_sessions" (
   	"_order" integer NOT NULL,
-  	"_parent_id" uuid NOT NULL,
+  	"_parent_id" integer NOT NULL,
   	"id" varchar PRIMARY KEY NOT NULL,
   	"created_at" timestamp(3) with time zone,
   	"expires_at" timestamp(3) with time zone NOT NULL
   );
   
   CREATE TABLE "users" (
-  	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+  	"id" serial PRIMARY KEY NOT NULL,
   	"full_name" varchar NOT NULL,
   	"updated_at" timestamp(3) with time zone DEFAULT now() NOT NULL,
   	"created_at" timestamp(3) with time zone DEFAULT now() NOT NULL,
@@ -35,7 +36,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   );
   
   CREATE TABLE "specialties" (
-  	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+  	"id" serial PRIMARY KEY NOT NULL,
   	"title" varchar NOT NULL,
   	"slug" varchar NOT NULL,
   	"description" varchar NOT NULL,
@@ -44,11 +45,11 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   );
   
   CREATE TABLE "doctors" (
-  	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+  	"id" serial PRIMARY KEY NOT NULL,
   	"full_name" varchar NOT NULL,
   	"slug" varchar NOT NULL,
   	"medical_license" varchar,
-  	"profile_picture_id" uuid NOT NULL,
+  	"profile_picture_id" integer NOT NULL,
   	"biography" jsonb,
   	"meta_title" varchar,
   	"meta_description" varchar,
@@ -62,32 +63,32 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   CREATE TABLE "doctors_rels" (
   	"id" serial PRIMARY KEY NOT NULL,
   	"order" integer,
-  	"parent_id" uuid NOT NULL,
+  	"parent_id" integer NOT NULL,
   	"path" varchar NOT NULL,
-  	"doctors_media_id" uuid,
-  	"specialties_id" uuid,
-  	"procedures_id" uuid,
-  	"facilities_id" uuid
+  	"doctors_media_id" integer,
+  	"specialties_id" integer,
+  	"procedures_id" integer,
+  	"facilities_id" integer
   );
   
   CREATE TABLE "certificates" (
-  	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+  	"id" serial PRIMARY KEY NOT NULL,
   	"name" varchar NOT NULL,
   	"issuer" varchar NOT NULL,
   	"verification_url" varchar,
-  	"logo_id" uuid NOT NULL,
+  	"logo_id" integer NOT NULL,
   	"is_active" boolean DEFAULT true,
   	"updated_at" timestamp(3) with time zone DEFAULT now() NOT NULL,
   	"created_at" timestamp(3) with time zone DEFAULT now() NOT NULL
   );
   
   CREATE TABLE "facilities" (
-  	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+  	"id" serial PRIMARY KEY NOT NULL,
   	"name" varchar NOT NULL,
   	"slug" varchar NOT NULL,
   	"description" jsonb NOT NULL,
   	"city" varchar NOT NULL,
-  	"hero_image_id" uuid NOT NULL,
+  	"hero_image_id" integer NOT NULL,
   	"is_active" boolean DEFAULT true,
   	"updated_at" timestamp(3) with time zone DEFAULT now() NOT NULL,
   	"created_at" timestamp(3) with time zone DEFAULT now() NOT NULL
@@ -96,20 +97,20 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   CREATE TABLE "facilities_rels" (
   	"id" serial PRIMARY KEY NOT NULL,
   	"order" integer,
-  	"parent_id" uuid NOT NULL,
+  	"parent_id" integer NOT NULL,
   	"path" varchar NOT NULL,
-  	"specialties_id" uuid,
-  	"doctors_id" uuid,
-  	"certificates_id" uuid,
-  	"facilities_media_id" uuid
+  	"specialties_id" integer,
+  	"doctors_id" integer,
+  	"certificates_id" integer,
+  	"facilities_media_id" integer
   );
   
   CREATE TABLE "institutions" (
-  	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+  	"id" serial PRIMARY KEY NOT NULL,
   	"name" varchar NOT NULL,
   	"slug" varchar NOT NULL,
   	"description" jsonb NOT NULL,
-  	"logo_id" uuid NOT NULL,
+  	"logo_id" integer NOT NULL,
   	"website" varchar,
   	"is_active" boolean DEFAULT true,
   	"updated_at" timestamp(3) with time zone DEFAULT now() NOT NULL,
@@ -117,15 +118,15 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   );
   
   CREATE TABLE "leads" (
-  	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+  	"id" serial PRIMARY KEY NOT NULL,
   	"folio" varchar,
   	"status" "enum_leads_status" DEFAULT 'new',
   	"contact_notes" jsonb,
   	"name" varchar NOT NULL,
   	"email" varchar NOT NULL,
   	"phone" varchar NOT NULL,
-  	"doctor_id" uuid NOT NULL,
-  	"procedure_id" uuid,
+  	"doctor_id" integer NOT NULL,
+  	"procedure_id" integer,
   	"notes" varchar,
   	"updated_at" timestamp(3) with time zone DEFAULT now() NOT NULL,
   	"created_at" timestamp(3) with time zone DEFAULT now() NOT NULL
@@ -133,18 +134,18 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   
   CREATE TABLE "procedures_faqs" (
   	"_order" integer NOT NULL,
-  	"_parent_id" uuid NOT NULL,
+  	"_parent_id" integer NOT NULL,
   	"id" varchar PRIMARY KEY NOT NULL,
   	"question" varchar NOT NULL,
   	"answer" varchar NOT NULL
   );
   
   CREATE TABLE "procedures" (
-  	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+  	"id" serial PRIMARY KEY NOT NULL,
   	"name" varchar NOT NULL,
   	"slug" varchar NOT NULL,
-  	"specialty_id" uuid NOT NULL,
-  	"cover_image_id" uuid,
+  	"specialty_id" integer NOT NULL,
+  	"cover_image_id" integer,
   	"short_summary" varchar NOT NULL,
   	"full_description" jsonb NOT NULL,
   	"pricing_starting_price_u_s_d" numeric NOT NULL,
@@ -158,7 +159,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   );
   
   CREATE TABLE "doctors_media" (
-  	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+  	"id" serial PRIMARY KEY NOT NULL,
   	"alt" varchar NOT NULL,
   	"caption" varchar,
   	"updated_at" timestamp(3) with time zone DEFAULT now() NOT NULL,
@@ -193,7 +194,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   );
   
   CREATE TABLE "facilities_media" (
-  	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+  	"id" serial PRIMARY KEY NOT NULL,
   	"alt" varchar NOT NULL,
   	"caption" varchar,
   	"updated_at" timestamp(3) with time zone DEFAULT now() NOT NULL,
@@ -228,7 +229,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   );
   
   CREATE TABLE "institutions_media" (
-  	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+  	"id" serial PRIMARY KEY NOT NULL,
   	"alt" varchar NOT NULL,
   	"caption" varchar,
   	"updated_at" timestamp(3) with time zone DEFAULT now() NOT NULL,
@@ -263,7 +264,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   );
   
   CREATE TABLE "certificates_media" (
-  	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+  	"id" serial PRIMARY KEY NOT NULL,
   	"alt" varchar NOT NULL,
   	"caption" varchar,
   	"updated_at" timestamp(3) with time zone DEFAULT now() NOT NULL,
@@ -298,7 +299,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   );
   
   CREATE TABLE "procedures_media" (
-  	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+  	"id" serial PRIMARY KEY NOT NULL,
   	"alt" varchar NOT NULL,
   	"caption" varchar,
   	"updated_at" timestamp(3) with time zone DEFAULT now() NOT NULL,
@@ -332,8 +333,8 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"sizes_hero_filename" varchar
   );
   
-  CREATE TABLE "globals_media" (
-  	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+  CREATE TABLE "medical_assets" (
+  	"id" serial PRIMARY KEY NOT NULL,
   	"alt" varchar NOT NULL,
   	"caption" varchar,
   	"updated_at" timestamp(3) with time zone DEFAULT now() NOT NULL,
@@ -368,13 +369,13 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   );
   
   CREATE TABLE "payload_kv" (
-  	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+  	"id" serial PRIMARY KEY NOT NULL,
   	"key" varchar NOT NULL,
   	"data" jsonb NOT NULL
   );
   
   CREATE TABLE "payload_locked_documents" (
-  	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+  	"id" serial PRIMARY KEY NOT NULL,
   	"global_slug" varchar,
   	"updated_at" timestamp(3) with time zone DEFAULT now() NOT NULL,
   	"created_at" timestamp(3) with time zone DEFAULT now() NOT NULL
@@ -383,26 +384,26 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   CREATE TABLE "payload_locked_documents_rels" (
   	"id" serial PRIMARY KEY NOT NULL,
   	"order" integer,
-  	"parent_id" uuid NOT NULL,
+  	"parent_id" integer NOT NULL,
   	"path" varchar NOT NULL,
-  	"users_id" uuid,
-  	"specialties_id" uuid,
-  	"doctors_id" uuid,
-  	"certificates_id" uuid,
-  	"facilities_id" uuid,
-  	"institutions_id" uuid,
-  	"leads_id" uuid,
-  	"procedures_id" uuid,
-  	"doctors_media_id" uuid,
-  	"facilities_media_id" uuid,
-  	"institutions_media_id" uuid,
-  	"certificates_media_id" uuid,
-  	"procedures_media_id" uuid,
-  	"globals_media_id" uuid
+  	"users_id" integer,
+  	"specialties_id" integer,
+  	"doctors_id" integer,
+  	"certificates_id" integer,
+  	"facilities_id" integer,
+  	"institutions_id" integer,
+  	"leads_id" integer,
+  	"procedures_id" integer,
+  	"doctors_media_id" integer,
+  	"facilities_media_id" integer,
+  	"institutions_media_id" integer,
+  	"certificates_media_id" integer,
+  	"procedures_media_id" integer,
+  	"medical_assets_id" integer
   );
   
   CREATE TABLE "payload_preferences" (
-  	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+  	"id" serial PRIMARY KEY NOT NULL,
   	"key" varchar,
   	"value" jsonb,
   	"updated_at" timestamp(3) with time zone DEFAULT now() NOT NULL,
@@ -412,13 +413,13 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   CREATE TABLE "payload_preferences_rels" (
   	"id" serial PRIMARY KEY NOT NULL,
   	"order" integer,
-  	"parent_id" uuid NOT NULL,
+  	"parent_id" integer NOT NULL,
   	"path" varchar NOT NULL,
-  	"users_id" uuid
+  	"users_id" integer
   );
   
   CREATE TABLE "payload_migrations" (
-  	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+  	"id" serial PRIMARY KEY NOT NULL,
   	"name" varchar,
   	"batch" numeric,
   	"updated_at" timestamp(3) with time zone DEFAULT now() NOT NULL,
@@ -426,7 +427,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   );
   
   CREATE TABLE "site_settings" (
-  	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+  	"id" serial PRIMARY KEY NOT NULL,
   	"company_name" varchar NOT NULL,
   	"contact_email" varchar NOT NULL,
   	"contact_phone" varchar NOT NULL,
@@ -450,26 +451,51 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"id" varchar PRIMARY KEY NOT NULL,
   	"title" varchar NOT NULL,
   	"description" varchar NOT NULL,
-  	"image_id" uuid NOT NULL
+  	"image_id" integer NOT NULL
   );
   
   CREATE TABLE "patient_journey_steps" (
   	"_order" integer NOT NULL,
-  	"_parent_id" uuid NOT NULL,
+  	"_parent_id" integer NOT NULL,
   	"id" varchar PRIMARY KEY NOT NULL,
   	"title" varchar NOT NULL,
   	"description" varchar NOT NULL,
   	"duration" varchar,
-  	"image_id" uuid
+  	"image_id" integer
   );
   
   CREATE TABLE "patient_journey" (
-  	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+  	"id" serial PRIMARY KEY NOT NULL,
   	"hero_title" varchar DEFAULT 'Your Medical Journey to Queretaro' NOT NULL,
   	"hero_description" varchar DEFAULT 'Experience world-class healthcare combined with the luxury of recovering in Mexico''s most beautiful colonial cities.' NOT NULL,
-  	"hero_cover_id" uuid NOT NULL,
+  	"hero_cover_id" integer NOT NULL,
   	"meta_title" varchar,
   	"meta_description" varchar,
+  	"updated_at" timestamp(3) with time zone,
+  	"created_at" timestamp(3) with time zone
+  );
+  
+  CREATE TABLE "why_queretaro_blocks_advantage_section" (
+  	"_order" integer NOT NULL,
+  	"_parent_id" integer NOT NULL,
+  	"_path" text NOT NULL,
+  	"id" varchar PRIMARY KEY NOT NULL,
+  	"layout" "enum_why_queretaro_blocks_advantage_section_layout" DEFAULT 'imageLeft',
+  	"anchor_slug" varchar NOT NULL,
+  	"title" varchar NOT NULL,
+  	"highlight_subtitle" varchar NOT NULL,
+  	"content" jsonb NOT NULL,
+  	"section_image_id" integer NOT NULL,
+  	"block_name" varchar
+  );
+  
+  CREATE TABLE "why_queretaro" (
+  	"id" serial PRIMARY KEY NOT NULL,
+  	"hero_title" varchar NOT NULL,
+  	"hero_subtitle" varchar NOT NULL,
+  	"hero_main_image_id" integer NOT NULL,
+  	"seo_meta_title" varchar NOT NULL,
+  	"seo_meta_description" varchar NOT NULL,
   	"updated_at" timestamp(3) with time zone,
   	"created_at" timestamp(3) with time zone
   );
@@ -509,14 +535,17 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   ALTER TABLE "payload_locked_documents_rels" ADD CONSTRAINT "payload_locked_documents_rels_institutions_media_fk" FOREIGN KEY ("institutions_media_id") REFERENCES "public"."institutions_media"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "payload_locked_documents_rels" ADD CONSTRAINT "payload_locked_documents_rels_certificates_media_fk" FOREIGN KEY ("certificates_media_id") REFERENCES "public"."certificates_media"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "payload_locked_documents_rels" ADD CONSTRAINT "payload_locked_documents_rels_procedures_media_fk" FOREIGN KEY ("procedures_media_id") REFERENCES "public"."procedures_media"("id") ON DELETE cascade ON UPDATE no action;
-  ALTER TABLE "payload_locked_documents_rels" ADD CONSTRAINT "payload_locked_documents_rels_globals_media_fk" FOREIGN KEY ("globals_media_id") REFERENCES "public"."globals_media"("id") ON DELETE cascade ON UPDATE no action;
+  ALTER TABLE "payload_locked_documents_rels" ADD CONSTRAINT "payload_locked_documents_rels_medical_assets_fk" FOREIGN KEY ("medical_assets_id") REFERENCES "public"."medical_assets"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "payload_preferences_rels" ADD CONSTRAINT "payload_preferences_rels_parent_fk" FOREIGN KEY ("parent_id") REFERENCES "public"."payload_preferences"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "payload_preferences_rels" ADD CONSTRAINT "payload_preferences_rels_users_fk" FOREIGN KEY ("users_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;
-  ALTER TABLE "patient_journey_steps_options" ADD CONSTRAINT "patient_journey_steps_options_image_id_globals_media_id_fk" FOREIGN KEY ("image_id") REFERENCES "public"."globals_media"("id") ON DELETE set null ON UPDATE no action;
+  ALTER TABLE "patient_journey_steps_options" ADD CONSTRAINT "patient_journey_steps_options_image_id_medical_assets_id_fk" FOREIGN KEY ("image_id") REFERENCES "public"."medical_assets"("id") ON DELETE set null ON UPDATE no action;
   ALTER TABLE "patient_journey_steps_options" ADD CONSTRAINT "patient_journey_steps_options_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."patient_journey_steps"("id") ON DELETE cascade ON UPDATE no action;
-  ALTER TABLE "patient_journey_steps" ADD CONSTRAINT "patient_journey_steps_image_id_globals_media_id_fk" FOREIGN KEY ("image_id") REFERENCES "public"."globals_media"("id") ON DELETE set null ON UPDATE no action;
+  ALTER TABLE "patient_journey_steps" ADD CONSTRAINT "patient_journey_steps_image_id_medical_assets_id_fk" FOREIGN KEY ("image_id") REFERENCES "public"."medical_assets"("id") ON DELETE set null ON UPDATE no action;
   ALTER TABLE "patient_journey_steps" ADD CONSTRAINT "patient_journey_steps_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."patient_journey"("id") ON DELETE cascade ON UPDATE no action;
-  ALTER TABLE "patient_journey" ADD CONSTRAINT "patient_journey_hero_cover_id_globals_media_id_fk" FOREIGN KEY ("hero_cover_id") REFERENCES "public"."globals_media"("id") ON DELETE set null ON UPDATE no action;
+  ALTER TABLE "patient_journey" ADD CONSTRAINT "patient_journey_hero_cover_id_medical_assets_id_fk" FOREIGN KEY ("hero_cover_id") REFERENCES "public"."medical_assets"("id") ON DELETE set null ON UPDATE no action;
+  ALTER TABLE "why_queretaro_blocks_advantage_section" ADD CONSTRAINT "why_queretaro_blocks_advantage_section_section_image_id_medical_assets_id_fk" FOREIGN KEY ("section_image_id") REFERENCES "public"."medical_assets"("id") ON DELETE set null ON UPDATE no action;
+  ALTER TABLE "why_queretaro_blocks_advantage_section" ADD CONSTRAINT "why_queretaro_blocks_advantage_section_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."why_queretaro"("id") ON DELETE cascade ON UPDATE no action;
+  ALTER TABLE "why_queretaro" ADD CONSTRAINT "why_queretaro_hero_main_image_id_medical_assets_id_fk" FOREIGN KEY ("hero_main_image_id") REFERENCES "public"."medical_assets"("id") ON DELETE set null ON UPDATE no action;
   CREATE INDEX "users_roles_order_idx" ON "users_roles" USING btree ("order");
   CREATE INDEX "users_roles_parent_idx" ON "users_roles" USING btree ("parent_id");
   CREATE INDEX "users_sessions_order_idx" ON "users_sessions" USING btree ("_order");
@@ -598,12 +627,12 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   CREATE INDEX "procedures_media_sizes_thumbnail_sizes_thumbnail_filenam_idx" ON "procedures_media" USING btree ("sizes_thumbnail_filename");
   CREATE INDEX "procedures_media_sizes_card_sizes_card_filename_idx" ON "procedures_media" USING btree ("sizes_card_filename");
   CREATE INDEX "procedures_media_sizes_hero_sizes_hero_filename_idx" ON "procedures_media" USING btree ("sizes_hero_filename");
-  CREATE INDEX "globals_media_updated_at_idx" ON "globals_media" USING btree ("updated_at");
-  CREATE INDEX "globals_media_created_at_idx" ON "globals_media" USING btree ("created_at");
-  CREATE UNIQUE INDEX "globals_media_filename_idx" ON "globals_media" USING btree ("filename");
-  CREATE INDEX "globals_media_sizes_thumbnail_sizes_thumbnail_filename_idx" ON "globals_media" USING btree ("sizes_thumbnail_filename");
-  CREATE INDEX "globals_media_sizes_hero_sizes_hero_filename_idx" ON "globals_media" USING btree ("sizes_hero_filename");
-  CREATE INDEX "globals_media_sizes_card_sizes_card_filename_idx" ON "globals_media" USING btree ("sizes_card_filename");
+  CREATE INDEX "medical_assets_updated_at_idx" ON "medical_assets" USING btree ("updated_at");
+  CREATE INDEX "medical_assets_created_at_idx" ON "medical_assets" USING btree ("created_at");
+  CREATE UNIQUE INDEX "medical_assets_filename_idx" ON "medical_assets" USING btree ("filename");
+  CREATE INDEX "medical_assets_sizes_thumbnail_sizes_thumbnail_filename_idx" ON "medical_assets" USING btree ("sizes_thumbnail_filename");
+  CREATE INDEX "medical_assets_sizes_hero_sizes_hero_filename_idx" ON "medical_assets" USING btree ("sizes_hero_filename");
+  CREATE INDEX "medical_assets_sizes_card_sizes_card_filename_idx" ON "medical_assets" USING btree ("sizes_card_filename");
   CREATE UNIQUE INDEX "payload_kv_key_idx" ON "payload_kv" USING btree ("key");
   CREATE INDEX "payload_locked_documents_global_slug_idx" ON "payload_locked_documents" USING btree ("global_slug");
   CREATE INDEX "payload_locked_documents_updated_at_idx" ON "payload_locked_documents" USING btree ("updated_at");
@@ -624,7 +653,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   CREATE INDEX "payload_locked_documents_rels_institutions_media_id_idx" ON "payload_locked_documents_rels" USING btree ("institutions_media_id");
   CREATE INDEX "payload_locked_documents_rels_certificates_media_id_idx" ON "payload_locked_documents_rels" USING btree ("certificates_media_id");
   CREATE INDEX "payload_locked_documents_rels_procedures_media_id_idx" ON "payload_locked_documents_rels" USING btree ("procedures_media_id");
-  CREATE INDEX "payload_locked_documents_rels_globals_media_id_idx" ON "payload_locked_documents_rels" USING btree ("globals_media_id");
+  CREATE INDEX "payload_locked_documents_rels_medical_assets_id_idx" ON "payload_locked_documents_rels" USING btree ("medical_assets_id");
   CREATE INDEX "payload_preferences_key_idx" ON "payload_preferences" USING btree ("key");
   CREATE INDEX "payload_preferences_updated_at_idx" ON "payload_preferences" USING btree ("updated_at");
   CREATE INDEX "payload_preferences_created_at_idx" ON "payload_preferences" USING btree ("created_at");
@@ -640,7 +669,12 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   CREATE INDEX "patient_journey_steps_order_idx" ON "patient_journey_steps" USING btree ("_order");
   CREATE INDEX "patient_journey_steps_parent_id_idx" ON "patient_journey_steps" USING btree ("_parent_id");
   CREATE INDEX "patient_journey_steps_image_idx" ON "patient_journey_steps" USING btree ("image_id");
-  CREATE INDEX "patient_journey_hero_cover_idx" ON "patient_journey" USING btree ("hero_cover_id");`)
+  CREATE INDEX "patient_journey_hero_cover_idx" ON "patient_journey" USING btree ("hero_cover_id");
+  CREATE INDEX "why_queretaro_blocks_advantage_section_order_idx" ON "why_queretaro_blocks_advantage_section" USING btree ("_order");
+  CREATE INDEX "why_queretaro_blocks_advantage_section_parent_id_idx" ON "why_queretaro_blocks_advantage_section" USING btree ("_parent_id");
+  CREATE INDEX "why_queretaro_blocks_advantage_section_path_idx" ON "why_queretaro_blocks_advantage_section" USING btree ("_path");
+  CREATE INDEX "why_queretaro_blocks_advantage_section_section_image_idx" ON "why_queretaro_blocks_advantage_section" USING btree ("section_image_id");
+  CREATE INDEX "why_queretaro_hero_hero_main_image_idx" ON "why_queretaro" USING btree ("hero_main_image_id");`)
 }
 
 export async function down({ db, payload, req }: MigrateDownArgs): Promise<void> {
@@ -663,7 +697,7 @@ export async function down({ db, payload, req }: MigrateDownArgs): Promise<void>
   DROP TABLE "institutions_media" CASCADE;
   DROP TABLE "certificates_media" CASCADE;
   DROP TABLE "procedures_media" CASCADE;
-  DROP TABLE "globals_media" CASCADE;
+  DROP TABLE "medical_assets" CASCADE;
   DROP TABLE "payload_kv" CASCADE;
   DROP TABLE "payload_locked_documents" CASCADE;
   DROP TABLE "payload_locked_documents_rels" CASCADE;
@@ -674,7 +708,10 @@ export async function down({ db, payload, req }: MigrateDownArgs): Promise<void>
   DROP TABLE "patient_journey_steps_options" CASCADE;
   DROP TABLE "patient_journey_steps" CASCADE;
   DROP TABLE "patient_journey" CASCADE;
+  DROP TABLE "why_queretaro_blocks_advantage_section" CASCADE;
+  DROP TABLE "why_queretaro" CASCADE;
   DROP TYPE "public"."enum_users_roles";
   DROP TYPE "public"."enum_leads_status";
-  DROP TYPE "public"."enum_procedures_anesthesia_type";`)
+  DROP TYPE "public"."enum_procedures_anesthesia_type";
+  DROP TYPE "public"."enum_why_queretaro_blocks_advantage_section_layout";`)
 }
