@@ -48,7 +48,7 @@ export async function generateMetadata(): Promise<Metadata> {
       template: `%s | ${siteName}`,
       default: siteName,
     },
-    description: settings?.siteDescription || 'World-class medical procedures with internationally accredited specialists.',
+    description: siteName || 'World-class medical procedures with internationally accredited specialists.',
     robots: {
       index: true,
       follow: true,
@@ -100,7 +100,7 @@ export default async function FrontendLayout({
         <Header 
           companyName={settings?.companyName}
           contactPhone={settings?.contactPhone} 
-          displayPhone = {settings?.displayPhone}
+          displayPhone = {settings?.contactPhone}
         />
         
         {/* Main Content Area */}
