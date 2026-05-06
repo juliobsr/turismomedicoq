@@ -12,7 +12,7 @@ export interface SelectOption {
 export interface LeadCaptureFormProps {
   // 'doctor' means we are on a doctor's page. 'procedure' means we are on a procedure page.
   context: 'doctor' | 'procedure'; 
-  fixedEntityId: string;
+  fixedEntityId: string | number;
   fixedEntityName: string;
   dynamicOptions: SelectOption[];
 }
@@ -26,7 +26,7 @@ export const LeadCaptureForm = ({
   context, 
   fixedEntityId, 
   fixedEntityName, 
-  dynamicOptions = [] 
+  dynamicOptions
 }: LeadCaptureFormProps) => {
   const [isPending, startTransition] = useTransition()
   const [formState, setFormState] = useState<SubmitLeadState | null>(null)
