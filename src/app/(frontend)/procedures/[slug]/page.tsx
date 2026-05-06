@@ -136,8 +136,8 @@ export default async function ProcedurePage({ params }: ProcedurePageProps) {
     if (doctor.facilities && Array.isArray(doctor.facilities)) {
       doctor.facilities.forEach(facility => {
         const fac = facility as Facility
-        if (fac.isActive && !facilitiesMap.has(fac.id)) {
-          facilitiesMap.set(fac.id, fac)
+        if (fac.isActive && !facilitiesMap.has(String(fac.id))) {
+          facilitiesMap.set(String(fac.id), fac)
         }
       })
     }
