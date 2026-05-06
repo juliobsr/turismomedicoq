@@ -7,7 +7,7 @@ import Zoom from 'yet-another-react-lightbox/plugins/zoom';
 import Fullscreen from 'yet-another-react-lightbox/plugins/fullscreen';
 import 'yet-another-react-lightbox/styles.css';
 
-import { Media as MediaType } from '@/payload-types';
+import { MedicalAsset as MediaType } from '@/payload-types';
 
 interface DoctorGalleryProps {
   images: (string | MediaType)[];
