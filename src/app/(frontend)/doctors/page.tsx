@@ -89,7 +89,7 @@ export default async function DoctorsDirectoryPage({ searchParams }: DoctorsDire
     })
 
     if (specs.length > 0) {
-      specialtyId = specs[0].id
+      specialtyId = String(specs[0].id)
       specialtyTitle = specs[0].title
     }
   }
