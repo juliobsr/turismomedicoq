@@ -1,7 +1,8 @@
 // src/collections/Specialties.ts
 import type { CollectionConfig } from 'payload'
 // ✅ IMPORT THE NEW HOOK
-import { revalidateNavigationCache } from '../hooks/revalidateCache'
+import { revalidateAfterChange, revalidateAfterDelete } from '../hooks/revalidateCache'
+import { formatSlug } from '../utils/formatSlug'
 /**
  * Enterprise Collection: Specialties
  * Purpose: Relational catalog for medical branches. Powers category pages in Next.js.
@@ -19,8 +20,8 @@ export const Specialties: CollectionConfig = {
     delete: ({ req: { user } }) => Boolean(user),
   },
   hooks: {
-    afterChange: [revalidateNavigationCache],
-    afterDelete: [revalidateNavigationCache], // Don't forget to purge if a doctor is deleted!
+    afterChange: [revalidateAfterChange],
+    afterDelete: [revalidateAfterDelete], // Don't forget to purge if a doctor is deleted!
   },
   fields: [
     {
@@ -36,7 +37,11 @@ export const Specialties: CollectionConfig = {
       required: true,
       unique: true,
       index: true, // Speeds up PostgreSQL lookups during Next.js SSG
+      hooks: {
+        beforeValidate: [formatSlug('title')],
+      },
     },
+    
     {
       name: 'description',
       type: 'textarea',

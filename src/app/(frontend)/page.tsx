@@ -111,7 +111,7 @@ export default async function HomePage({
                   >
                     <option value="all">All Specialties</option>
                     {allSpecialties.map((s) => (
-                      <option key={s.id} value={s.id}>{s.name}</option>
+                      <option key={s.id} value={s.id}>{s.title}</option>
                     ))}
                   </select>
                 </div>
@@ -153,7 +153,7 @@ export default async function HomePage({
             {/* 1. INFO DEL DOCTOR: Primero en móvil, Segundo en Desktop */}
             <div className="p-6 order-1 md:order-2">
               <div className="flex flex-wrap gap-2 mb-3">
-                {Array.isArray(doctor.specialty) && doctor.specialty.map((spec: any) => (
+                {Array.isArray(doctor.specialties) && doctor.specialties.map((spec: any) => (
                   <span key={spec.id} className="text-[10px] font-bold uppercase tracking-wider text-blue-600 bg-blue-50 px-2 py-1 rounded-md">
                     {typeof spec === 'object' ? spec.name : 'Specialist'}
                   </span>
