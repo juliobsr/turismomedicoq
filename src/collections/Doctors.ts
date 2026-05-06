@@ -1,7 +1,7 @@
 // src/collections/Doctors.ts
 import type { CollectionConfig } from 'payload'
 // ✅ IMPORT THE NEW HOOK
-import { revalidateNavigationCache } from '../hooks/revalidateCache'
+import { revalidateAfterChange, revalidateAfterDelete } from '../hooks/revalidateCache'
 /**
  * Enterprise Collection: Doctors
  * Architecture: Relational PostgreSQL table.
@@ -22,8 +22,8 @@ export const Doctors: CollectionConfig = {
     delete: ({ req: { user } }) => Boolean(user),
   },
   hooks: {
-    afterChange: [revalidateNavigationCache],
-    afterDelete: [revalidateNavigationCache], // Don't forget to purge if a doctor is deleted!
+    afterChange: [revalidateAfterChange],
+    afterDelete: [revalidateAfterDelete], // Don't forget to purge if a doctor is deleted!
   },
   fields: [
     {
