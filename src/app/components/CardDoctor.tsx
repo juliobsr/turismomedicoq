@@ -1,14 +1,14 @@
 // src/components/CardDoctor.tsx
 import Image from 'next/image'
 import Link from 'next/link'
-import type { Doctor, Media, Specialty } from '@/payload-types'
+import type { Doctor, MedicalAsset, Specialty } from '@/payload-types'
 
 interface CardDoctorProps {
   doctor: Doctor
 }
 
 export const CardDoctor = ({ doctor }: CardDoctorProps) => {
-  const profilePicture = doctor.profilePicture as Media | undefined
+  const profilePicture = doctor.profilePicture as MedicalAsset | undefined
   const specialties = doctor.specialties as Specialty[] | undefined
 
   return (
