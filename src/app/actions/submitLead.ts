@@ -11,15 +11,18 @@ const leadSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters long.'),
   email: z.string().email('Please provide a valid email address.'),
   phone: z.string().min(10, 'Phone number must be at least 10 digits.'),
+  
+  // 🚀 El doctor siempre será un número en Postgres
   doctorId: z.coerce.number(),
   
-  // 🚀 ENTERPRISE UX: Handle "General Consultation" explicitly
-  // We accept a UUID, the string 'general', or empty string, then transform it.
-  procedureId: z.union([
-    z.string().uuid(),
-    z.literal('general'),
-    z.literal('')
-  ]).optional(),
+  // 🛡️ TECH LEAD FIX: Pre-procesamiento Inteligente para PostgreSQL
+  // Si el formulario envía "general" o un string vacío, lo volvemos "undefined" 
+  // para que no rompa la llave foránea (Foreign Key). Si es un número, lo parseamos.
+  procedureId: z.preprocess((val) => {
+    if (!val || val === 'general' || val === '') return undefined;
+    const parsed = Number(val);
+    return isNaN(parsed) ? undefined : parsed;
+  }, z.number().optional()),
   
   notes: z.string().max(500, 'Notes cannot exceed 500 characters.').optional(),
 })
@@ -34,6 +37,7 @@ export async function submitLeadAction(
   prevState: SubmitLeadState | null,
   formData: FormData
 ): Promise<SubmitLeadState> {
+  // Extraemos los datos crudos del FormData
   const rawData = {
     name: formData.get('name'),
     email: formData.get('email'),
@@ -43,6 +47,7 @@ export async function submitLeadAction(
     notes: formData.get('notes'),
   }
 
+  // Parseo Seguro con Zod
   const validatedData = leadSchema.safeParse(rawData)
 
   if (!validatedData.success) {
@@ -57,20 +62,19 @@ export async function submitLeadAction(
     const payload = await getPayload({ config: configPromise })
     const { procedureId, ...restData } = validatedData.data;
 
-    // Check if it's a specific procedure or a general consultation
-    const isSpecificProcedure = procedureId && procedureId !== 'general';
-
+    // 🚀 TECH LEAD FIX: Inyección Limpia
     await payload.create({
       collection: 'leads',
       data: {
         name: restData.name,
         email: restData.email,
         phone: restData.phone,
-        doctor: restData.doctorId,
-        // Only attach the procedure relationship if a valid UUID was sent
-        ...(isSpecificProcedure && { procedure: procedureId }),
-        notes: restData.notes || '',
+        // Corregido: Usamos restData.doctorId (que Zod ya convirtió en número)
+        doctor: restData.doctorId, 
         status: 'new',
+        // Inyectamos procedure SOLO si procedureId es un número válido
+        ...(procedureId !== undefined ? { procedure: procedureId } : {}),
+        notes: restData.notes || '',
       },
     })
 
