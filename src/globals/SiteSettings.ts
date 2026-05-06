@@ -18,10 +18,18 @@ export const SiteSettings: GlobalConfig = {
   },
   hooks: {
     afterChange: [
-      ({ doc }) => {
-        console.log('[Payload Hook] SiteSettings updated. Purging Next.js cache...')
-        // Invalidate the exact tag we used in unstable_cache
-        revalidateTag('site-settings')
+      ({ doc, req }) => {
+        /**
+         * 🚀 TECH LEAD FIX:
+         * In Next.js 15+, revalidateTag requires a second argument.
+         * We pass an empty object to satisfy the required 'profile' configuration.
+         */
+        try {
+          revalidateTag('site-settings', {})
+          req.payload.logger.info('[Payload Hook] SiteSettings updated. Next.js cache purged successfully.')
+        } catch (err) {
+          req.payload.logger.error(`[Payload Hook] Failed to purge Next.js cache: ${err}`)
+        }
         return doc
       },
     ],
