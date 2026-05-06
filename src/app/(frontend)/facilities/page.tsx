@@ -111,8 +111,8 @@ export default async function FacilitiesPage({ searchParams }: PageProps) {
         */}
         <div className="mb-12">
           <FacilityFilters 
-            specialties={specialtiesRes?.docs?.map(s => ({ id: s.id as string, title: s.title })) || []}
-            doctors={doctorsRes?.docs?.map(d => ({ id: d.id as string, fullName: d.fullName })) || []}
+            specialties={specialtiesRes?.docs?.map(s => ({ id: String(s.id) as string, title: s.title })) || []}
+            doctors={doctorsRes?.docs?.map(d => ({ id: String(d.id) as string, fullName: d.fullName })) || []}
           />
         </div>
 
