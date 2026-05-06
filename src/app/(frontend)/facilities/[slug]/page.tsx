@@ -7,7 +7,7 @@ import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import type { Metadata } from 'next';
-import type { Facility, Media, Specialty, Doctor } from '@/payload-types';
+import type { Facility, MedicalAsset, Specialty, Doctor } from '@/payload-types';
 
 // Components
 import { LexicalRenderer } from '@/app/components/LexicalRenderer';
@@ -62,7 +62,7 @@ export async function generateMetadata({ params }: FacilityPageProps): Promise<M
   const facility = docs[0] as Facility | undefined;
   if (!facility) return {};
 
-  const primaryImage = (facility.heroImage as Media)?.url;
+  const primaryImage = (facility.heroImage as MedicalAsset)?.url;
 
   return {
     title: `${facility.name} | Premium Medical Facilities`,
@@ -97,10 +97,10 @@ export default async function FacilityDetailPage({ params }: FacilityPageProps) 
   }
 
   // Defensive Type Casting and Safety Fallbacks
-  const heroImage = facility.heroImage as Media | undefined;
+  const heroImage = facility.heroImage as MedicalAsset | undefined;
   const specialties = (facility.specialtiesOffered as Specialty[] | undefined) || [];
   const doctors = (facility.doctors as Doctor[] | undefined) || [];
-  const galleryImages = (facility.infrastructureGallery as Media[] | undefined) || [];
+  const galleryImages = (facility.infrastructureGallery as MedicalAsset[] | undefined) || [];
 
   /**
    * JSON-LD: MedicalClinic Schema
@@ -219,9 +219,9 @@ export default async function FacilityDetailPage({ params }: FacilityPageProps) 
                     className="flex items-center gap-4 p-3 rounded-2xl transition-colors hover:bg-slate-50 group"
                   >
                     <div className="w-12 h-12 rounded-full overflow-hidden bg-slate-200 relative shrink-0">
-                      {(doc.profilePicture as Media)?.url && (
+                      {(doc.profilePicture as MedicalAsset)?.url && (
                         <Image 
-                          src={(doc.profilePicture as Media).url!} 
+                          src={(doc.profilePicture as MedicalAsset).url!} 
                           alt={doc.fullName} 
                           fill 
                           className="object-cover" 
