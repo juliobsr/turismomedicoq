@@ -2,7 +2,8 @@
 import { buildConfig } from 'payload'
 import { postgresAdapter } from '@payloadcms/db-postgres'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
-import { vercelBlobStorage } from '@payloadcms/storage-vercel-blob'; // 🚀 NUEVO
+import { vercelBlobStorage } from '@payloadcms/storage-vercel-blob'
+import sharp from 'sharp'
 import path from 'path'
 import { fileURLToPath } from 'url'
 
@@ -21,7 +22,7 @@ import { Certificates } from './collections/Certificates'
 import { Facilities } from './collections/Facilities'
 import { Institutions } from './collections/Institutions'
 import { Leads } from './collections/Leads'
-import { Procedures} from './collections/Procedures'
+import { Procedures } from './collections/Procedures'
 
 
 import { resendAdapter } from '@payloadcms/email-resend'
@@ -29,16 +30,6 @@ import { resendAdapter } from '@payloadcms/email-resend'
 import { Users } from './collections/Users'
 
 import { SiteSettings } from './globals/SiteSettings'
-
-console.log('--- PAYLOAD BOOT SEQUENCE ---');
-console.log('1. Is GlobalsMedia object loaded?:', !!GlobalMedia);
-if (GlobalMedia) {
-  console.log('2. Registered Slug:', GlobalMedia.slug);
-} else {
-  console.error('❌ FATAL: GlobalsMedia is undefined! Check export/import pathing.');
-}
-console.log('-----------------------------');
-
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -60,6 +51,7 @@ assertEnvironment()
  */
 export default buildConfig({
   editor: lexicalEditor(),
+  sharp,
   
   secret: process.env.PAYLOAD_SECRET as string,
   
@@ -89,22 +81,16 @@ export default buildConfig({
   ],
 
   globals: [
-    SiteSettings, // ✅ Registra el Global aquí
-    PatientJourney, // ✅ Registra el Global aquí
-    WhyQueretaro, // 
+    SiteSettings,
+    PatientJourney,
+    WhyQueretaro,
   ],
 
   plugins: [
 
-    /**
-     * 🛡️ ESTRATEGIA DE ALMACENAMIENTO VZSOLUCIONES:
-     * Redirigimos todas las subidas de archivos a Vercel Blob.
-     * Esto garantiza que las fotos de doctores y quirófanos sean persistentes.
-     */
     vercelBlobStorage({
       enabled: !!process.env.BLOB_READ_WRITE_TOKEN, // Solo se activa si el token existe
       collections: {
-        // ⚠️ IMPORTANTE: Pon aquí los SLUGS exactos de tus colecciones de Media
         'medical-assets': true,
         'certificates-media': true,
         'doctors-media': true,
@@ -131,7 +117,6 @@ export default buildConfig({
   // ==========================================================================
   db: postgresAdapter({
     pool: {
-      // 🚀 TECH LEAD TIP: Standard Neon connection string for Serverless/Build
       connectionString: process.env.DATABASE_URI || '',
       /**
        * SSL is mandatory for Neon. 
@@ -158,3 +143,4 @@ export default buildConfig({
     defaultFromName: process.env.RESEND_SENDER_NAME || 'Queretaro Medical',
   }),
 })
+

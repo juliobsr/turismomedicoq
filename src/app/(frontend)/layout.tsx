@@ -38,7 +38,7 @@ export const viewport: Viewport = {
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSiteSettings()
   const siteName = settings?.companyName || 'Queretaro Medical Tourism'
-  
+
   // Security/SEO: Always define a reliable base URL. Fallback to localhost for dev.
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
 

@@ -1,5 +1,6 @@
 import { withPayload } from '@payloadcms/next/withPayload';
 import type { NextConfig } from 'next';
+import path from 'path';
 
 /**
  * Enterprise Next.js Configuration for Vzsoluciones
@@ -8,13 +9,19 @@ import type { NextConfig } from 'next';
 const nextConfig: NextConfig = {
   // 1. CORE PERFORMANCE & SECURITY
   reactStrictMode: false,
-
+  webpack: (config, { isServer }) => {
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      // Esto asegura que siempre busque en la misma ruta absoluta
+      '@': path.resolve(__dirname, 'src'),
+    };
+    return config;
+  },
   // 2. CSS/SSR RESOLUTION FIX
   transpilePackages: ['react-image-crop'],
 
   // 3. MEDICAL TOURISM IMAGE OPTIMIZATION (CLOUD READY)
   images: {
-    // 🚀 TECH LEAD TIP: Auto-serve lighter formats to boost Core Web Vitals
     formats: ['image/avif', 'image/webp'],
     remotePatterns: [
       {
@@ -25,12 +32,12 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'images.unsplash.com',
       },
-      // ☁️ VZSOLUCIONES FIX: Vercel Preview/Production URL (Strict Hostname)
+      //  Vercel Preview/Production URL
       {
         protocol: 'https',
         hostname: 'turismomedicoq-7zodzx3g2-juliobsrs-projects.vercel.app',
       },
-      // ☁️ VERCEL BLOB STORAGE (For permanent production images)
+      //  VERCEL BLOB STORAGE (For permanent production images)
       {
         protocol: 'https',
         hostname: '*.public.blob.vercel-storage.com',
@@ -45,5 +52,5 @@ const nextConfig: NextConfig = {
   },
 };
 
-// devBundleServerPackages: false optimizes local memory usage
+// devBundleServerPackages: false optimiza el uso de memoria RAM local
 export default withPayload(nextConfig, { devBundleServerPackages: false });
