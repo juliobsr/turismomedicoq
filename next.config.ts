@@ -40,7 +40,7 @@ const nextConfig: NextConfig = {
       //  VERCEL BLOB STORAGE (For permanent production images)
       {
         protocol: 'https',
-        hostname: '*.public.blob.vercel-storage.com',
+        hostname: '**.public.blob.vercel-storage.com',
         port: '',
       },
       {
