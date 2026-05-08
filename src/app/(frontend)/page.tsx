@@ -1,135 +1,302 @@
-// src/app/(frontend)/page.tsx
-import configPromise from '@payload-config';
-import { getPayload } from 'payload';
-import Image from 'next/image';
-import Link from 'next/link';
+import type { Metadata } from 'next'
+import Image from 'next/image'
+import Link from 'next/link'
+import { getPayload } from 'payload'
+import {
+  ArrowRightIcon,
+  CheckCircleIcon,
+  ClipboardDocumentCheckIcon,
+  HeartIcon,
+  MapPinIcon,
+  ShieldCheckIcon,
+  SparklesIcon,
+} from '@heroicons/react/24/outline'
 
-export default async function HomePage({
-  searchParams,
-}: {
-  searchParams: Promise<{ q?: string; specialty?: string }>;
-}) {
-  const { q, specialty } = await searchParams;
-  const payload = await getPayload({ config: configPromise });
+import configPromise from '@payload-config'
+import { HomeLeadForm } from '@/app/components/HomeLeadForm'
+import { getSiteSettings } from '@/lib/globals'
 
-  // 1. Traemos las especialidades reales para el menú
-  const { docs: allSpecialties } = await payload.find({
-    collection: 'specialties',
-    sort: 'name',
-    limit: 100,
-  });
+export const revalidate = 3600
 
-  // 2. Ajustamos el filtro (whereClause)
-  const whereClause: any = {};
-  if (q) whereClause.name = { contains: q };
-  
-  // IMPORTANTE: Al ser relación, filtramos por el ID de la especialidad
-  if (specialty && specialty !== 'all') {
-    whereClause.specialty = { equals: specialty };
+const heroImage =
+  'https://elements-resized.envatousercontent.com/envato-dam-assets-production/EVA/TRX/16/38/c6/40/8b/v1_E11/E117OW06.jpg?w=1600&cf_fit=scale-down&mark-alpha=18&mark=https%3A%2F%2Felements-assets.envato.com%2Fstatic%2Fwatermark4.png&q=85&format=auto&s=1968228562e3f1ac81aff123d89abafcc51bfe5b336a70b538b1fdc533650720'
+
+const journeySteps = [
+  {
+    title: 'Clinical review',
+    description:
+      'Share your diagnosis, goals or symptoms. We match you with a vetted specialist and outline the right next step.',
+    icon: ClipboardDocumentCheckIcon,
+  },
+  {
+    title: 'Specialist plan',
+    description:
+      'Receive guidance on consultations, medical records, timelines and treatment expectations before you travel.',
+    icon: HeartIcon,
+  },
+  {
+    title: 'Travel coordination',
+    description:
+      'Plan a safe arrival in Queretaro with appointment logistics, hospital access and recovery support aligned in advance.',
+    icon: MapPinIcon,
+  },
+  {
+    title: 'Recovery follow-up',
+    description:
+      'Continue your recovery with clear post-care instructions and communication between your coordinator and specialist.',
+    icon: SparklesIcon,
+  },
+]
+
+const queretaroAdvantages = [
+  'One of Mexico’s safest and most orderly major cities',
+  'Modern private hospitals with advanced specialty care',
+  'A calmer recovery environment than larger medical tourism hubs',
+  'Strong connectivity to Mexico City, Bajio and international travel routes',
+]
+
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getSiteSettings()
+  const companyName = settings?.companyName || 'Premium Surgery'
+
+  const title = `Medical Tourism in Queretaro, Mexico | ${companyName}`
+  const description =
+    'Plan safe, high-quality medical tourism in Queretaro with vetted specialists, modern hospitals, private coordination and a patient journey designed for international care.'
+
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: '/',
+    },
+    keywords: [
+      'medical tourism Queretaro',
+      'medical tourism Mexico',
+      'surgery in Queretaro',
+      'private hospitals Mexico',
+      'orthopedic surgery Queretaro',
+      'spine surgery Mexico',
+      'medical travel Mexico',
+    ],
+    openGraph: {
+      title,
+      description,
+      type: 'website',
+      siteName: companyName,
+      images: [{ url: heroImage }],
+      locale: 'en_US',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: [heroImage],
+    },
+  }
+}
+
+export default async function HomePage() {
+  const payload = await getPayload({ config: configPromise })
+
+  const [settings, doctorsResponse, proceduresResponse] = await Promise.all([
+    getSiteSettings(),
+    payload.find({
+      collection: 'doctors',
+      depth: 0,
+      limit: 20,
+      sort: 'fullName',
+      where: { isActive: { equals: true } },
+      select: { id: true, fullName: true },
+    }),
+    payload.find({
+      collection: 'procedures',
+      depth: 0,
+      limit: 20,
+      sort: 'name',
+      where: { isActive: { equals: true } },
+      select: { id: true, name: true },
+    }),
+  ])
+
+  const companyName = settings?.companyName || 'Premium Surgery'
+  const doctors = doctorsResponse.docs.map((doctor) => ({
+    id: String(doctor.id),
+    name: doctor.fullName,
+  }))
+  const procedures = proceduresResponse.docs.map((procedure) => ({
+    id: String(procedure.id),
+    name: procedure.name,
+  }))
+
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'MedicalBusiness',
+    name: companyName,
+    description:
+      'Medical tourism coordination in Queretaro, Mexico for international patients seeking vetted specialists and modern private care.',
+    areaServed: {
+      '@type': 'City',
+      name: 'Queretaro',
+      addressCountry: 'MX',
+    },
+    medicalSpecialty: ['Orthopedic Surgery', 'Spine Surgery', 'Medical Tourism Coordination'],
+    url: process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000',
   }
 
-  const { docs: doctors } = await payload.find({
-    collection: 'doctors',
-    where: whereClause,
-  });
-
   return (
-    <main className="min-h-screen bg-gray-50 pb-12">
-      {/* SECCIÓN HERO */}
-      <section className="relative bg-blue-900 py-20 lg:py-32 overflow-hidden">
-        {/* 1. IMAGEN DE FONDO (Reemplaza la URL por la tuya real) */}
-  <div className="absolute inset-0 z-0">
-    <Image
-      src="https://elements-resized.envatousercontent.com/envato-dam-assets-production/EVA/TRX/16/38/c6/40/8b/v1_E11/E117OW06.jpg?w=1600&cf_fit=scale-down&mark-alpha=18&mark=https%3A%2F%2Felements-assets.envato.com%2Fstatic%2Fwatermark4.png&q=85&format=auto&s=1968228562e3f1ac81aff123d89abafcc51bfe5b336a70b538b1fdc533650720" // Ejemplo: Hospital Moderno
-      alt="Modern Medical Facilities in Queretaro"
-      fill
-      priority
-      className="object-cover object-center"
-      sizes="100vw"
-    />
-    {/* 2. SUPERPOSICIÓN OSCURA (Overlay) para legibilidad */}
-    <div className="absolute inset-0 bg-blue-750/60 backdrop-blur-[2px]"></div>
-  </div>
-        {/* Decoración de fondo (Opcional: puedes usar una imagen de fondo aquí) */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute -top-24 -left-24 w-96 h-96 bg-blue-400 rounded-full blur-3xl"></div>
-          <div className="absolute top-1/2 -right-24 w-80 h-80 bg-blue-300 rounded-full blur-3xl"></div>
-        </div>
+    <main className="bg-white text-slate-950">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
 
-        <div className=" mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="text-center lg:text-left lg:grid lg:grid-cols-2 lg:items-center gap-12">
-            
-            {/* Texto del Hero */}
-            <div>
-              <span className="inline-block px-4 py-1.5 rounded-full bg-blue-800 text-blue-100 text-sm font-bold mb-6 tracking-wide uppercase">
-                Trusted Medical Care in Mexico
-              </span>
-              <h1 className="text-4xl md:text-6xl font-black text-white leading-tight mb-6">
-                World-Class Doctors <br />
-                <span className="text-blue-400 text-3xl md:text-5xl">At a Fraction of the Cost</span>
-              </h1>
-              <p className="text-lg text-blue-100 mb-10 max-w-xl mx-auto lg:mx-0">
-                Connect with board-certified specialists in Queretaro. 
-                Save up to 60% on premium medical procedures without compromising quality.
-              </p>
-              
-              <div className="flex flex-wrap justify-center lg:justify-start gap-4 mb-8">
-                <div className="flex items-center gap-2 text-white/80 text-sm font-medium">
-                  <span className="text-blue-400 font-bold">✓</span> Certified Specialists
-                </div>
-                <div className="flex items-center gap-2 text-white/80 text-sm font-medium">
-                  <span className="text-blue-400 font-bold">✓</span> English-Speaking Staff
-                </div>
-                <div className="flex items-center gap-2 text-white/80 text-sm font-medium">
-                  <span className="text-blue-400 font-bold">✓</span> Modern Facilities
-                </div>
+      <section className="relative overflow-hidden bg-slate-950">
+        <Image
+          src={heroImage}
+          alt="Modern private hospital environment for medical tourism in Queretaro"
+          fill
+          priority
+          className="object-cover object-center opacity-45"
+          sizes="100vw"
+        />
+        <div className="absolute inset-0 bg-slate-950/45" />
+
+        <div className="relative mx-auto grid min-h-[760px] max-w-7xl items-center gap-12 px-4 py-16 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:px-8">
+          <div className="max-w-3xl text-white">
+            <p className="mb-5 inline-flex items-center gap-2 rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-xs font-bold uppercase tracking-[0.22em] backdrop-blur">
+              <ShieldCheckIcon className="h-4 w-4" />
+              Medical tourism in Queretaro, Mexico
+            </p>
+            <h1 className="text-5xl font-black leading-[1.02] tracking-tight md:text-7xl">
+              Safer medical travel starts with the right specialist.
+            </h1>
+            <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-100 md:text-xl">
+              Access vetted doctors, modern private hospitals and concierge-level coordination in Queretaro, Mexico’s hidden gem for premium medical care and calm recovery.
+            </p>
+
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+              <Link
+                href="/doctors"
+                className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-5 py-3 text-sm font-extrabold uppercase tracking-[0.14em] text-slate-950 transition hover:bg-slate-100"
+              >
+                Meet specialists
+                <ArrowRightIcon className="h-4 w-4" />
+              </Link>
+              <Link
+                href="/why-queretaro"
+                className="inline-flex items-center justify-center gap-2 rounded-lg border border-white/35 px-5 py-3 text-sm font-extrabold uppercase tracking-[0.14em] text-white transition hover:bg-white/10"
+              >
+                Why Queretaro
+              </Link>
+            </div>
+
+            <dl className="mt-10 grid max-w-2xl grid-cols-3 gap-4 border-t border-white/20 pt-8">
+              <div>
+                <dt className="text-3xl font-black">10+</dt>
+                <dd className="mt-1 text-xs font-semibold uppercase tracking-wide text-slate-200">Years of specialist experience</dd>
               </div>
-            </div>
+              <div>
+                <dt className="text-3xl font-black">24h</dt>
+                <dd className="mt-1 text-xs font-semibold uppercase tracking-wide text-slate-200">Coordinator response target</dd>
+              </div>
+              <div>
+                <dt className="text-3xl font-black">MX</dt>
+                <dd className="mt-1 text-xs font-semibold uppercase tracking-wide text-slate-200">Modern care, easier recovery</dd>
+              </div>
+            </dl>
+          </div>
 
-            {/* BUSCADOR INTEGRADO EN EL HERO */}
-            <div id="search" className="bg-white p-6 md:p-8 rounded-3xl shadow-2xl border border-gray-100 transition-transform hover:scale-[1.02]">
-              <h2 className="text-xl font-bold text-gray-900 mb-6 text-center lg:text-left">
-                Start your treatment here
-              </h2>
-              <form className="space-y-4">
-                <div className="space-y-1">
-                  <label className="text-xs font-bold text-gray-400 uppercase ml-1">What are you looking for?</label>
-                  <input 
-                    name="q" 
-                    defaultValue={q} 
-                    placeholder="Doctor name or procedure..." 
-                    className="w-full px-5 py-4 rounded-xl bg-gray-50 border border-gray-200 focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none transition-all text-gray-900"
-                  />
-                </div>
+          <HomeLeadForm doctors={doctors} procedures={procedures} />
+        </div>
+      </section>
 
-                <div className="space-y-1">
-                  <label className="text-xs font-bold text-gray-400 uppercase ml-1">Specialty</label>
-                  <select 
-                    name="specialty" 
-                    defaultValue={specialty || 'all'}
-                    className="w-full px-5 py-4 rounded-xl bg-gray-50 border border-gray-200 focus:ring-2 focus:ring-blue-600 outline-none appearance-none text-gray-900"
-                  >
-                    <option value="all">All Specialties</option>
-                    {allSpecialties.map((s) => (
-                      <option key={s.id} value={s.id}>{s.title}</option>
-                    ))}
-                  </select>
-                </div>
+      <section className="border-b border-slate-200 bg-white py-14">
+        <div className="mx-auto grid max-w-7xl gap-8 px-4 sm:px-6 lg:grid-cols-4 lg:px-8">
+          {[
+            ['Vetted specialists', 'Clinical profiles are structured so patients can compare expertise, focus and availability.'],
+            ['Private hospitals', 'Queretaro offers modern medical infrastructure without the friction of oversized destination cities.'],
+            ['Transparent journey', 'Patients understand the path before traveling: review, appointment, procedure and recovery.'],
+            ['English-first coordination', 'Clear communication for international patients from first inquiry to follow-up.'],
+          ].map(([title, description]) => (
+            <article key={title} className="rounded-lg border border-slate-200 p-5">
+              <CheckCircleIcon className="h-6 w-6 text-brand-primary" />
+              <h2 className="mt-4 text-lg font-extrabold text-slate-950">{title}</h2>
+              <p className="mt-2 text-sm leading-6 text-slate-600">{description}</p>
+            </article>
+          ))}
+        </div>
+      </section>
 
-                <button 
-                  type="submit" 
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-4 rounded-xl shadow-lg shadow-blue-200 transition-all uppercase tracking-widest mt-2"
-                >
-                  Search Specialists
-                </button>
-              </form>
-            </div>
+      <section className="bg-slate-50 py-20">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="max-w-3xl">
+            <p className="text-sm font-bold uppercase tracking-[0.22em] text-brand-primary">
+              Patient journey
+            </p>
+            <h2 className="mt-3 text-4xl font-black tracking-tight text-slate-950 md:text-5xl">
+              A medical trip should feel planned, not improvised.
+            </h2>
+            <p className="mt-5 text-lg leading-8 text-slate-600">
+              Our platform turns uncertainty into a clear sequence of decisions, documents, consultations and recovery steps.
+            </p>
+          </div>
 
+          <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
+            {journeySteps.map((step, index) => {
+              const Icon = step.icon
+              return (
+                <article key={step.title} className="rounded-lg border border-slate-200 bg-white p-6">
+                  <div className="flex items-center justify-between">
+                    <Icon className="h-8 w-8 text-brand-primary" />
+                    <span className="text-sm font-black text-slate-300">0{index + 1}</span>
+                  </div>
+                  <h3 className="mt-6 text-xl font-extrabold text-slate-950">{step.title}</h3>
+                  <p className="mt-3 text-sm leading-6 text-slate-600">{step.description}</p>
+                </article>
+              )
+            })}
           </div>
         </div>
       </section>
 
-      
+      <section className="bg-white py-20">
+        <div className="mx-auto grid max-w-7xl gap-12 px-4 sm:px-6 lg:grid-cols-[0.95fr_1.05fr] lg:px-8">
+          <div>
+            <p className="text-sm font-bold uppercase tracking-[0.22em] text-brand-primary">
+              Why Queretaro
+            </p>
+            <h2 className="mt-3 text-4xl font-black tracking-tight text-slate-950 md:text-5xl">
+              The hidden gem of medical tourism in Mexico.
+            </h2>
+          </div>
+
+          <div>
+            <p className="text-lg leading-8 text-slate-700">
+              Queretaro combines the standards international patients expect with the calm they need while recovering. The city is known for safety, order, modern infrastructure, strong business culture and a quality of life that feels more personal than the typical medical tourism corridor.
+            </p>
+            <p className="mt-5 text-lg leading-8 text-slate-700">
+              For patients, that means less noise around the medical decision: easier mobility, premium private care, reliable hotels, a beautiful historic center and access to a city that feels secure, modern and quietly sophisticated.
+            </p>
+
+            <ul className="mt-8 grid gap-3 sm:grid-cols-2">
+              {queretaroAdvantages.map((advantage) => (
+                <li key={advantage} className="flex gap-3 rounded-lg border border-slate-200 p-4 text-sm font-semibold text-slate-700">
+                  <CheckCircleIcon className="mt-0.5 h-5 w-5 shrink-0 text-brand-primary" />
+                  {advantage}
+                </li>
+              ))}
+            </ul>
+
+            <Link
+              href="/patient-journey"
+              className="mt-8 inline-flex items-center gap-2 rounded-lg bg-brand-primary px-5 py-3 text-sm font-extrabold uppercase tracking-[0.14em] text-white transition hover:brightness-110"
+            >
+              Explore the patient journey
+              <ArrowRightIcon className="h-4 w-4" />
+            </Link>
+          </div>
+        </div>
+      </section>
     </main>
-  );
+  )
 }

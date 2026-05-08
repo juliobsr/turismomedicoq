@@ -29,7 +29,7 @@ interface FooterProps {
  */
 export const Footer = ({ settings }: FooterProps) => {
   // 1. Fallbacks for resilience
-  const companyName = settings?.companyName || 'Vzsoluciones Medical'
+  const companyName = settings?.companyName || 'Queretaro Medical'
   const currentYear = new Date().getFullYear()
 
   // 2. Dynamic Branding Logic (Matching the Header)
