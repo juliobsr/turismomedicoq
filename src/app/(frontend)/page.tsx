@@ -21,6 +21,9 @@ export const revalidate = 3600
 const heroImage =
   'https://elements-resized.envatousercontent.com/envato-dam-assets-production/EVA/TRX/16/38/c6/40/8b/v1_E11/E117OW06.jpg?w=1600&cf_fit=scale-down&mark-alpha=18&mark=https%3A%2F%2Felements-assets.envato.com%2Fstatic%2Fwatermark4.png&q=85&format=auto&s=1968228562e3f1ac81aff123d89abafcc51bfe5b336a70b538b1fdc533650720'
 
+const cityImage = '/media/globals/queretaro-panoramica-1-1920x1080.jpg'
+const aqueductImage = '/media/globals/ACUEDUCTO-DE-QUERETARO1-1.jpg'
+
 const journeySteps = [
   {
     title: 'Clinical review',
@@ -210,26 +213,45 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="border-b border-slate-200 bg-white py-14">
-        <div className="mx-auto grid max-w-7xl gap-8 px-4 sm:px-6 lg:grid-cols-4 lg:px-8">
+      <section className="bg-slate-950 py-14 text-white">
+        <div className="mx-auto grid max-w-7xl gap-5 px-4 sm:px-6 lg:grid-cols-4 lg:px-8">
           {[
             ['Vetted specialists', 'Clinical profiles are structured so patients can compare expertise, focus and availability.'],
             ['Private hospitals', 'Queretaro offers modern medical infrastructure without the friction of oversized destination cities.'],
             ['Transparent journey', 'Patients understand the path before traveling: review, appointment, procedure and recovery.'],
             ['English-first coordination', 'Clear communication for international patients from first inquiry to follow-up.'],
           ].map(([title, description]) => (
-            <article key={title} className="rounded-lg border border-slate-200 p-5">
-              <CheckCircleIcon className="h-6 w-6 text-brand-primary" />
-              <h2 className="mt-4 text-lg font-extrabold text-slate-950">{title}</h2>
-              <p className="mt-2 text-sm leading-6 text-slate-600">{description}</p>
+            <article key={title} className="rounded-lg border border-white/10 bg-white/[0.06] p-5">
+              <CheckCircleIcon className="h-6 w-6 text-blue-300" />
+              <h2 className="mt-4 text-lg font-extrabold text-white">{title}</h2>
+              <p className="mt-2 text-sm leading-6 text-slate-300">{description}</p>
             </article>
           ))}
         </div>
       </section>
 
-      <section className="bg-slate-50 py-20">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl">
+      <section className="bg-[#eef5f2] py-24">
+        <div className="mx-auto grid max-w-7xl gap-12 px-4 sm:px-6 lg:grid-cols-[0.9fr_1.1fr] lg:items-center lg:px-8">
+          <div className="relative min-h-[520px] overflow-hidden rounded-lg bg-slate-900 shadow-2xl shadow-slate-900/20">
+            <Image
+              src={cityImage}
+              alt="Panoramic view of Queretaro for medical tourism recovery"
+              fill
+              className="object-cover"
+              sizes="(max-width: 1024px) 100vw, 560px"
+            />
+            <div className="absolute inset-0 bg-slate-950/35" />
+            <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-blue-100">
+                Planned care, calmer recovery
+              </p>
+              <p className="mt-3 max-w-md text-2xl font-extrabold leading-tight">
+                A medical journey designed before the patient boards a plane.
+              </p>
+            </div>
+          </div>
+
+          <div>
             <p className="text-sm font-bold uppercase tracking-[0.22em] text-brand-primary">
               Patient journey
             </p>
@@ -239,28 +261,30 @@ export default async function HomePage() {
             <p className="mt-5 text-lg leading-8 text-slate-600">
               Our platform turns uncertainty into a clear sequence of decisions, documents, consultations and recovery steps.
             </p>
-          </div>
 
-          <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
-            {journeySteps.map((step, index) => {
-              const Icon = step.icon
-              return (
-                <article key={step.title} className="rounded-lg border border-slate-200 bg-white p-6">
-                  <div className="flex items-center justify-between">
-                    <Icon className="h-8 w-8 text-brand-primary" />
-                    <span className="text-sm font-black text-slate-300">0{index + 1}</span>
-                  </div>
-                  <h3 className="mt-6 text-xl font-extrabold text-slate-950">{step.title}</h3>
-                  <p className="mt-3 text-sm leading-6 text-slate-600">{step.description}</p>
-                </article>
-              )
-            })}
+            <div className="mt-10 grid gap-4 sm:grid-cols-2">
+              {journeySteps.map((step, index) => {
+                const Icon = step.icon
+                return (
+                  <article key={step.title} className="rounded-lg border border-white bg-white/80 p-6 shadow-sm">
+                    <div className="flex items-center justify-between">
+                      <span className="flex h-11 w-11 items-center justify-center rounded-lg bg-brand-primary text-white">
+                        <Icon className="h-6 w-6" />
+                      </span>
+                      <span className="text-sm font-black text-slate-300">0{index + 1}</span>
+                    </div>
+                    <h3 className="mt-6 text-xl font-extrabold text-slate-950">{step.title}</h3>
+                    <p className="mt-3 text-sm leading-6 text-slate-600">{step.description}</p>
+                  </article>
+                )
+              })}
+            </div>
           </div>
         </div>
       </section>
 
-      <section className="bg-white py-20">
-        <div className="mx-auto grid max-w-7xl gap-12 px-4 sm:px-6 lg:grid-cols-[0.95fr_1.05fr] lg:px-8">
+      <section className="bg-white py-24">
+        <div className="mx-auto grid max-w-7xl gap-12 px-4 sm:px-6 lg:grid-cols-[0.95fr_1.05fr] lg:items-center lg:px-8">
           <div>
             <p className="text-sm font-bold uppercase tracking-[0.22em] text-brand-primary">
               Why Queretaro
@@ -268,9 +292,18 @@ export default async function HomePage() {
             <h2 className="mt-3 text-4xl font-black tracking-tight text-slate-950 md:text-5xl">
               The hidden gem of medical tourism in Mexico.
             </h2>
+            <div className="relative mt-10 aspect-[4/3] overflow-hidden rounded-lg bg-slate-200 shadow-xl shadow-slate-900/15">
+              <Image
+                src={aqueductImage}
+                alt="Historic aqueduct in Queretaro, Mexico"
+                fill
+                className="object-cover"
+                sizes="(max-width: 1024px) 100vw, 520px"
+              />
+            </div>
           </div>
 
-          <div>
+          <div className="rounded-lg bg-slate-50 p-6 ring-1 ring-slate-200 md:p-8">
             <p className="text-lg leading-8 text-slate-700">
               Queretaro combines the standards international patients expect with the calm they need while recovering. The city is known for safety, order, modern infrastructure, strong business culture and a quality of life that feels more personal than the typical medical tourism corridor.
             </p>
@@ -280,7 +313,7 @@ export default async function HomePage() {
 
             <ul className="mt-8 grid gap-3 sm:grid-cols-2">
               {queretaroAdvantages.map((advantage) => (
-                <li key={advantage} className="flex gap-3 rounded-lg border border-slate-200 p-4 text-sm font-semibold text-slate-700">
+                <li key={advantage} className="flex gap-3 rounded-lg border border-slate-200 bg-white p-4 text-sm font-semibold text-slate-700">
                   <CheckCircleIcon className="mt-0.5 h-5 w-5 shrink-0 text-brand-primary" />
                   {advantage}
                 </li>
