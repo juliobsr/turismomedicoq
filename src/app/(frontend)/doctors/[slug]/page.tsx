@@ -5,6 +5,7 @@ import { notFound } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
 import type { Metadata } from 'next'
+import { SparklesIcon } from '@heroicons/react/24/outline'
 import type { Doctor, MedicalAsset, Specialty, Procedure, Facility } from '@/payload-types'
 
 // Services & Context
@@ -122,6 +123,7 @@ export default async function DoctorProfilePage({ params }: DoctorProfileProps) 
   const specialties = doctor.specialties as Specialty[] | undefined
   const proceduresRaw = doctor.procedures as Procedure[] | undefined
   const facilities = doctor.facilities as Facility[] | undefined
+  const showForbesBadge = doctor.slug === 'dr-jose-larrinua'
 
   // 🚀 DEFENSIVE PROGRAMMING: Safely extract procedures for the Lead Form
   // Prevents 'Cannot read properties of undefined (reading 'map')'
@@ -181,6 +183,15 @@ export default async function DoctorProfilePage({ params }: DoctorProfileProps) 
           <div className="text-center md:text-left flex-grow">
             <h1 className="text-4xl md:text-5xl font-extrabold mb-4">{doctor.fullName}</h1>
             {doctor.metaTitle && <h2 className="text-xl text-white/80 font-medium mb-4">{doctor.metaTitle}</h2>}
+
+            {showForbesBadge && (
+              <div className="mb-5 inline-flex max-w-2xl items-center gap-3 rounded-lg bg-amber-400 px-4 py-3 text-left text-sm font-extrabold text-slate-950 shadow-lg shadow-amber-950/20">
+                <SparklesIcon className="h-5 w-5 shrink-0" />
+                <span>
+                  Featured by Forbes Mexico as one of the country’s leading physicians in 2022.
+                </span>
+              </div>
+            )}
             
             {specialties && specialties.length > 0 && (
               <div className="flex flex-wrap gap-3 justify-center md:justify-start">

@@ -69,7 +69,7 @@ export const FacilityGallery = ({ images = [] }: FacilityGalleryProps) => {
           <div
             key={img.id}
             onClick={() => setLightboxIndex(idx)}
-            className="group relative aspect-[4/3] w-full cursor-zoom-in overflow-hidden rounded-2xl bg-slate-100 shadow-sm transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
+            className="group relative aspect-[4/3] w-full cursor-zoom-in overflow-hidden rounded-lg bg-slate-100 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
           >
             <Image
               src={img.url!}
@@ -84,7 +84,7 @@ export const FacilityGallery = ({ images = [] }: FacilityGalleryProps) => {
             {/* Elegant Hover Overlay */}
             <div className="absolute inset-0 bg-slate-900/0 transition-all duration-300 group-hover:bg-slate-900/30 flex items-center justify-center">
               <div className="translate-y-4 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
-                <span className="flex items-center gap-2 bg-white/95 backdrop-blur-sm px-5 py-2.5 rounded-full text-slate-900 text-sm font-bold shadow-lg">
+                <span className="flex items-center gap-2 rounded-lg bg-white/95 px-5 py-2.5 text-sm font-bold text-slate-900 shadow-lg backdrop-blur-sm">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
                   </svg>

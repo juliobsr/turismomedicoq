@@ -7,6 +7,15 @@ import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import type { Metadata } from 'next';
+import {
+  ArrowRightIcon,
+  BuildingOffice2Icon,
+  CheckCircleIcon,
+  CpuChipIcon,
+  ShieldCheckIcon,
+  SparklesIcon,
+  UserGroupIcon,
+} from '@heroicons/react/24/outline';
 import type { Facility, MedicalAsset, Specialty, Doctor } from '@/payload-types';
 
 // Components
@@ -21,6 +30,15 @@ interface FacilityPageProps {
 
 // ISR: Revalidate the static page every hour to keep doctor rosters and gallery fresh
 export const revalidate = 3600; 
+
+const publicFacilityImage = (asset?: MedicalAsset): MedicalAsset | undefined => {
+  if (!asset?.filename?.startsWith('hospital-angeles-')) return asset
+
+  return {
+    ...asset,
+    url: `/media/facilities/${asset.filename}`,
+  }
+}
 
 /**
  * Enterprise Architecture: Static Path Generation (SSG)
@@ -62,16 +80,28 @@ export async function generateMetadata({ params }: FacilityPageProps): Promise<M
   const facility = docs[0] as Facility | undefined;
   if (!facility) return {};
 
-  const primaryImage = (facility.heroImage as MedicalAsset)?.url;
+  const primaryImage = publicFacilityImage(facility.heroImage as MedicalAsset | undefined)?.url;
+
+  const title = `${facility.name} | Tier 1 Private Hospital in Queretaro`
+  const description = `Explore ${facility.name}, a Tier 1 private hospital environment in Queretaro with advanced technology, modern infrastructure and specialist care for international patients.`
 
   return {
-    title: `${facility.name} | Premium Medical Facilities`,
-    description: `Explore the world-class medical infrastructure at ${facility.name} located in ${facility.city}.`,
+    title,
+    description,
+    alternates: {
+      canonical: `/facilities/${resolvedParams.slug}`,
+    },
     openGraph: {
-      title: facility.name,
-      description: `State-of-the-art medical facility in ${facility.city}.`,
+      title,
+      description,
       type: 'website',
       images: primaryImage ? [{ url: primaryImage }] : [],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: primaryImage ? [primaryImage] : [],
     },
   };
 }
@@ -97,10 +127,34 @@ export default async function FacilityDetailPage({ params }: FacilityPageProps) 
   }
 
   // Defensive Type Casting and Safety Fallbacks
-  const heroImage = facility.heroImage as MedicalAsset | undefined;
+  const heroImage = publicFacilityImage(facility.heroImage as MedicalAsset | undefined);
   const specialties = (facility.specialtiesOffered as Specialty[] | undefined) || [];
   const doctors = (facility.doctors as Doctor[] | undefined) || [];
-  const galleryImages = (facility.infrastructureGallery as MedicalAsset[] | undefined) || [];
+  const galleryImages = ((facility.infrastructureGallery as MedicalAsset[] | undefined) || []).map(
+    publicFacilityImage
+  ).filter((asset): asset is MedicalAsset => Boolean(asset));
+  const isHospitalAngeles = facility.slug === 'hospital-angeles-centro-sur'
+
+  const premiumPoints = [
+    {
+      title: 'Tier 1 private-hospital environment',
+      description:
+        'Designed for complex specialty care, privacy, comfort and international patient confidence.',
+      icon: ShieldCheckIcon,
+    },
+    {
+      title: 'Advanced technology platform',
+      description:
+        'Public hospital information highlights modern facilities, imaging, laboratory, intensive care and surgical areas.',
+      icon: CpuChipIcon,
+    },
+    {
+      title: 'Specialist medical staff ecosystem',
+      description:
+        'A high-caliber private network where leading specialists can coordinate care inside a modern hospital setting.',
+      icon: UserGroupIcon,
+    },
+  ]
 
   /**
    * JSON-LD: MedicalClinic Schema
@@ -128,50 +182,127 @@ export default async function FacilityDetailPage({ params }: FacilityPageProps) 
       />
 
       {/* Hero Section with LCP Optimization */}
-      <section className="relative w-full h-[50vh] min-h-[400px] max-h-[600px] bg-slate-900">
+      <section className="relative min-h-[680px] w-full bg-slate-900">
         {heroImage?.url && (
           <Image
             src={heroImage.url}
             alt={heroImage.alt || facility.name}
             fill
-            className="object-cover opacity-60"
+            className="object-cover opacity-55"
             priority // Critical for Core Web Vitals (LCP)
             sizes="100vw"
           />
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/40 to-transparent" />
+        <div className="absolute inset-0 bg-slate-950/55" />
         
-        <div className="absolute bottom-0 left-0 w-full">
-          <div className="max-w-7xl mx-auto px-4 pb-12">
-            <span className="inline-block bg-blue-600 text-white text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full mb-4 shadow-sm">
+        <div className="relative z-10 mx-auto flex min-h-[680px] max-w-7xl flex-col justify-end px-4 py-16">
+          <div className="max-w-4xl">
+            <span className="mb-5 inline-flex items-center gap-2 rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-xs font-bold uppercase tracking-[0.18em] text-blue-100 backdrop-blur">
+              <BuildingOffice2Icon className="h-4 w-4" />
               {facility.city}
             </span>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-white tracking-tight">
+            <h1 className="text-5xl font-black leading-[1.02] tracking-tight text-white md:text-7xl">
               {facility.name}
             </h1>
+            <p className="mt-6 max-w-3xl text-lg leading-8 text-slate-100 md:text-xl">
+              A Tier 1 private hospital environment in Queretaro for patients who expect advanced technology, elite specialist care and a recovery setting that feels secure, modern and well coordinated.
+            </p>
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+              <Link
+                href="/doctors/dr-jose-larrinua"
+                className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-5 py-3 text-sm font-extrabold uppercase tracking-[0.14em] text-slate-950 transition hover:bg-slate-100"
+              >
+                View specialist
+                <ArrowRightIcon className="h-4 w-4" />
+              </Link>
+              <Link
+                href="/patient-journey"
+                className="inline-flex items-center justify-center gap-2 rounded-lg border border-white/35 px-5 py-3 text-sm font-extrabold uppercase tracking-[0.14em] text-white transition hover:bg-white/10"
+              >
+                Plan patient journey
+              </Link>
+            </div>
           </div>
         </div>
       </section>
 
+      <section className="bg-slate-950 py-8 text-white">
+        <div className="mx-auto grid max-w-7xl gap-4 px-4 md:grid-cols-3">
+          {premiumPoints.map((point) => {
+            const Icon = point.icon
+
+            return (
+              <article key={point.title} className="rounded-lg border border-white/10 bg-white/[0.06] p-5">
+                <Icon className="h-7 w-7 text-blue-300" />
+                <h2 className="mt-4 text-lg font-extrabold">{point.title}</h2>
+                <p className="mt-2 text-sm leading-6 text-slate-300">{point.description}</p>
+              </article>
+            )
+          })}
+        </div>
+      </section>
+
       {/* Main Content Layout */}
-      <section className="max-w-7xl mx-auto px-4 py-16 grid grid-cols-1 lg:grid-cols-3 gap-16">
+      <section className="mx-auto grid max-w-7xl grid-cols-1 gap-16 px-4 py-16 lg:grid-cols-3">
         
         {/* Left Column: Description & Gallery */}
         <div className="lg:col-span-2 space-y-12">
-          <div className="prose prose-lg prose-slate max-w-none">
-            <h2 className="text-3xl font-bold text-slate-900 mb-6">About the Facility</h2>
+          <div className="rounded-lg bg-white p-8 shadow-sm ring-1 ring-slate-200 md:p-10">
+            <p className="text-sm font-bold uppercase tracking-[0.2em] text-blue-700">
+              Private hospital profile
+            </p>
+            <h2 className="mt-3 text-3xl font-black tracking-tight text-slate-900">
+              Built for high-confidence medical travel.
+            </h2>
             {/* Assuming description is RichText (Lexical) from Payload */}
             {facility.description ? (
-              <LexicalRenderer data={facility.description} />
+              <LexicalRenderer data={facility.description} className="mt-6" />
             ) : (
               <p className="text-slate-500 italic">No description available.</p>
             )}
           </div>
 
+          {isHospitalAngeles && (
+            <section className="rounded-lg bg-[#eef5f2] p-8 ring-1 ring-emerald-100 md:p-10">
+              <div className="grid gap-8 md:grid-cols-[0.8fr_1.2fr] md:items-center">
+                <div>
+                  <p className="text-sm font-bold uppercase tracking-[0.2em] text-brand-primary">
+                    US patient standard
+                  </p>
+                  <h2 className="mt-3 text-3xl font-black tracking-tight text-slate-950">
+                    Designed to stand shoulder to shoulder with premium private care expectations.
+                  </h2>
+                </div>
+                <div className="space-y-4">
+                  {[
+                    'Advanced operating, intensive care, imaging, laboratory and hospitalization environments.',
+                    'A medical staff ecosystem capable of supporting high-complexity specialty care.',
+                    'A Centro Sur location that makes post-treatment logistics easier for patients and companions.',
+                  ].map((item) => (
+                    <p key={item} className="flex gap-3 text-sm font-semibold leading-6 text-slate-700">
+                      <CheckCircleIcon className="mt-0.5 h-5 w-5 shrink-0 text-emerald-600" />
+                      {item}
+                    </p>
+                  ))}
+                </div>
+              </div>
+            </section>
+          )}
+
           {/* Infrastructure Gallery Client Component */}
           {galleryImages.length > 0 && (
             <div className="mt-12">
-              <h3 className="text-2xl font-bold text-slate-900 mb-6">Infrastructure Gallery</h3>
+              <div className="mb-6 flex items-end justify-between gap-6">
+                <div>
+                  <p className="text-sm font-bold uppercase tracking-[0.2em] text-blue-700">
+                    Visual tour
+                  </p>
+                  <h3 className="mt-2 text-3xl font-black tracking-tight text-slate-900">
+                    Infrastructure Gallery
+                  </h3>
+                </div>
+                <SparklesIcon className="hidden h-8 w-8 text-blue-700 md:block" />
+              </div>
               {/* Reusing a client-side Lightbox gallery approach */}
               <FacilityGallery images={galleryImages} />
             </div>
@@ -182,7 +313,7 @@ export default async function FacilityDetailPage({ params }: FacilityPageProps) 
         <aside className="space-y-10">
           
           {/* Specialties Widget */}
-          <div className="bg-slate-50 p-8 rounded-3xl border border-slate-200">
+          <div className="rounded-lg border border-slate-200 bg-slate-50 p-8">
             <h3 className="text-xl font-bold text-slate-900 mb-6 flex items-center gap-2">
               <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
@@ -192,7 +323,7 @@ export default async function FacilityDetailPage({ params }: FacilityPageProps) 
             {specialties.length > 0 ? (
               <ul className="flex flex-wrap gap-2">
                 {specialties.map(spec => (
-                  <li key={spec.id} className="bg-white border border-slate-200 px-4 py-2 rounded-lg text-sm font-semibold text-slate-700 shadow-sm">
+                  <li key={spec.id} className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm">
                     {spec.title}
                   </li>
                 ))}
@@ -203,7 +334,7 @@ export default async function FacilityDetailPage({ params }: FacilityPageProps) 
           </div>
 
           {/* Doctors Widget */}
-          <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-xl shadow-slate-100/50">
+          <div className="rounded-lg border border-slate-200 bg-white p-8 shadow-xl shadow-slate-100/50">
             <h3 className="text-xl font-bold text-slate-900 mb-6 flex items-center gap-2">
               <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
@@ -216,7 +347,7 @@ export default async function FacilityDetailPage({ params }: FacilityPageProps) 
                   <Link 
                     key={doc.id} 
                     href={`/doctors/${doc.slug}`}
-                    className="flex items-center gap-4 p-3 rounded-2xl transition-colors hover:bg-slate-50 group"
+                    className="group flex items-center gap-4 rounded-lg p-3 transition-colors hover:bg-slate-50"
                   >
                     <div className="w-12 h-12 rounded-full overflow-hidden bg-slate-200 relative shrink-0">
                       {(doc.profilePicture as MedicalAsset)?.url && (

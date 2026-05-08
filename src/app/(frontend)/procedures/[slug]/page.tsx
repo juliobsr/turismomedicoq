@@ -5,6 +5,12 @@ import { notFound } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
 import type { Metadata } from 'next'
+import {
+  CheckCircleIcon,
+  ClockIcon,
+  CurrencyDollarIcon,
+  ShieldCheckIcon,
+} from '@heroicons/react/24/outline'
 import type { Procedure, MedicalAsset, Doctor, Facility } from '@/payload-types'
 
 // Core Utilities & Components
@@ -19,6 +25,8 @@ interface ProcedurePageProps {
 }
 
 export const revalidate = 3600 // ISR: Cache for 1 hour
+
+const procedureFallbackImage = '/media/globals/queretaro-panoramica-1-1920x1080.jpg'
 
 // ============================================================================
 // SSG: STATIC PATH GENERATION
@@ -58,28 +66,29 @@ export async function generateMetadata({ params }: ProcedurePageProps): Promise<
   if (!procedure) return {}
 
   const companyName = settings?.companyName || 'Medical Network'
-  const coverImage = (procedure.coverImage as MedicalAsset)?.url
+  const coverImage = (procedure.coverImage as MedicalAsset)?.url || procedureFallbackImage
   
-  // Safe Fallback Title
-  const pageTitle = procedure.name || `${procedure.name} in Mexico | ${companyName}`
+  const pageTitle = `${procedure.name} | Spine Surgery in Queretaro for US Patients`
+  const description = `${procedure.shortSummary} Learn candidacy, recovery planning, bilingual support and treatment options in Queretaro, Mexico.`
 
   return {
     title: pageTitle,
-    description: procedure.shortSummary || procedure.shortSummary,
+    description,
     alternates: {
       canonical: `/procedures/${resolvedParams.slug}`,
     },
     openGraph: {
       title: pageTitle,
-      description: procedure.shortSummary || procedure.shortSummary,
+      description,
       type: 'article',
       siteName: companyName,
-      images: coverImage ? [{ url: coverImage }] : [],
+      images: [{ url: coverImage }],
     },
     twitter: {
       card: 'summary_large_image',
       title: pageTitle,
-      images: coverImage ? [coverImage] : [],
+      description,
+      images: [coverImage],
     }
   }
 }
@@ -162,7 +171,7 @@ export default async function ProcedurePage({ params }: ProcedurePageProps) {
         '@type': 'MedicalClinic',
         name: fac.name,
       })),
-      offers: procedure.pricing?.startingPriceUSD ? {
+      offers: procedure.pricing?.startingPriceUSD && procedure.pricing.startingPriceUSD > 0 ? {
         '@type': 'Offer',
         priceCurrency: 'USD',
         price: procedure.pricing.startingPriceUSD,
@@ -199,24 +208,28 @@ export default async function ProcedurePage({ params }: ProcedurePageProps) {
       />
 
       {/* Hero Section */}
-      <section 
-        style={{ backgroundColor: brandPrimaryColor }} 
-        className="relative w-full h-[50vh] min-h-[400px] flex items-center justify-center overflow-hidden transition-colors duration-300"
+      <section
+        style={{ backgroundColor: brandPrimaryColor }}
+        className="relative flex min-h-[560px] w-full items-center overflow-hidden transition-colors duration-300"
       >
-        {coverImage?.url && (
-          <Image
-            src={coverImage.url}
-            alt={coverImage.alt || procedure.name}
-            fill
-            className="object-cover object-center absolute inset-0 z-0 brightness-[0.4]"
-            priority
-          />
-        )}
-        <div className="relative z-10 text-center px-4 max-w-4xl mx-auto mt-16">
-          <h1 className="text-4xl md:text-6xl font-extrabold text-white drop-shadow-lg mb-6 tracking-tight">
+        <Image
+          src={coverImage?.url || procedureFallbackImage}
+          alt={coverImage?.alt || procedure.name}
+          fill
+          className="absolute inset-0 z-0 object-cover object-center opacity-45"
+          priority
+          sizes="100vw"
+        />
+        <div className="absolute inset-0 z-0 bg-slate-950/55" />
+        <div className="relative z-10 mx-auto max-w-5xl px-4 pt-24 text-center">
+          <p className="mb-5 inline-flex items-center gap-2 rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-xs font-bold uppercase tracking-[0.18em] text-blue-100 backdrop-blur">
+            <ShieldCheckIcon className="h-4 w-4" />
+            Spine treatment in Queretaro for international patients
+          </p>
+          <h1 className="text-4xl font-extrabold tracking-tight text-white drop-shadow-lg md:text-6xl">
             {procedure.name}
           </h1>
-          <p className="text-lg md:text-xl text-slate-200 font-medium max-w-2xl mx-auto drop-shadow-md">
+          <p className="mx-auto mt-6 max-w-3xl text-lg font-medium leading-8 text-slate-100 md:text-xl">
             {procedure.shortSummary}
           </p>
         </div>
@@ -229,18 +242,18 @@ export default async function ProcedurePage({ params }: ProcedurePageProps) {
         <div className="lg:col-span-2 space-y-8">
           
           {/* Quick Facts Card */}
-          <section className="bg-white rounded-2xl p-6 md:p-8 shadow-lg border border-slate-100 flex flex-col md:flex-row gap-6 justify-between items-start md:items-center">
+          <section className="flex flex-col items-start justify-between gap-6 rounded-lg border border-slate-100 bg-white p-6 shadow-lg md:flex-row md:items-center md:p-8">
             <div className="flex-1">
               <p className="text-slate-500 text-sm font-semibold uppercase tracking-wider mb-1">Starting Price</p>
               <p className="text-3xl font-extrabold text-slate-900">
-                {procedure.pricing?.startingPriceUSD 
+                {procedure.pricing?.startingPriceUSD && procedure.pricing.startingPriceUSD > 0
                   ? `$${procedure.pricing.startingPriceUSD.toLocaleString()} USD` 
-                  : 'Contact for Quote'
+                  : 'Personalized Quote'
                 }
               </p>
               {procedure.pricing?.financingAvailable && (
                 <p className="text-sm text-green-600 font-medium mt-1 flex items-center">
-                  <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+                  <CurrencyDollarIcon className="mr-1 h-4 w-4" />
                   Financing Available
                 </p>
               )}
@@ -250,7 +263,7 @@ export default async function ProcedurePage({ params }: ProcedurePageProps) {
               {procedure.surgeryDuration && (
                 <div>
                   <p className="text-slate-500 text-sm font-semibold mb-1 flex items-center">
-                    <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    <ClockIcon className="mr-1 h-4 w-4" />
                     Duration
                   </p>
                   <p className="font-semibold text-slate-900">{procedure.surgeryDuration}</p>
@@ -259,7 +272,7 @@ export default async function ProcedurePage({ params }: ProcedurePageProps) {
               {procedure.recoveryTime && (
                 <div>
                   <p className="text-slate-500 text-sm font-semibold mb-1 flex items-center">
-                    <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                    <CheckCircleIcon className="mr-1 h-4 w-4" />
                     Recovery
                   </p>
                   <p className="font-semibold text-slate-900">{procedure.recoveryTime}</p>
@@ -269,16 +282,16 @@ export default async function ProcedurePage({ params }: ProcedurePageProps) {
           </section>
 
           {/* Procedure Description (RichText) */}
-          <article className="bg-white rounded-3xl p-8 md:p-12 shadow-sm border border-slate-100">
-            <h2 className="text-3xl font-bold text-slate-900 mb-8 border-b border-slate-100 pb-4">
-              About the Procedure
+          <article className="rounded-lg border border-slate-100 bg-white p-8 shadow-sm md:p-12">
+            <h2 className="mb-8 border-b border-slate-100 pb-4 text-3xl font-bold text-slate-900">
+              About this procedure
             </h2>
             <LexicalRenderer data={procedure.fullDescription} />
           </article>
 
           {/* FAQs Section */}
           {procedure.faqs && procedure.faqs.length > 0 && (
-            <section className="bg-white rounded-3xl p-8 md:p-12 shadow-sm border border-slate-100">
+            <section className="rounded-lg border border-slate-100 bg-white p-8 shadow-sm md:p-12">
               <h2 className="text-2xl font-bold text-slate-900 mb-6">Frequently Asked Questions</h2>
               <div className="space-y-6">
                 {procedure.faqs.map((faq, index) => (
@@ -296,7 +309,7 @@ export default async function ProcedurePage({ params }: ProcedurePageProps) {
         <aside className="space-y-8">
           
           {/* Specialists Roster */}
-          <div className="bg-white p-8 rounded-3xl shadow-sm border border-slate-100">
+          <div className="rounded-lg border border-slate-100 bg-white p-8 shadow-sm">
             <h3 className="text-xl font-bold text-slate-900 mb-6">Certified Specialists</h3>
             {performingDoctors.length > 0 ? (
               <ul className="space-y-4">
