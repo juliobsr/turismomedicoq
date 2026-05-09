@@ -126,34 +126,34 @@ const bulletList = (items) => ({
 const description = {
   root: {
     children: [
-      heading('h2', 'A Tier 1 private hospital environment in Queretaro'),
+      heading('h2', 'A hospital experience built around confidence'),
       paragraph(
         text(
-          'Hospital Angeles Centro Sur is one of Queretaro’s most important private hospital environments for international patients who expect advanced infrastructure, privacy, coordinated specialty care and a recovery setting that feels modern, secure and practical.'
+          'For a patient traveling from the United States, the hospital is often the biggest question mark. Hospital Angeles Centro Sur helps reduce that uncertainty. It offers a modern private-hospital environment where patients can feel they are entering a serious, organized and technology-forward medical setting, not improvising care in an unfamiliar place.'
         )
       ),
       paragraph(
         text(
-          'The hospital is located in Centro Sur, one of the most convenient medical and business zones in the city. For patients traveling from the United States, that location matters: hotels, mobility routes, specialist offices and hospital access can be planned with less friction.'
+          'The hospital is located in Centro Sur, one of Queretaro’s most practical areas for medical travel. For patients and companions, that means easier access to hotels, transportation, specialist offices and key city routes. The goal is simple: make the treatment journey feel clear, close and manageable before, during and after the procedure.'
         )
       ),
-      heading('h3', 'Why it matters for medical travel'),
+      heading('h3', 'What this means for the patient'),
       bulletList([
-        'Modern private-hospital infrastructure designed for complex specialty care.',
-        'Access to operating rooms, intensive care, imaging, laboratory and hospitalization services.',
-        'Comfort-focused rooms that support privacy and post-treatment recovery.',
-        'A strong medical staff ecosystem with specialists across major clinical areas.',
+        'A private-hospital setting designed for comfort, privacy and clear medical coordination.',
+        'Access to surgical areas, intensive care, imaging, laboratory and hospitalization services in one environment.',
+        'A practical Centro Sur location that makes recovery logistics easier for patients and companions.',
+        'A specialist ecosystem that supports complex care with the infrastructure patients expect from a premium hospital.',
       ]),
-      heading('h3', 'A competitive standard for US patients'),
+      heading('h3', 'A premium standard for US patients'),
       paragraph(
         text(
-          'For many American patients, the decision is not only about cost. It is about confidence: the hospital environment, the physician team, the ability to understand the plan, and the quality of recovery after treatment. Hospital Angeles Centro Sur helps position Queretaro as a serious alternative to high-end private care settings in the United States, while offering the logistical and recovery advantages of Mexico.'
+          'Patients who compare medical care in Mexico with private care in the United States are not only comparing price. They are comparing trust, cleanliness, communication, technology, physician access and the feeling that someone has thought through the details. Hospital Angeles Centro Sur allows Queretaro to present a premium hospital option that can feel familiar to patients with high expectations, while still offering the recovery advantages and value of Mexico.'
         )
       ),
-      heading('h3', 'Publicly documented infrastructure'),
+      heading('h3', 'Technology and infrastructure patients can understand'),
       paragraph(
         text(
-          'Public information from Hospital Angeles describes modern facilities, advanced technology, specialized areas such as operating rooms, intensive care and laboratory services, and 24/7 emergency attention. Guardian Glass also describes the Centro Sur tower as a 65,000 square meter healthcare project expanding critical medical infrastructure.'
+          'Public information from Hospital Angeles describes modern facilities, advanced technology, specialized areas such as operating rooms, intensive care, imaging, laboratory services and 24/7 emergency attention. Guardian Glass also describes the Centro Sur tower as a 65,000 square meter healthcare project expanding critical medical infrastructure. For patients, that translates into a stronger sense of readiness: the hospital is built to support serious medicine, not just basic care.'
         )
       ),
     ],

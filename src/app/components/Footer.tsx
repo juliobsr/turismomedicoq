@@ -1,6 +1,7 @@
 // src/components/Footer/Footer.tsx
 import Link from 'next/link'
 import { PhoneIcon, EnvelopeIcon, MapPinIcon } from '@heroicons/react/24/outline'
+import { primaryNavigation } from '@/lib/siteNavigation'
 
 // In a real scenario, this comes from your generated @/payload-types
 interface Address {
@@ -83,19 +84,25 @@ export const Footer = ({ settings }: FooterProps) => {
           <div className="mt-16 grid grid-cols-2 gap-8 xl:col-span-2 xl:mt-0">
             <div className="md:grid md:grid-cols-2 md:gap-8">
               <div>
-                <h3 className="text-sm font-bold leading-6 text-brand-primary">SERVICES</h3>
+                <h3 className="text-sm font-bold leading-6 text-brand-primary">NAVIGATION</h3>
                 <nav className="mt-6 space-y-4">
-                  <Link href="/doctors" className="text-sm leading-6 text-gray-200 hover:text-brand-primary transition-colors">Medical Specialists</Link>
-                  <Link href="/facilities" className="block text-sm leading-6 text-gray-200 hover:text-brand-primary transition-colors">Hospitals & Clinics</Link>
-                  <Link href="/patient-journey" className="block text-sm leading-6 text-gray-200 hover:text-brand-primary transition-colors">Travel Concierge</Link>
+                  {primaryNavigation.map((item) => (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      className="block text-sm leading-6 text-gray-200 hover:text-brand-primary transition-colors"
+                    >
+                      {item.label}
+                    </Link>
+                  ))}
                 </nav>
               </div>
               <div className="mt-10 md:mt-0">
-                <h3 className="text-sm font-bold leading-6 text-brand-primary">COMPANY</h3>
+                <h3 className="text-sm font-bold leading-6 text-brand-primary">PATIENT RESOURCES</h3>
                 <nav className="mt-6 space-y-4">
-                  <Link href="/about" className="block text-sm leading-6 text-gray-200 hover:text-brand-primary transition-colors">About Us</Link>
-                  <Link href="/faq" className="block text-sm leading-6 text-gray-200 hover:text-brand-primary transition-colors">FAQ</Link>
-                  <Link href="/contact" className="block text-sm leading-6 text-gray-200 hover:text-brand-primary transition-colors">Contact</Link>
+                  <Link href="/procedures/endoscopic-spine-surgery-queretaro" className="block text-sm leading-6 text-gray-200 hover:text-brand-primary transition-colors">Endoscopic Spine Surgery</Link>
+                  <Link href="/facilities/hospital-angeles-centro-sur" className="block text-sm leading-6 text-gray-200 hover:text-brand-primary transition-colors">Hospital Ángeles Centro Sur</Link>
+                  <Link href="/doctors/dr-jose-larrinua" className="block text-sm leading-6 text-gray-200 hover:text-brand-primary transition-colors">Dr. Larrinua Profile</Link>
                 </nav>
               </div>
             </div>

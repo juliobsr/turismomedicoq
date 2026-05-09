@@ -3,6 +3,15 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Facility, MedicalAsset, Specialty } from '@/payload-types';
 
+const publicFacilityImage = (asset?: MedicalAsset): MedicalAsset | undefined => {
+  if (!asset?.filename?.startsWith('hospital-angeles-')) return asset
+
+  return {
+    ...asset,
+    url: `/media/facilities/${asset.filename}`,
+  }
+}
+
 /**
  * Enterprise Interface for FacilityCard
  * Strictly typed to handle Payload CMS relational data.
@@ -31,13 +40,17 @@ export default function FacilityCard({ facility, priority = false }: FacilityCar
   } = facility;
 
   // Type Casting for the Media object (assuming Depth 1)
-  const image = heroImage as MedicalAsset | undefined;
+  const image = publicFacilityImage(heroImage as MedicalAsset | undefined);
   
   // Extracting and limiting specialties for UI consistency
   const displayedSpecialties = (specialtiesOffered as Specialty[] | undefined)?.slice(0, 3);
 
   return (
-    <article className="group bg-white rounded-2xl overflow-hidden border border-slate-200 shadow-sm transition-all duration-300 hover:shadow-xl hover:-translate-y-1 flex flex-col h-full">
+    <Link
+      href={`/facilities/${slug}`}
+      className="group flex h-full flex-col overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl focus:outline-none focus:ring-4 focus:ring-blue-100"
+      aria-label={`View infrastructure for ${name}`}
+    >
       {/* 
           Image Container: 
           Uses fixed aspect ratio to eliminate Cumulative Layout Shift (CLS).
@@ -93,10 +106,7 @@ export default function FacilityCard({ facility, priority = false }: FacilityCar
 
         {/* Primary Call to Action */}
         <div className="mt-auto">
-          <Link 
-            href={`/facilities/${slug}`}
-            className="inline-flex items-center justify-center w-full bg-slate-900 text-white text-sm font-bold py-3 rounded-xl transition-all hover:bg-blue-700 focus:ring-4 focus:ring-blue-100"
-          >
+          <span className="inline-flex w-full items-center justify-center rounded-lg bg-slate-900 py-3 text-sm font-bold text-white transition-all group-hover:bg-blue-700">
             View Infrastructure
             <svg 
               className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" 
@@ -106,9 +116,9 @@ export default function FacilityCard({ facility, priority = false }: FacilityCar
             >
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
             </svg>
-          </Link>
+          </span>
         </div>
       </div>
-    </article>
+    </Link>
   );
 }

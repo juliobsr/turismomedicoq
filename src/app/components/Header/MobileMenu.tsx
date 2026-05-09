@@ -7,6 +7,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Bars3Icon, XMarkIcon, PhoneIcon } from '@heroicons/react/24/outline'
 import type { Specialty } from '@/payload-types'
+import { primaryNavigation } from '@/lib/siteNavigation'
 
 interface MobileMenuProps {
   specialties: Specialty[]
@@ -97,19 +98,15 @@ export const MobileMenu = ({
         <div className="mt-6 flow-root">
           <div className="-my-6 divide-y divide-gray-100">
             <div className="space-y-2 py-6">
-              
-              <Link href="/facilities" className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-brand-text hover:bg-gray-50 hover:text-brand-primary transition-colors">
-                Hospitals
-              </Link>
-              <Link href="/facilities" className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-brand-text hover:bg-gray-50 hover:text-brand-primary transition-colors">
-                How it Works?
-              </Link>
-              <Link href="/patient-journey" className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-brand-text hover:bg-gray-50 hover:text-brand-primary transition-colors">
-                Hospitals
-              </Link>
-              <Link href="/why-queretaro" className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-brand-text hover:bg-gray-50 hover:text-brand-primary transition-colors">
-                Why Queretaro?
-              </Link>
+              {primaryNavigation.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-brand-text hover:bg-gray-50 hover:text-brand-primary transition-colors"
+                >
+                  {item.label}
+                </Link>
+              ))}
 
               {/* Dynamic Specialties Section */}
               <div className="pt-4 pb-2">

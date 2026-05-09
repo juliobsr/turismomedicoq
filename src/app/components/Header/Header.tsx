@@ -2,6 +2,7 @@
 import Link from 'next/link'
 import { PhoneIcon } from '@heroicons/react/20/solid'
 import { getActiveSpecialtiesForMenu } from '@/lib/navigation'
+import { primaryNavigation } from '@/lib/siteNavigation'
 import { SpecialtiesDropdown } from './SpecialtiesDropdown'
 import { MobileMenu } from './MobileMenu'
 
@@ -67,16 +68,17 @@ const rawCompanyName = companyName || 'Queretaro Medical'
         {/* Central Navigation Links */}
         <div className="hidden lg:flex lg:gap-x-8 items-center">
           <SpecialtiesDropdown specialties={activeSpecialties} />
-          {/* ✅ UPDATED: hover:text-brand-primary */}
-          <Link href="/facilities" className="text-sm font-semibold leading-6 text-brand-text hover:text-brand-primary transition-colors">
-            Hospitals
-          </Link>
-          <Link href="/patient-journey" className="text-sm font-semibold leading-6 text-brand-text hover:text-brand-primary transition-colors">
-            How it Works?
-          </Link>
-          <Link href="/why-queretaro" className="text-sm font-semibold leading-6 text-brand-text hover:text-brand-primary transition-colors">
-            Why Queretaro?
-          </Link>
+          {primaryNavigation
+            .filter((item) => item.href !== '/doctors')
+            .map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="text-sm font-semibold leading-6 text-brand-text hover:text-brand-primary transition-colors"
+              >
+                {item.label}
+              </Link>
+            ))}
         </div>
 
         {/* Click-to-Call Button */}
