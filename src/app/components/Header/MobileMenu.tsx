@@ -121,7 +121,7 @@ export const MobileMenu = ({
                   {specialties.map((spec) => (
                     <Link
                       key={spec.id}
-                      href={`/doctors/${spec.slug}`}
+                      href={`/doctors?specialty=${spec.slug}`}
                       className="block rounded-lg py-2 text-sm text-gray-600 hover:text-brand-primary transition-colors"
                     >
                       {spec.title}
