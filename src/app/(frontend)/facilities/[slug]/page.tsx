@@ -251,9 +251,7 @@ export default async function FacilityDetailPage({ params }: FacilityPageProps) 
             <p className="text-sm font-bold uppercase tracking-[0.2em] text-blue-700">
               Private hospital profile
             </p>
-            <h2 className="mt-3 text-3xl font-black tracking-tight text-slate-900">
-              Built for high-confidence medical travel.
-            </h2>
+            
             {/* Assuming description is RichText (Lexical) from Payload */}
             {facility.description ? (
               <LexicalRenderer data={facility.description} className="mt-6" />

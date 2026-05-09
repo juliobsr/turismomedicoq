@@ -102,12 +102,12 @@ export const MobileMenu = ({
                 Hospitals
               </Link>
               <Link href="/facilities" className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-brand-text hover:bg-gray-50 hover:text-brand-primary transition-colors">
+                How it Works?
+              </Link>
+              <Link href="/patient-journey" className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-brand-text hover:bg-gray-50 hover:text-brand-primary transition-colors">
                 Hospitals
               </Link>
-              <Link href="/facilities" className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-brand-text hover:bg-gray-50 hover:text-brand-primary transition-colors">
-                Hospitals
-              </Link>
-              <Link href="/about" className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-brand-text hover:bg-gray-50 hover:text-brand-primary transition-colors">
+              <Link href="/why-queretaro" className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-brand-text hover:bg-gray-50 hover:text-brand-primary transition-colors">
                 Why Queretaro?
               </Link>
 
@@ -115,13 +115,13 @@ export const MobileMenu = ({
               <div className="pt-4 pb-2">
                 <p className="text-sm font-bold text-brand-primary mb-2 uppercase tracking-wider">Specialties</p>
                 <div className="space-y-1 pl-3 border-l-2 border-brand-primary/20">
-                  <Link href="/specialties" className="block rounded-lg py-2 text-sm font-semibold text-brand-text hover:text-brand-primary transition-colors">
+                  <Link href="/doctors" className="block rounded-lg py-2 text-sm font-semibold text-brand-text hover:text-brand-primary transition-colors">
                     View All Specialties &rarr;
                   </Link>
                   {specialties.map((spec) => (
                     <Link
                       key={spec.id}
-                      href={`/specialties/${spec.slug}`}
+                      href={`/doctors/${spec.slug}`}
                       className="block rounded-lg py-2 text-sm text-gray-600 hover:text-brand-primary transition-colors"
                     >
                       {spec.title}
