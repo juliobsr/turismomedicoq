@@ -5,7 +5,7 @@ import { notFound } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
 import type { Metadata } from 'next'
-import { SparklesIcon } from '@heroicons/react/24/outline'
+import { PlayCircleIcon, SparklesIcon } from '@heroicons/react/24/outline'
 import type { Doctor, MedicalAsset, Specialty, Procedure, Facility } from '@/payload-types'
 
 // Services & Context
@@ -23,6 +23,56 @@ interface DoctorProfileProps {
 }
 
 export const revalidate = 3600 // ISR: Re-generate page every hour
+
+const toVideoEmbedUrl = (url?: string | null) => {
+  if (!url) return null
+
+  try {
+    const parsed = new URL(url)
+    const host = parsed.hostname.replace(/^www\./, '')
+
+    if (host === 'youtu.be') {
+      const videoId = parsed.pathname.split('/').filter(Boolean)[0]
+      return videoId ? `https://www.youtube.com/embed/${videoId}` : url
+    }
+
+    if (host === 'youtube.com' || host === 'm.youtube.com') {
+      const videoId = parsed.searchParams.get('v')
+      if (videoId) return `https://www.youtube.com/embed/${videoId}`
+      if (parsed.pathname.startsWith('/embed/')) return url
+      if (parsed.pathname.startsWith('/shorts/')) {
+        const videoIdFromPath = parsed.pathname.split('/').filter(Boolean)[1]
+        return videoIdFromPath ? `https://www.youtube.com/embed/${videoIdFromPath}` : url
+      }
+    }
+
+    if (host === 'vimeo.com') {
+      const videoId = parsed.pathname.split('/').filter(Boolean)[0]
+      return videoId ? `https://player.vimeo.com/video/${videoId}` : url
+    }
+
+    return url
+  } catch {
+    return url
+  }
+}
+
+const isDirectVideoUrl = (url?: string | null) => {
+  if (!url) return false
+  return /\.(mp4|webm|ogg)(\?.*)?$/i.test(url)
+}
+
+const isEmbeddableVideoUrl = (url?: string | null) => {
+  if (!url) return false
+
+  try {
+    const parsed = new URL(url)
+    const host = parsed.hostname.replace(/^www\./, '')
+    return host === 'youtu.be' || host === 'youtube.com' || host === 'm.youtube.com' || host === 'vimeo.com'
+  } catch {
+    return false
+  }
+}
 
 // ============================================================================
 // SSG: STATIC PATH GENERATION
@@ -69,7 +119,10 @@ export async function generateMetadata({ params }: DoctorProfileProps): Promise<
   if (!doctor) return {}
 
   const companyName = settings?.companyName || 'Queretaro Medical'
-  const primaryImage = (doctor.profilePicture as MedicalAsset)?.url || (doctor.officeGallery?.[0] as MedicalAsset)?.url
+  const primaryImage =
+    (doctor.heroBackground as MedicalAsset)?.url ||
+    (doctor.profilePicture as MedicalAsset)?.url ||
+    (doctor.officeGallery?.[0] as MedicalAsset)?.url
   
   // SEO Safe Fallback Title
   const pageTitle = doctor.metaTitle 
@@ -120,10 +173,19 @@ export default async function DoctorProfilePage({ params }: DoctorProfileProps) 
 
   // Relationship extraction
   const profilePicture = doctor.profilePicture as MedicalAsset | undefined
+  const heroBackground = doctor.heroBackground as MedicalAsset | undefined
   const specialties = doctor.specialties as Specialty[] | undefined
   const proceduresRaw = doctor.procedures as Procedure[] | undefined
   const facilities = doctor.facilities as Facility[] | undefined
   const showForbesBadge = doctor.slug === 'dr-jose-larrinua'
+  const procedureGallery = doctor.procedureGallery
+    ? (doctor.procedureGallery as any[]).filter((img) => typeof img === 'object')
+    : []
+  const officeGallery = doctor.officeGallery
+    ? (doctor.officeGallery as any[]).filter((img) => typeof img === 'object')
+    : []
+  const patientTestimonials = doctor.patientTestimonials || []
+  const heroImage = heroBackground || officeGallery[0] || profilePicture
 
   // 🚀 DEFENSIVE PROGRAMMING: Safely extract procedures for the Lead Form
   // Prevents 'Cannot read properties of undefined (reading 'map')'
@@ -146,7 +208,7 @@ export default async function DoctorProfilePage({ params }: DoctorProfileProps) 
     '@context': 'https://schema.org',
     '@type': 'Physician',
     name: doctor.fullName,
-    image: profilePicture?.url || (doctor.officeGallery?.[0] as MedicalAsset)?.url,
+    image: heroImage?.url,
     medicalSpecialty: specialties?.map(s => s.title).join(', '),
     description: doctor.metaDescription || `Medical specialist profile for ${doctor.fullName}`,
     address: {
@@ -155,9 +217,6 @@ export default async function DoctorProfilePage({ params }: DoctorProfileProps) 
       addressCountry: 'MX'
     }
   }
-  const galleryImages = doctor.officeGallery 
-  ? (doctor.officeGallery as any[]).filter(img => typeof img === 'object') 
-  : [];
   return (
     <main className="min-h-screen bg-white">
       {/* 🚀 Injected Structured Data */}
@@ -166,9 +225,31 @@ export default async function DoctorProfilePage({ params }: DoctorProfileProps) 
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      {/* Hero Section with Dynamic Branding */}
-      <section style={{ backgroundColor: brandPrimaryColor }} className="text-white py-16 lg:py-24 transition-colors duration-300">
-        <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row gap-12 items-center">
+      {/* Hero Section with Dynamic Media Background */}
+      <section style={{ backgroundColor: brandPrimaryColor }} className="relative overflow-hidden text-white py-16 lg:py-24 transition-colors duration-300">
+        {doctor.heroVideoUrl && isDirectVideoUrl(doctor.heroVideoUrl) ? (
+          <video
+            className="absolute inset-0 h-full w-full object-cover opacity-45"
+            autoPlay
+            muted
+            loop
+            playsInline
+            poster={heroImage?.url}
+          >
+            <source src={doctor.heroVideoUrl} />
+          </video>
+        ) : heroImage?.url ? (
+          <Image
+            src={heroImage.url}
+            alt={heroImage.alt || doctor.fullName}
+            fill
+            className="absolute inset-0 object-cover opacity-45"
+            priority
+            sizes="100vw"
+          />
+        ) : null}
+        <div className="absolute inset-0 bg-slate-950/55" />
+        <div className="relative z-10 max-w-7xl mx-auto px-4 flex flex-col md:flex-row gap-12 items-center">
           <div className="relative w-48 h-48 md:w-64 md:h-64 rounded-full overflow-hidden border-4 border-white/20 flex-shrink-0 shadow-xl bg-white/10">
             {profilePicture?.url && (
               <Image
@@ -192,6 +273,18 @@ export default async function DoctorProfilePage({ params }: DoctorProfileProps) 
                 </span>
               </div>
             )}
+
+            {doctor.heroVideoUrl && !isDirectVideoUrl(doctor.heroVideoUrl) && (
+              <a
+                href={doctor.heroVideoUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="mb-5 inline-flex items-center gap-2 rounded-lg bg-white px-4 py-3 text-sm font-extrabold text-slate-950 shadow-lg transition hover:bg-blue-50"
+              >
+                <PlayCircleIcon className="h-5 w-5 text-blue-700" />
+                Watch profile video
+              </a>
+            )}
             
             {specialties && specialties.length > 0 && (
               <div className="flex flex-wrap gap-3 justify-center md:justify-start">
@@ -205,6 +298,15 @@ export default async function DoctorProfilePage({ params }: DoctorProfileProps) 
           </div>
         </div>
       </section>
+
+      {procedureGallery.length > 0 && (
+        <DoctorGallery
+          images={procedureGallery}
+          eyebrow="Clinical procedure gallery"
+          title={`${doctor.fullName} Procedure Gallery`}
+          itemActionLabel="View procedure image"
+        />
+      )}
 
       {/* Content Section */}
       <section className="max-w-7xl mx-auto px-4 py-16 grid grid-cols-1 lg:grid-cols-3 gap-12">
@@ -273,8 +375,96 @@ export default async function DoctorProfilePage({ params }: DoctorProfileProps) 
       </section>
 
       {/* Integrated Gallery */}
-      {doctor.officeGallery && doctor.officeGallery.length > 0 && (
-        <DoctorGallery images={doctor.officeGallery} />
+      {officeGallery.length > 0 && (
+        <DoctorGallery
+          images={officeGallery}
+          eyebrow="Practice environment"
+          title="Clinic and consultation spaces"
+          itemActionLabel="View clinic image"
+        />
+      )}
+
+      {patientTestimonials.length > 0 && (
+        <section className="bg-slate-950 py-20 text-white">
+          <div className="mx-auto max-w-7xl px-4">
+            <div className="mb-12 max-w-3xl">
+              <p className="text-sm font-bold uppercase tracking-[0.2em] text-blue-300">
+                Patient stories
+              </p>
+              <h2 className="mt-3 text-3xl font-extrabold tracking-tight md:text-4xl">
+                Video testimonials from patients who trusted the process.
+              </h2>
+              <p className="mt-4 text-base leading-7 text-slate-300">
+                These stories help future patients understand the care experience, communication and recovery support before making a decision.
+              </p>
+            </div>
+
+            <div className="grid gap-6 md:grid-cols-2">
+              {patientTestimonials.map((testimonial, index) => {
+                const embedUrl = toVideoEmbedUrl(testimonial.videoUrl)
+                const isDirectVideo = isDirectVideoUrl(embedUrl)
+                const canEmbed = isEmbeddableVideoUrl(testimonial.videoUrl)
+
+                return (
+                  <article key={testimonial.id || `${testimonial.title}-${index}`} className="overflow-hidden rounded-lg border border-white/10 bg-white/5 shadow-2xl shadow-slate-950/30">
+                    <div className="relative aspect-video bg-slate-900">
+                      {embedUrl && isDirectVideo ? (
+                        <video className="h-full w-full object-cover" controls preload="metadata" playsInline>
+                          <source src={embedUrl} />
+                        </video>
+                      ) : embedUrl && canEmbed ? (
+                        <iframe
+                          src={embedUrl}
+                          title={testimonial.title}
+                          className="absolute inset-0 h-full w-full"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                          allowFullScreen
+                          loading="lazy"
+                        />
+                      ) : (
+                        <div className="flex h-full flex-col items-center justify-center gap-4 p-6 text-center">
+                          <PlayCircleIcon className="h-14 w-14 text-white/60" />
+                          <a
+                            href={testimonial.videoUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="rounded-lg bg-white px-5 py-3 text-sm font-extrabold text-slate-950 transition hover:bg-blue-50"
+                          >
+                            Open patient video
+                          </a>
+                        </div>
+                      )}
+                    </div>
+                    <div className="p-6">
+                      <h3 className="text-xl font-extrabold">{testimonial.title}</h3>
+                      {testimonial.patientLocation && (
+                        <p className="mt-2 text-sm font-bold uppercase tracking-[0.16em] text-blue-300">
+                          {testimonial.patientLocation}
+                        </p>
+                      )}
+                      {testimonial.quote && (
+                        <p className="mt-4 text-sm leading-6 text-slate-300">
+                          {testimonial.quote}
+                        </p>
+                      )}
+                      {testimonial.videoUrl && !canEmbed && (
+                        <a
+                          href={testimonial.videoUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="mt-5 inline-flex items-center gap-2 rounded-lg border border-white/15 px-4 py-2 text-sm font-extrabold text-white transition hover:border-blue-300 hover:text-blue-200"
+                        >
+                          Watch video
+                          <PlayCircleIcon className="h-5 w-5" />
+                        </a>
+                      )}
+                    </div>
+                  </article>
+                )
+              })}
+            </div>
+          </div>
+        </section>
       )}
     </main>
   )

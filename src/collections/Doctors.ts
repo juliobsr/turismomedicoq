@@ -115,6 +115,75 @@ export const Doctors: CollectionConfig = {
           ],
         },
         {
+          label: 'Media & Testimonials',
+          fields: [
+            {
+              name: 'heroBackground',
+              type: 'relationship',
+              relationTo: 'doctors-media',
+              required: false,
+              admin: {
+                description: 'Optional hero background image for the public doctor profile.',
+              },
+            },
+            {
+              name: 'heroVideoUrl',
+              type: 'text',
+              required: false,
+              admin: {
+                description: 'Optional direct MP4/WebM URL for the hero background. If present, it overrides the hero image.',
+              },
+            },
+            {
+              name: 'procedureGallery',
+              type: 'relationship',
+              relationTo: 'doctors-media',
+              hasMany: true,
+              required: false,
+              admin: {
+                description: 'Procedure, technology, OR or treatment images shown as a clinical gallery on the doctor profile.',
+              },
+            },
+            {
+              name: 'patientTestimonials',
+              type: 'array',
+              required: false,
+              labels: {
+                singular: 'Patient Testimonial Video',
+                plural: 'Patient Testimonial Videos',
+              },
+              fields: [
+                {
+                  name: 'title',
+                  type: 'text',
+                  required: true,
+                },
+                {
+                  name: 'videoUrl',
+                  type: 'text',
+                  required: true,
+                  admin: {
+                    description: 'YouTube, Vimeo or direct hosted video URL.',
+                  },
+                },
+                {
+                  name: 'patientLocation',
+                  type: 'text',
+                  required: false,
+                  admin: {
+                    description: 'Example: Dallas, Texas or Phoenix, Arizona.',
+                  },
+                },
+                {
+                  name: 'quote',
+                  type: 'textarea',
+                  required: false,
+                },
+              ],
+            },
+          ],
+        },
+        {
           label: 'SEO & Meta',
           fields: [
             {

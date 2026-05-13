@@ -5,15 +5,24 @@ import Link from 'next/link'
 import type { Metadata } from 'next'
 import {
   ArrowRightIcon,
+  ArrowUpTrayIcon,
+  BeakerIcon,
   CheckCircleIcon,
   ClockIcon,
+  HeartIcon,
+  HomeModernIcon,
   LanguageIcon,
+  MapPinIcon,
+  PaperAirplaneIcon,
   ShieldCheckIcon,
+  SparklesIcon,
+  TruckIcon,
+  UserGroupIcon,
 } from '@heroicons/react/24/outline'
 import type { PatientJourney as PatientJourneyType, MedicalAsset } from '@/payload-types'
 
 import { getSiteSettings } from '@/lib/globals'
-import { LeadCaptureForm } from '@/app/components/LeadCaptureForm'
+import { HomeLeadForm } from '@/app/components/HomeLeadForm'
 
 export const revalidate = 3600
 
@@ -31,6 +40,74 @@ const slugify = (value: string) =>
     .replace(/[\u0300-\u036f]/g, '')
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/(^-|-$)+/g, '')
+
+const conciergeTimeline = [
+  {
+    phase: 'Phase 1',
+    title: 'Welcome and VIP Transfer',
+    subtitle: 'The Touchdown',
+    description:
+      'This is often the most nervous moment for the patient. The priority is simple: you are met, guided and never left to figure things out alone.',
+    icon: TruckIcon,
+    items: [
+      'Airport reception at Queretaro International Airport (AIQ) or Mexico City with bilingual coordination.',
+      'Private executive transportation to the hospital or recovery hotel.',
+      'Assisted check-in at the hotel or clinic to remove language barriers from the first hour.',
+    ],
+  },
+  {
+    phase: 'Phase 2',
+    title: 'Pre-op and Hospital Admission',
+    subtitle: 'Clinical safety check',
+    description:
+      'Before treatment begins, the clinical plan is confirmed in person and the patient receives the final safety checks.',
+    icon: BeakerIcon,
+    items: [
+      'Final face-to-face consultation with the specialist to resolve last-minute questions.',
+      'Clinical labs, imaging review and pre-anesthesia evaluations in qualified facilities.',
+      'Hospital admission into a medical suite designed for privacy, comfort and international patient expectations.',
+    ],
+  },
+  {
+    phase: 'Phase 3',
+    title: 'Procedure and Immediate Recovery',
+    subtitle: 'The medical core',
+    description:
+      'The procedure is performed by the selected surgeon, supported by hospital teams and a clear post-op plan.',
+    icon: HeartIcon,
+    items: [
+      'Surgical intervention performed by the specialist selected and reviewed by the patient.',
+      'Hospital stay with 24/7 monitoring by nursing staff familiar with international patient needs.',
+      'Clear post-op updates for the patient and companion so the next steps are understood.',
+    ],
+  },
+  {
+    phase: 'Phase 4',
+    title: 'Concierge Recovery',
+    subtitle: 'More than a hotel stay',
+    description:
+      'Patients often worry about recovering in an ordinary hotel. This phase is designed around comfort, follow-up and safe daily support.',
+    icon: HomeModernIcon,
+    items: [
+      'Medical discharge and private transfer to a recovery hotel or suitable recovery setting.',
+      'Follow-up visits in the patient’s room for wound care, medication control and recovery checks when appropriate.',
+      'Optional light tourism, if medically cleared, such as guided visits through Queretaro’s Historic Center.',
+    ],
+  },
+  {
+    phase: 'Phase 5',
+    title: 'Final Review and Fit to Fly',
+    subtitle: 'Safe return home',
+    description:
+      'The return trip is planned around medical clearance, airline documentation and a final transfer back to the airport.',
+    icon: PaperAirplaneIcon,
+    items: [
+      'Final doctor review with discharge instructions for home care.',
+      'Fit-to-fly documentation when required for post-surgical airline boarding.',
+      'Private transfer back to the airport for the return flight.',
+    ],
+  },
+]
 
 export async function generateMetadata(): Promise<Metadata> {
   const payload = await getPayload({ config: configPromise })
@@ -73,15 +150,39 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function PatientJourneyPage() {
   const payload = await getPayload({ config: configPromise })
 
-  const [settings, journeyData] = await Promise.all([
+  const [settings, journeyData, doctorsResponse, proceduresResponse] = await Promise.all([
     getSiteSettings(),
     payload.findGlobal({ slug: 'patient-journey' }),
+    payload.find({
+      collection: 'doctors',
+      depth: 0,
+      limit: 30,
+      sort: 'fullName',
+      where: { isActive: { equals: true } },
+      select: { id: true, fullName: true },
+    }),
+    payload.find({
+      collection: 'procedures',
+      depth: 0,
+      limit: 30,
+      sort: 'name',
+      where: { isActive: { equals: true } },
+      select: { id: true, name: true },
+    }),
   ])
 
   const journey = journeyData as unknown as PatientJourneyType
   const companyName = settings?.companyName || 'Queretaro Medical'
   const brandPrimaryColor = settings?.primaryColor || '#1e3a8a'
   const heroImage = journey.heroCover as MedicalAsset | undefined
+  const doctors = doctorsResponse.docs.map((doctor) => ({
+    id: String(doctor.id),
+    name: doctor.fullName,
+  }))
+  const procedures = proceduresResponse.docs.map((procedure) => ({
+    id: String(procedure.id),
+    name: procedure.name,
+  }))
 
   const howToSchema = {
     '@context': 'https://schema.org',
@@ -170,124 +271,118 @@ export default async function PatientJourneyPage() {
         </div>
       </section>
 
-      <div className="mx-auto grid max-w-7xl grid-cols-1 gap-12 px-4 py-16 lg:grid-cols-3 lg:gap-16">
-        <div className="lg:col-span-2">
-          <ol className="space-y-14">
-            {journey.steps?.map((step, index) => {
-              const mainStepMedia = step.image as MedicalAsset | undefined
-              const imageSrc = mainStepMedia?.url || stepFallbackImages[index % stepFallbackImages.length]
-              const hasOptions = Boolean(step.options?.length)
+      <section className="bg-[#eef5f2] py-24">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:items-end">
+            <div>
+              <p className="text-sm font-bold uppercase tracking-[0.22em] text-brand-primary">
+                Concierge patient journey
+              </p>
+              <h2 className="mt-3 text-4xl font-black tracking-tight text-slate-950 md:text-5xl">
+                From touchdown to fit-to-fly, every step is guided.
+              </h2>
+            </div>
+            <p className="text-lg leading-8 text-slate-700">
+              Medical travel should not feel like the patient is managing a surgery, a foreign city and a recovery plan alone. This timeline shows how the platform turns each stage into a coordinated, bilingual experience.
+            </p>
+          </div>
 
-              return (
-                <li key={index} className="grid gap-6 border-b border-slate-200 pb-14 md:grid-cols-[240px_minmax(0,1fr)]">
-                  <div className="relative aspect-[4/3] w-full overflow-hidden rounded-lg bg-slate-200 md:sticky md:top-8">
-                    <Image
-                      src={imageSrc}
-                      alt={mainStepMedia?.alt || step.title}
-                      fill
-                      className="object-cover"
-                      sizes="(max-width: 768px) 100vw, 240px"
-                    />
-                    <div
-                      className="absolute left-4 top-4 flex h-10 w-10 items-center justify-center rounded-lg text-sm font-extrabold text-white shadow-lg"
-                      style={{ backgroundColor: brandPrimaryColor }}
-                    >
-                      {index + 1}
+          <div className="mt-14">
+            <ol className="relative space-y-6 before:absolute before:left-6 before:top-4 before:hidden before:h-[calc(100%-2rem)] before:w-px before:bg-slate-300 md:before:block">
+              {conciergeTimeline.map((step, index) => {
+                const Icon = step.icon
+                const isLast = index === conciergeTimeline.length - 1
+
+                return (
+                  <li key={step.title} className="group relative md:pl-20">
+                    <div className="absolute left-0 top-6 hidden h-12 w-12 items-center justify-center rounded-lg bg-slate-950 text-white shadow-lg transition group-hover:bg-brand-primary md:flex">
+                      <Icon className="h-6 w-6" />
                     </div>
-                  </div>
 
-                  <article className="min-w-0">
-                    {step.duration && (
-                      <span className="mb-4 inline-flex items-center gap-2 rounded-lg bg-blue-50 px-3 py-2 text-xs font-bold uppercase tracking-[0.16em] text-blue-700">
-                        <ClockIcon className="h-4 w-4" />
-                        {step.duration}
-                      </span>
-                    )}
+                    <article className="rounded-lg border border-white bg-white/85 p-6 shadow-sm transition duration-300 hover:-translate-y-0.5 hover:shadow-xl md:p-8">
+                      <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+                        <div className="max-w-2xl">
+                          <div className="flex flex-wrap items-center gap-3">
+                            <span className="rounded-lg bg-slate-950 px-3 py-2 text-xs font-extrabold uppercase tracking-[0.18em] text-white">
+                              {step.phase}
+                            </span>
+                            <span className="text-xs font-bold uppercase tracking-[0.18em] text-brand-primary">
+                              {step.subtitle}
+                            </span>
+                          </div>
+                          <h3 className="mt-5 text-2xl font-extrabold tracking-tight text-slate-950 md:text-3xl">
+                            {step.title}
+                          </h3>
+                          <p className="mt-3 text-base leading-7 text-slate-600">
+                            {step.description}
+                          </p>
+                        </div>
 
-                    <h2 className="text-3xl font-extrabold tracking-tight text-slate-950">
-                      {step.title}
-                    </h2>
-
-                    <p className="mt-4 text-lg leading-8 text-slate-600">
-                      {step.description}
-                    </p>
-
-                    {hasOptions && (
-                      <div className="mt-8">
-                        <h3 className="text-xl font-extrabold text-slate-900">
-                          Recovery options
-                        </h3>
-                        <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
-                          Choose a recovery setting that matches the pace, privacy and support level you want after treatment.
-                        </p>
-
-                        <div className="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-2">
-                          {step.options!.map((option, optIdx) => {
-                            const optionImg = option.image as MedicalAsset | undefined
-                            const optionSlug = slugify(option.title)
-                            const optionImageSrc =
-                              optionImg?.url ||
-                              stepFallbackImages[(index + optIdx + 1) % stepFallbackImages.length]
-
-                            return (
-                              <Link
-                                key={optionSlug}
-                                href={`/patient-journey/recovery/${optionSlug}`}
-                                className="group overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-lg"
-                              >
-                                <div className="relative h-44 overflow-hidden bg-slate-200">
-                                  <Image
-                                    src={optionImageSrc}
-                                    alt={optionImg?.alt || option.title}
-                                    fill
-                                    className="object-cover transition duration-500 group-hover:scale-105"
-                                    sizes="(max-width: 768px) 100vw, 360px"
-                                  />
-                                  <div className="absolute inset-0 bg-slate-950/25" />
-                                </div>
-                                <div className="p-5">
-                                  <h4 className="flex items-center justify-between gap-3 text-lg font-extrabold text-slate-950">
-                                    {option.title}
-                                    <ArrowRightIcon className="h-5 w-5 shrink-0 text-blue-700 transition group-hover:translate-x-1" />
-                                  </h4>
-                                  <p className="mt-3 text-sm leading-6 text-slate-600">
-                                    {option.description}
-                                  </p>
-                                </div>
-                              </Link>
-                            )
-                          })}
+                        <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg bg-brand-primary text-white md:hidden">
+                          <Icon className="h-7 w-7" />
                         </div>
                       </div>
-                    )}
-                  </article>
-                </li>
-              )
-            })}
-          </ol>
-        </div>
 
-        <aside className="relative">
-          <div className="sticky top-8 space-y-8">
-            <div className="rounded-lg bg-slate-950 p-8 text-white shadow-lg">
-              <p className="text-xs font-bold uppercase tracking-[0.18em] text-blue-300">
-                {companyName}
-              </p>
-              <h3 className="mt-3 text-2xl font-extrabold">Start Your Journey</h3>
-              <p className="mt-4 text-sm leading-6 text-slate-300">
-                From airport arrival to medical appointments, discharge instructions and recovery, our concierge team keeps the journey organized and understandable in English and Spanish.
-              </p>
-            </div>
+                      <ul className="mt-6 grid gap-3">
+                        {step.items.map((item) => (
+                          <li key={item} className="flex gap-3 text-sm font-medium leading-6 text-slate-700">
+                            <CheckCircleIcon className="mt-0.5 h-5 w-5 shrink-0 text-emerald-600" />
+                            {item}
+                          </li>
+                        ))}
+                      </ul>
 
-            <LeadCaptureForm
-              context="doctor"
-              fixedEntityId="general"
-              fixedEntityName="Our Concierge Team"
-              dynamicOptions={[]}
-            />
+                      {isLast && (
+                        <Link
+                          href="#start-journey"
+                          className="mt-8 inline-flex items-center gap-2 rounded-lg bg-brand-primary px-5 py-3 text-sm font-extrabold uppercase tracking-[0.14em] text-white transition hover:brightness-110"
+                        >
+                          Start my journey today
+                          <ArrowRightIcon className="h-4 w-4" />
+                        </Link>
+                      )}
+                    </article>
+                  </li>
+                )
+              })}
+            </ol>
           </div>
-        </aside>
-      </div>
+        </div>
+      </section>
+
+      <section id="start-journey" className="scroll-mt-24 bg-slate-950 py-20">
+        <div className="mx-auto grid max-w-7xl gap-10 px-4 sm:px-6 lg:grid-cols-[0.9fr_1.1fr] lg:items-center lg:px-8">
+          <div className="text-white">
+            <p className="text-xs font-bold uppercase tracking-[0.22em] text-blue-300">
+              Start my journey today
+            </p>
+            <h2 className="mt-4 text-4xl font-black tracking-tight md:text-5xl">
+              Tell us what you need and we will route your case to the right medical team.
+            </h2>
+            <p className="mt-5 text-lg leading-8 text-slate-300">
+              A bilingual coordinator can help review your goals, match you with a specialist,
+              explain the next step and keep communication clear before you travel.
+            </p>
+            <div className="mt-8 grid gap-3 text-sm font-semibold text-slate-200 sm:grid-cols-2">
+              {[
+                'English and Spanish coordination',
+                'Doctor or procedure matching',
+                'Travel and recovery guidance',
+                'Private follow-up by the concierge team',
+              ].map((item) => (
+                <div key={item} className="flex gap-3">
+                  <CheckCircleIcon className="mt-0.5 h-5 w-5 shrink-0 text-emerald-400" />
+                  <span>{item}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <HomeLeadForm doctors={doctors} procedures={procedures} />
+        </div>
+      </section>
+
+
     </main>
   )
 }

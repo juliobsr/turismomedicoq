@@ -9,6 +9,7 @@ import {
   HeartIcon,
   HomeModernIcon,
   MapPinIcon,
+  PaperAirplaneIcon,
   ShieldCheckIcon,
   SparklesIcon,
 } from '@heroicons/react/24/outline'
@@ -22,7 +23,7 @@ const cityImage = '/media/globals/queretaro-panoramica-1.jpg'
 export const metadata: Metadata = {
   title: 'Why Queretaro for Medical Tourism in Mexico',
   description:
-    'Why American patients choose Queretaro for medical treatment in Mexico: modern private care, bilingual coordination, calm recovery zones and access to San Miguel de Allende, Bernal and the historic center.',
+    'Why American patients choose Queretaro for medical treatment in Mexico: modern private care, bilingual coordination, direct US flight access, calm recovery zones and access to San Miguel de Allende, Bernal and the historic center.',
   alternates: {
     canonical: '/why-queretaro',
   },
@@ -32,6 +33,8 @@ export const metadata: Metadata = {
     'Queretaro recovery after surgery',
     'San Miguel de Allende medical tourism',
     'private hospitals Queretaro',
+    'Queretaro airport direct flights US',
+    'QRO airport medical tourism',
   ],
   openGraph: {
     title: 'Why Queretaro for Medical Tourism in Mexico',
@@ -111,6 +114,25 @@ const proofPoints = [
   'San Miguel de Allende nearby for patients who value an established international lifestyle scene.',
   'Bernal and the wine-and-cheese region for peaceful recovery weekends and companion travel.',
   'Centro Sur for practical post-treatment stays close to hospitals, hotels and mobility routes.',
+]
+
+const airportConnections = [
+  {
+    city: 'Houston',
+    detail: 'Direct service through IAH gives patients access to one of the largest US connection hubs.',
+  },
+  {
+    city: 'Dallas-Fort Worth',
+    detail: 'DFW connectivity helps patients from Texas and beyond reach Queretaro with fewer travel steps.',
+  },
+  {
+    city: 'San Antonio',
+    detail: 'A short direct route makes Queretaro especially practical for patients in South Texas.',
+  },
+  {
+    city: 'Denver and Orlando',
+    detail: 'Recently announced routes expand the US footprint and make Queretaro easier to consider from more regions.',
+  },
 ]
 
 export default function WhyQueretaroPage() {
@@ -205,6 +227,41 @@ export default function WhyQueretaroPage() {
                 </article>
               )
             })}
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-white py-24">
+        <div className="mx-auto grid max-w-7xl gap-12 px-4 sm:px-6 lg:grid-cols-[0.9fr_1.1fr] lg:items-center lg:px-8">
+          <div>
+            <p className="text-sm font-bold uppercase tracking-[0.22em] text-brand-primary">
+              Air access from the United States
+            </p>
+            <h2 className="mt-3 text-4xl font-black tracking-tight text-slate-950 md:text-5xl">
+              Getting to Queretaro is easier than many patients expect.
+            </h2>
+            <p className="mt-6 text-lg leading-8 text-slate-700">
+              For medical travel, connectivity matters. Fewer transfers can mean less stress before a consultation and a smoother return home after the doctor clears travel. Queretaro International Airport gives patients direct and expanding access to several US cities, while still keeping the arrival experience smaller and calmer than Mexico’s largest airports.
+            </p>
+            <p className="mt-5 text-lg leading-8 text-slate-700">
+              That combination is useful for patients and companions: direct flights into QRO, straightforward ground access to Centro Sur, and recovery zones that are close enough to feel planned rather than improvised.
+            </p>
+          </div>
+
+          <div className="grid gap-4">
+            {airportConnections.map((connection) => (
+              <article key={connection.city} className="rounded-lg border border-slate-200 bg-slate-50 p-5">
+                <div className="flex gap-4">
+                  <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-slate-950 text-white">
+                    <PaperAirplaneIcon className="h-5 w-5" />
+                  </span>
+                  <div>
+                    <h3 className="text-xl font-extrabold text-slate-950">{connection.city}</h3>
+                    <p className="mt-2 text-sm leading-6 text-slate-600">{connection.detail}</p>
+                  </div>
+                </div>
+              </article>
+            ))}
           </div>
         </div>
       </section>

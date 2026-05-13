@@ -232,6 +232,33 @@ export interface Doctor {
     };
     [k: string]: unknown;
   } | null;
+  /**
+   * Optional hero background image for the public doctor profile.
+   */
+  heroBackground?: (number | null) | DoctorsMedia;
+  /**
+   * Optional direct MP4/WebM URL for the hero background. If present, it overrides the hero image.
+   */
+  heroVideoUrl?: string | null;
+  /**
+   * Procedure, technology, OR or treatment images shown as a clinical gallery on the doctor profile.
+   */
+  procedureGallery?: (number | DoctorsMedia)[] | null;
+  patientTestimonials?:
+    | {
+        title: string;
+        /**
+         * YouTube, Vimeo or direct hosted video URL.
+         */
+        videoUrl: string;
+        /**
+         * Example: Dallas, Texas or Phoenix, Arizona.
+         */
+        patientLocation?: string | null;
+        quote?: string | null;
+        id?: string | null;
+      }[]
+    | null;
   metaTitle?: string | null;
   metaDescription?: string | null;
   phone?: string | null;
@@ -916,6 +943,18 @@ export interface DoctorsSelect<T extends boolean = true> {
   procedures?: T;
   facilities?: T;
   biography?: T;
+  heroBackground?: T;
+  heroVideoUrl?: T;
+  procedureGallery?: T;
+  patientTestimonials?:
+    | T
+    | {
+        title?: T;
+        videoUrl?: T;
+        patientLocation?: T;
+        quote?: T;
+        id?: T;
+      };
   metaTitle?: T;
   metaDescription?: T;
   phone?: T;

@@ -15,6 +15,9 @@ import { MedicalAsset } from '@/payload-types';
 interface DoctorGalleryProps {
   /** Accepts raw IDs or fully populated MedicalAsset objects from Payload CMS */
   images: (number | string | MedicalAsset)[];
+  title?: string;
+  eyebrow?: string;
+  itemActionLabel?: string;
 }
 
 /**
@@ -36,16 +39,18 @@ const isMedicalAsset = (item: unknown): item is MedicalAsset => {
  */
 const GalleryItem = ({ 
   asset, 
-  onClick 
+  onClick,
+  actionLabel,
 }: { 
   asset: MedicalAsset; 
-  onClick: () => void 
+  onClick: () => void;
+  actionLabel: string;
 }) => (
   <button
     type="button"
     onClick={onClick}
     className="group relative h-80 w-full cursor-zoom-in overflow-hidden rounded-2xl bg-slate-200 shadow-sm transition-all duration-500 hover:shadow-2xl focus:outline-none focus:ring-4 focus:ring-blue-600/20"
-    aria-label={`Examine facility: ${asset.alt || 'Medical Center'}`}
+    aria-label={`${actionLabel}: ${asset.alt || 'Medical image'}`}
   >
     <Image
       src={asset.url || ''}
@@ -60,7 +65,7 @@ const GalleryItem = ({
     <div className="absolute inset-0 bg-slate-900/0 transition-all duration-300 group-hover:bg-slate-900/40 flex items-center justify-center">
       <div className="translate-y-4 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
         <span className="bg-white/95 px-6 py-2.5 rounded-full text-slate-900 text-sm font-bold shadow-lg">
-          Examine Facility
+          {actionLabel}
         </span>
       </div>
     </div>
@@ -71,7 +76,12 @@ const GalleryItem = ({
  * Enhanced DoctorGallery
  * Strategy: Dynamic Grid + Optimized Lightbox.
  */
-export default function DoctorGallery({ images }: DoctorGalleryProps) {
+export default function DoctorGallery({
+  images,
+  title = 'Our Medical Facilities',
+  eyebrow,
+  itemActionLabel = 'Examine Image',
+}: DoctorGalleryProps) {
   const [index, setIndex] = useState<number>(-1);
 
   // 1. DATA SANITIZATION: Strict check for populated assets only
@@ -104,8 +114,13 @@ export default function DoctorGallery({ images }: DoctorGalleryProps) {
     <section className="w-full py-20 bg-slate-50 border-t border-slate-200">
       <div className="container mx-auto px-4">
         <header className="mb-12 text-center">
+          {eyebrow && (
+            <p className="mb-3 text-sm font-bold uppercase tracking-[0.2em] text-blue-700">
+              {eyebrow}
+            </p>
+          )}
           <h2 className="text-3xl font-extrabold text-slate-900 tracking-tight sm:text-4xl">
-            Our Medical Facilities
+            {title}
           </h2>
           <div className="mt-4 flex justify-center">
             <span className="h-1.5 w-24 rounded-full bg-blue-600" aria-hidden="true" />
@@ -118,7 +133,8 @@ export default function DoctorGallery({ images }: DoctorGalleryProps) {
             <GalleryItem 
               key={item.id} 
               asset={item} 
-              onClick={() => setIndex(idx)} 
+              onClick={() => setIndex(idx)}
+              actionLabel={itemActionLabel}
             />
           ))}
         </div>
