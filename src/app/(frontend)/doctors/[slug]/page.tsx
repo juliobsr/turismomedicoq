@@ -399,15 +399,15 @@ export default async function DoctorProfilePage({ params }: DoctorProfileProps) 
               </p>
             </div>
 
-            <div className="grid gap-6 md:grid-cols-2">
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {patientTestimonials.map((testimonial, index) => {
                 const embedUrl = toVideoEmbedUrl(testimonial.videoUrl)
                 const isDirectVideo = isDirectVideoUrl(embedUrl)
                 const canEmbed = isEmbeddableVideoUrl(testimonial.videoUrl)
 
                 return (
-                  <article key={testimonial.id || `${testimonial.title}-${index}`} className="overflow-hidden rounded-lg border border-white/10 bg-white/5 shadow-2xl shadow-slate-950/30">
-                    <div className="relative aspect-video bg-slate-900">
+                  <article key={testimonial.id || `${testimonial.title}-${index}`} className="mx-auto w-full max-w-sm overflow-hidden rounded-lg border border-white/10 bg-white/5 shadow-2xl shadow-slate-950/30">
+                    <div className="relative aspect-[9/16] bg-slate-900">
                       {embedUrl && isDirectVideo ? (
                         <video className="h-full w-full object-cover" controls preload="metadata" playsInline>
                           <source src={embedUrl} />
