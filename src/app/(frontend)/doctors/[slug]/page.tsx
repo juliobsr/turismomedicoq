@@ -299,15 +299,6 @@ export default async function DoctorProfilePage({ params }: DoctorProfileProps) 
         </div>
       </section>
 
-      {procedureGallery.length > 0 && (
-        <DoctorGallery
-          images={procedureGallery}
-          eyebrow="Clinical procedure gallery"
-          title={`${doctor.fullName} Procedure Gallery`}
-          itemActionLabel="View procedure image"
-        />
-      )}
-
       {/* Content Section */}
       <section className="max-w-7xl mx-auto px-4 py-16 grid grid-cols-1 lg:grid-cols-3 gap-12">
         <div className="lg:col-span-2">
@@ -373,16 +364,6 @@ export default async function DoctorProfilePage({ params }: DoctorProfileProps) 
           </div>
         </aside>
       </section>
-
-      {/* Integrated Gallery */}
-      {officeGallery.length > 0 && (
-        <DoctorGallery
-          images={officeGallery}
-          eyebrow="Practice environment"
-          title="Clinic and consultation spaces"
-          itemActionLabel="View clinic image"
-        />
-      )}
 
       {patientTestimonials.length > 0 && (
         <section className="bg-slate-950 py-20 text-white">
@@ -465,6 +446,25 @@ export default async function DoctorProfilePage({ params }: DoctorProfileProps) 
             </div>
           </div>
         </section>
+      )}
+
+      {procedureGallery.length > 0 && (
+        <DoctorGallery
+          images={procedureGallery}
+          eyebrow="Clinical procedure gallery"
+          title={`${doctor.fullName} Procedure Gallery`}
+          itemActionLabel="View procedure image"
+        />
+      )}
+
+      {/* Integrated Gallery */}
+      {officeGallery.length > 0 && (
+        <DoctorGallery
+          images={officeGallery}
+          eyebrow="Practice environment"
+          title="Clinic and consultation spaces"
+          itemActionLabel="View clinic image"
+        />
       )}
     </main>
   )
