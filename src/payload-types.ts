@@ -68,12 +68,14 @@ export interface Config {
   blocks: {};
   collections: {
     users: User;
+    'backend-roles': BackendRole;
     specialties: Specialty;
     doctors: Doctor;
     certificates: Certificate;
     facilities: Facility;
     institutions: Institution;
     leads: Lead;
+    'lead-files': LeadFile;
     procedures: Procedure;
     'doctors-media': DoctorsMedia;
     'facilities-media': FacilitiesMedia;
@@ -89,12 +91,14 @@ export interface Config {
   collectionsJoins: {};
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
+    'backend-roles': BackendRolesSelect<false> | BackendRolesSelect<true>;
     specialties: SpecialtiesSelect<false> | SpecialtiesSelect<true>;
     doctors: DoctorsSelect<false> | DoctorsSelect<true>;
     certificates: CertificatesSelect<false> | CertificatesSelect<true>;
     facilities: FacilitiesSelect<false> | FacilitiesSelect<true>;
     institutions: InstitutionsSelect<false> | InstitutionsSelect<true>;
     leads: LeadsSelect<false> | LeadsSelect<true>;
+    'lead-files': LeadFilesSelect<false> | LeadFilesSelect<true>;
     procedures: ProceduresSelect<false> | ProceduresSelect<true>;
     'doctors-media': DoctorsMediaSelect<false> | DoctorsMediaSelect<true>;
     'facilities-media': FacilitiesMediaSelect<false> | FacilitiesMediaSelect<true>;
@@ -155,7 +159,14 @@ export interface UserAuthOperations {
  */
 export interface User {
   id: number;
+  /**
+   * The Admin option is the principal administrator role and can create backend roles.
+   */
   roles: ('admin' | 'doctor' | 'patient')[];
+  /**
+   * Configurable backend permissions. Only the principal admin can assign these roles.
+   */
+  backendRoles?: (number | BackendRole)[] | null;
   fullName: string;
   updatedAt: string;
   createdAt: string;
@@ -175,6 +186,49 @@ export interface User {
     | null;
   password?: string | null;
   collection: 'users';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "backend-roles".
+ */
+export interface BackendRole {
+  id: number;
+  name: string;
+  /**
+   * Internal identifier, for example lead-coordinator or content-editor.
+   */
+  slug: string;
+  description?: string | null;
+  isActive?: boolean | null;
+  permissions: {
+    target:
+      | 'users'
+      | 'backend-roles'
+      | 'specialties'
+      | 'doctors'
+      | 'certificates'
+      | 'facilities'
+      | 'institutions'
+      | 'leads'
+      | 'lead-files'
+      | 'procedures'
+      | 'doctors-media'
+      | 'facilities-media'
+      | 'institutions-media'
+      | 'certificates-media'
+      | 'procedures-media'
+      | 'medical-assets'
+      | 'site-settings'
+      | 'patient-journey'
+      | 'why-queretaro';
+    read?: boolean | null;
+    create?: boolean | null;
+    update?: boolean | null;
+    delete?: boolean | null;
+    id?: string | null;
+  }[];
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -712,14 +766,75 @@ export interface Lead {
     };
     [k: string]: unknown;
   } | null;
+  /**
+   * Last manual response sent from the backend.
+   */
+  lastResponseSentAt?: string | null;
   name: string;
   email: string;
   phone: string;
   doctor: number | Doctor;
   procedure?: (number | null) | Procedure;
   notes?: string | null;
+  /**
+   * Choose the email template to send to the patient.
+   */
+  responseTemplate?: ('request_medical_records' | 'consultation_next_steps' | 'general_follow_up') | null;
+  /**
+   * Optional. Leave empty to use the template subject.
+   */
+  responseSubject?: string | null;
+  /**
+   * Optional custom message added to the selected template.
+   */
+  responseMessage?: string | null;
+  /**
+   * Check this box and save the lead to email the selected response to the patient.
+   */
+  sendResponseNow?: boolean | null;
+  /**
+   * Files uploaded by the patient through the secure folio link.
+   */
+  uploadedFiles?: (number | LeadFile)[] | null;
+  /**
+   * Audit trail for patient contact, file uploads and internal follow-up events.
+   */
+  communicationHistory?:
+    | {
+        direction: 'inbound' | 'outbound' | 'internal';
+        eventType: 'lead_created' | 'email_sent' | 'email_failed' | 'file_uploaded' | 'internal_note';
+        template?: string | null;
+        subject?: string | null;
+        message?: string | null;
+        file?: (number | null) | LeadFile;
+        occurredAt: string;
+        createdBy?: string | null;
+        id?: string | null;
+      }[]
+    | null;
   updatedAt: string;
   createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "lead-files".
+ */
+export interface LeadFile {
+  id: number;
+  lead: number | Lead;
+  originalName: string;
+  patientNote?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
+  focalX?: number | null;
+  focalY?: number | null;
 }
 /**
  * Media assets exclusively for global pages like the Patient Journey.
@@ -801,6 +916,10 @@ export interface PayloadLockedDocument {
         value: number | User;
       } | null)
     | ({
+        relationTo: 'backend-roles';
+        value: number | BackendRole;
+      } | null)
+    | ({
         relationTo: 'specialties';
         value: number | Specialty;
       } | null)
@@ -823,6 +942,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'leads';
         value: number | Lead;
+      } | null)
+    | ({
+        relationTo: 'lead-files';
+        value: number | LeadFile;
       } | null)
     | ({
         relationTo: 'procedures';
@@ -900,6 +1023,7 @@ export interface PayloadMigration {
  */
 export interface UsersSelect<T extends boolean = true> {
   roles?: T;
+  backendRoles?: T;
   fullName?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -917,6 +1041,28 @@ export interface UsersSelect<T extends boolean = true> {
         createdAt?: T;
         expiresAt?: T;
       };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "backend-roles_select".
+ */
+export interface BackendRolesSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  description?: T;
+  isActive?: T;
+  permissions?:
+    | T
+    | {
+        target?: T;
+        read?: T;
+        create?: T;
+        update?: T;
+        delete?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1016,14 +1162,53 @@ export interface LeadsSelect<T extends boolean = true> {
   folio?: T;
   status?: T;
   contactNotes?: T;
+  lastResponseSentAt?: T;
   name?: T;
   email?: T;
   phone?: T;
   doctor?: T;
   procedure?: T;
   notes?: T;
+  responseTemplate?: T;
+  responseSubject?: T;
+  responseMessage?: T;
+  sendResponseNow?: T;
+  uploadedFiles?: T;
+  communicationHistory?:
+    | T
+    | {
+        direction?: T;
+        eventType?: T;
+        template?: T;
+        subject?: T;
+        message?: T;
+        file?: T;
+        occurredAt?: T;
+        createdBy?: T;
+        id?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "lead-files_select".
+ */
+export interface LeadFilesSelect<T extends boolean = true> {
+  lead?: T;
+  originalName?: T;
+  patientNote?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  url?: T;
+  thumbnailURL?: T;
+  filename?: T;
+  mimeType?: T;
+  filesize?: T;
+  width?: T;
+  height?: T;
+  focalX?: T;
+  focalY?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

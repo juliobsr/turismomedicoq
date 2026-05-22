@@ -1,5 +1,6 @@
 import { CollectionConfig } from 'payload';
 import path from 'path';
+import { backendAccess } from '@/access/backendRoles'
 /**
  * Enterprise Base Media Configuration
  * Purpose: Provides standard upload settings, access control, and SEO fields.
@@ -17,8 +18,9 @@ export const createMediaCollection = (
   access: {
     // Public read for Next.js SSR/SEO, restricted updates
     read: () => true,
-    update: ({ req: { user } }) => Boolean(user),
-    delete: ({ req: { user } }) => Boolean(user),
+    create: backendAccess(slug, 'create'),
+    update: backendAccess(slug, 'update'),
+    delete: backendAccess(slug, 'delete'),
   },
   admin: {
     useAsTitle: 'filename',

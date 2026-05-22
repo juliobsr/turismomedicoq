@@ -22,7 +22,9 @@ import { Certificates } from './collections/Certificates'
 import { Facilities } from './collections/Facilities'
 import { Institutions } from './collections/Institutions'
 import { Leads } from './collections/Leads'
+import { LeadFiles } from './collections/LeadFiles'
 import { Procedures } from './collections/Procedures'
+import { BackendRoles } from './collections/BackendRoles'
 
 
 import { resendAdapter } from '@payloadcms/email-resend'
@@ -64,6 +66,7 @@ export default buildConfig({
 
   collections: [
     Users,
+    BackendRoles,
    
     Specialties,  // 2. Dependency
     Doctors,      // 3. Main Entity
@@ -71,6 +74,7 @@ export default buildConfig({
     Facilities,
     Institutions,
     Leads,
+    LeadFiles,
     Procedures,
     DoctorsMedia,
     FacilitiesMedia,
@@ -96,6 +100,7 @@ export default buildConfig({
         'doctors-media': true,
         'facilities-media': true,
         'institutions-media': true,
+        'lead-files': true,
         'procedures-media': true,
       },
       token: process.env.BLOB_READ_WRITE_TOKEN,

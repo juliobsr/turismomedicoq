@@ -2,6 +2,7 @@
 import type { CollectionConfig } from 'payload'
 // ✅ IMPORT THE NEW HOOK
 import { revalidateAfterChange, revalidateAfterDelete } from '../hooks/revalidateCache'
+import { backendAccess } from '@/access/backendRoles'
 /**
  * Enterprise Collection: Doctors
  * Architecture: Relational PostgreSQL table.
@@ -17,9 +18,9 @@ export const Doctors: CollectionConfig = {
   access: {
     // SECURITY: Public read access required for Next.js SSG
     read: () => true,
-    create: ({ req: { user } }) => Boolean(user),
-    update: ({ req: { user } }) => Boolean(user),
-    delete: ({ req: { user } }) => Boolean(user),
+    create: backendAccess('doctors', 'create'),
+    update: backendAccess('doctors', 'update'),
+    delete: backendAccess('doctors', 'delete'),
   },
   hooks: {
     afterChange: [revalidateAfterChange],

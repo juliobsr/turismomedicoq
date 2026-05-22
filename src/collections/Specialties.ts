@@ -3,6 +3,7 @@ import type { CollectionConfig } from 'payload'
 // ✅ IMPORT THE NEW HOOK
 import { revalidateAfterChange, revalidateAfterDelete } from '../hooks/revalidateCache'
 import { formatSlug } from '../utils/formatSlug'
+import { backendAccess } from '@/access/backendRoles'
 /**
  * Enterprise Collection: Specialties
  * Purpose: Relational catalog for medical branches. Powers category pages in Next.js.
@@ -15,9 +16,9 @@ export const Specialties: CollectionConfig = {
   },
   access: {
     read: () => true,
-    create: ({ req: { user } }) => Boolean(user),
-    update: ({ req: { user } }) => Boolean(user),
-    delete: ({ req: { user } }) => Boolean(user),
+    create: backendAccess('specialties', 'create'),
+    update: backendAccess('specialties', 'update'),
+    delete: backendAccess('specialties', 'delete'),
   },
   hooks: {
     afterChange: [revalidateAfterChange],

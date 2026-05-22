@@ -1,5 +1,6 @@
 // src/collections/Procedures.ts
 import type { CollectionConfig } from 'payload'
+import { backendAccess } from '@/access/backendRoles'
 
 /**
  * Enterprise Collection: Procedures
@@ -17,9 +18,9 @@ export const Procedures: CollectionConfig = {
     // SECURITY: Public read for Next.js Build Time (SSG) & Client fetching
     read: () => true,
     // MUTATIONS: Restricted strictly to authenticated Vzsoluciones staff
-    create: ({ req: { user } }) => Boolean(user),
-    update: ({ req: { user } }) => Boolean(user),
-    delete: ({ req: { user } }) => Boolean(user),
+    create: backendAccess('procedures', 'create'),
+    update: backendAccess('procedures', 'update'),
+    delete: backendAccess('procedures', 'delete'),
   },
   fields: [
     {

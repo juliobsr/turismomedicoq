@@ -1,5 +1,6 @@
 // src/collections/Certificates.ts
 import type { CollectionConfig } from 'payload'
+import { backendAccess } from '@/access/backendRoles'
 
 /**
  * Enterprise Collection: Certificates
@@ -18,9 +19,9 @@ export const Certificates: CollectionConfig = {
     // SECURITY & SSR: Public read is mandatory so Next.js can fetch this during 'next build'
     read: () => true,
     // Only authenticated staff can modify accreditations
-    create: ({ req: { user } }) => Boolean(user),
-    update: ({ req: { user } }) => Boolean(user),
-    delete: ({ req: { user } }) => Boolean(user),
+    create: backendAccess('certificates', 'create'),
+    update: backendAccess('certificates', 'update'),
+    delete: backendAccess('certificates', 'delete'),
   },
   fields: [
     {

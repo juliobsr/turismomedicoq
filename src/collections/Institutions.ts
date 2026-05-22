@@ -1,5 +1,6 @@
 // src/collections/Institutions.ts
 import type { CollectionConfig } from 'payload'
+import { backendAccess } from '@/access/backendRoles'
 
 /**
  * Enterprise Collection: Institutions
@@ -18,9 +19,9 @@ export const Institutions: CollectionConfig = {
     // SECURITY: Public read access is mandatory so Next.js can fetch this via API for SSG
     read: () => true,
     // Only authenticated Vzsoluciones staff can create/update/delete records
-    create: ({ req: { user } }) => Boolean(user),
-    update: ({ req: { user } }) => Boolean(user),
-    delete: ({ req: { user } }) => Boolean(user),
+    create: backendAccess('institutions', 'create'),
+    update: backendAccess('institutions', 'update'),
+    delete: backendAccess('institutions', 'delete'),
   },
   fields: [
     {

@@ -1,4 +1,5 @@
 import type { GlobalConfig } from 'payload'
+import { backendAccess } from '@/access/backendRoles'
 
 /**
  * Enterprise Global: Patient Journey
@@ -14,7 +15,7 @@ export const PatientJourney: GlobalConfig = {
   access: {
     // SECURITY: Publicly readable for Next.js SSR, editable only by authenticated admins
     read: () => true,
-    update: ({ req: { user } }) => Boolean(user),
+    update: backendAccess('patient-journey', 'update'),
   },
   fields: [
     {

@@ -1,4 +1,5 @@
 import type { GlobalConfig, Block } from 'payload';
+import { backendAccess } from '@/access/backendRoles'
 
 /**
  * Modern Advantage Block
@@ -58,6 +59,7 @@ export const WhyQueretaro: GlobalConfig = {
   },
   access: {
     read: () => true,
+    update: backendAccess('why-queretaro', 'update'),
   },
   fields: [
     {

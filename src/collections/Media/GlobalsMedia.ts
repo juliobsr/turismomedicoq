@@ -1,5 +1,6 @@
 import type { CollectionConfig } from 'payload';
 import path from 'path';
+import { backendAccess } from '@/access/backendRoles'
 
 /**
  * Enterprise Collection: Globals Media (Flattened for Debugging)
@@ -15,9 +16,9 @@ export const GlobalMedia: CollectionConfig = {
   access: {
     // SECURITY: Public read access for Next.js SSR image optimization
     read: () => true,
-    create: ({ req: { user } }) => Boolean(user),
-    update: ({ req: { user } }) => Boolean(user),
-    delete: ({ req: { user } }) => Boolean(user),
+    create: backendAccess('medical-assets', 'create'),
+    update: backendAccess('medical-assets', 'update'),
+    delete: backendAccess('medical-assets', 'delete'),
   },
   upload: {
     // NODE.JS: Safe absolute path resolution pointing to the Next.js public directory

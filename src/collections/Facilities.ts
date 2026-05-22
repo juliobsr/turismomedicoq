@@ -1,5 +1,6 @@
 import type { CollectionConfig } from 'payload'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
+import { backendAccess } from '@/access/backendRoles'
 /**
  * Enterprise Collection: Facilities
  * Refactored for High-Performance Filtering and Relational Integrity.
@@ -13,9 +14,9 @@ export const Facilities: CollectionConfig = {
   },
   access: {
     read: () => true, // Essential for SSG/ISR in Next.js
-    create: ({ req: { user } }) => Boolean(user),
-    update: ({ req: { user } }) => Boolean(user),
-    delete: ({ req: { user } }) => Boolean(user),
+    create: backendAccess('facilities', 'create'),
+    update: backendAccess('facilities', 'update'),
+    delete: backendAccess('facilities', 'delete'),
   },
   fields: [
     {

@@ -5,11 +5,12 @@ import type {
   CollectionAfterChangeHook 
 } from 'payload'
 import { notifyLeadCreation } from '../hooks/notifyLeadCreation';
+import { sendLeadResponse } from '../hooks/sendLeadResponse'
+import { backendAccess } from '@/access/backendRoles'
 import crypto from 'crypto'
 import {
   lexicalEditor,
   HTMLConverterFeature,
-  lexicalHTML,
 } from '@payloadcms/richtext-lexical'
 // 1. STRICT TYPING: Define the expected shape of the Lead document
 interface LeadDocument {
@@ -58,14 +59,14 @@ export const Leads: CollectionConfig = {
     // Anyone (Next.js public forms) can create a lead
     create: () => true,
     // ONLY authenticated clinical staff/admins can read the leads
-    read: ({ req: { user } }) => Boolean(user),
-    update: ({ req: { user } }) => Boolean(user),
-    delete: ({ req: { user } }) => Boolean(user),
+    read: backendAccess('leads', 'read'),
+    update: backendAccess('leads', 'update'),
+    delete: backendAccess('leads', 'delete'),
   },
 
   hooks: {
     beforeChange: [generateSecureFolio],
-    afterChange: [notifyLeadCreation],
+    afterChange: [notifyLeadCreation, sendLeadResponse],
   },
 
   fields: [
@@ -114,6 +115,15 @@ export const Leads: CollectionConfig = {
       },
     },
     {
+      name: 'lastResponseSentAt',
+      type: 'date',
+      admin: {
+        position: 'sidebar',
+        readOnly: true,
+        description: 'Last manual response sent from the backend.',
+      },
+    },
+    {
       name: 'name', 
       type: 'text',
       required: true,
@@ -154,6 +164,138 @@ export const Leads: CollectionConfig = {
       name: 'notes',
       type: 'textarea',
       label: 'Patient Notes'
+    },
+    {
+      type: 'tabs',
+      tabs: [
+        {
+          label: 'Response Center',
+          fields: [
+            {
+              name: 'responseTemplate',
+              type: 'select',
+              defaultValue: 'request_medical_records',
+              options: [
+                {
+                  label: 'Request medical records upload',
+                  value: 'request_medical_records',
+                },
+                {
+                  label: 'Consultation next steps',
+                  value: 'consultation_next_steps',
+                },
+                {
+                  label: 'General follow-up',
+                  value: 'general_follow_up',
+                },
+              ],
+              admin: {
+                description: 'Choose the email template to send to the patient.',
+              },
+            },
+            {
+              name: 'responseSubject',
+              type: 'text',
+              admin: {
+                description: 'Optional. Leave empty to use the template subject.',
+              },
+            },
+            {
+              name: 'responseMessage',
+              type: 'textarea',
+              admin: {
+                rows: 6,
+                description: 'Optional custom message added to the selected template.',
+              },
+            },
+            {
+              name: 'sendResponseNow',
+              type: 'checkbox',
+              defaultValue: false,
+              admin: {
+                description: 'Check this box and save the lead to email the selected response to the patient.',
+              },
+            },
+          ],
+        },
+        {
+          label: 'Uploaded Files',
+          fields: [
+            {
+              name: 'uploadedFiles',
+              type: 'relationship',
+              relationTo: 'lead-files',
+              hasMany: true,
+              admin: {
+                description: 'Files uploaded by the patient through the secure folio link.',
+              },
+            },
+          ],
+        },
+        {
+          label: 'Communication History',
+          fields: [
+            {
+              name: 'communicationHistory',
+              type: 'array',
+              admin: {
+                readOnly: true,
+                description: 'Audit trail for patient contact, file uploads and internal follow-up events.',
+              },
+              fields: [
+                {
+                  name: 'direction',
+                  type: 'select',
+                  required: true,
+                  options: [
+                    { label: 'Inbound', value: 'inbound' },
+                    { label: 'Outbound', value: 'outbound' },
+                    { label: 'Internal', value: 'internal' },
+                  ],
+                },
+                {
+                  name: 'eventType',
+                  type: 'select',
+                  required: true,
+                  options: [
+                    { label: 'Lead created', value: 'lead_created' },
+                    { label: 'Email sent', value: 'email_sent' },
+                    { label: 'Email failed', value: 'email_failed' },
+                    { label: 'File uploaded', value: 'file_uploaded' },
+                    { label: 'Internal note', value: 'internal_note' },
+                  ],
+                },
+                {
+                  name: 'template',
+                  type: 'text',
+                },
+                {
+                  name: 'subject',
+                  type: 'text',
+                },
+                {
+                  name: 'message',
+                  type: 'textarea',
+                },
+                {
+                  name: 'file',
+                  type: 'relationship',
+                  relationTo: 'lead-files',
+                },
+                {
+                  name: 'occurredAt',
+                  type: 'date',
+                  required: true,
+                },
+                {
+                  name: 'createdBy',
+                  type: 'text',
+                },
+              ],
+            },
+          ],
+        },
+      ],
     },
   ],
   timestamps: true, // Auto-generates createdAt for funnel tracking

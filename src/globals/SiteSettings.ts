@@ -1,6 +1,7 @@
 // src/globals/SiteSettings.ts
 import type { GlobalConfig } from 'payload'
 import { revalidateTag } from 'next/cache'
+import { backendAccess } from '@/access/backendRoles'
 
 /**
  * Enterprise Global: SiteSettings
@@ -14,7 +15,7 @@ export const SiteSettings: GlobalConfig = {
     // SECURITY: Next.js needs public read access to generate the static HTML and CSS
     read: () => true,
     // MUTATION: Strictly limited to authenticated Vzsoluciones staff
-    update: ({ req: { user } }) => Boolean(user),
+    update: backendAccess('site-settings', 'update'),
   },
   hooks: {
     afterChange: [
