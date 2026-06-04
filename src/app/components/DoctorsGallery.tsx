@@ -82,7 +82,7 @@ const SliderItem = ({
   onClick: () => void;
   actionLabel: string;
 }) => (
-  <article className="group relative w-[82vw] max-w-[760px] shrink-0 snap-center overflow-hidden rounded-lg bg-slate-950 shadow-2xl shadow-slate-950/20 ring-1 ring-slate-200 sm:w-[68vw] lg:w-[58vw]">
+  <article className="group relative w-[58vw] max-w-[260px] shrink-0 snap-center overflow-hidden rounded-lg bg-slate-950 shadow-2xl shadow-slate-950/20 ring-1 ring-slate-200 sm:w-[42vw] sm:max-w-[320px] md:w-[34vw] lg:w-[28vw] lg:max-w-[380px]">
     <button
       type="button"
       onClick={onClick}
@@ -93,16 +93,16 @@ const SliderItem = ({
         src={asset.url || ''}
         alt={asset.alt || 'Medical procedure image'}
         fill
-        sizes="(max-width: 768px) 82vw, 760px"
+        sizes="(max-width: 640px) 58vw, (max-width: 1024px) 34vw, 380px"
         className="object-cover transition duration-700 group-hover:scale-105"
         loading="lazy"
       />
       <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/25 to-transparent" />
-      <div className="absolute inset-x-0 bottom-0 p-5 sm:p-7">
-        <p className="max-w-3xl text-lg font-extrabold leading-7 text-white sm:text-2xl">
+      <div className="absolute inset-x-0 bottom-0 p-4 sm:p-5">
+        <p className="max-w-3xl text-sm font-extrabold leading-5 text-white sm:text-base sm:leading-6">
           {asset.caption || asset.alt || 'Procedure image'}
         </p>
-        <span className="mt-4 inline-flex rounded-lg bg-white/95 px-4 py-2 text-xs font-extrabold uppercase tracking-[0.14em] text-slate-950 opacity-0 transition group-hover:opacity-100">
+        <span className="mt-3 inline-flex rounded-lg bg-white/95 px-3 py-2 text-[11px] font-extrabold uppercase tracking-[0.12em] text-slate-950 opacity-0 transition group-hover:opacity-100">
           {actionLabel}
         </span>
       </div>
