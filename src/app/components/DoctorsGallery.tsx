@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useRef, useState, useMemo } from 'react';
 import Image from 'next/image';
 import Lightbox from 'yet-another-react-lightbox';
 import Zoom from 'yet-another-react-lightbox/plugins/zoom';
@@ -18,6 +18,7 @@ interface DoctorGalleryProps {
   title?: string;
   eyebrow?: string;
   itemActionLabel?: string;
+  variant?: 'grid' | 'slider';
 }
 
 /**
@@ -72,6 +73,43 @@ const GalleryItem = ({
   </button>
 );
 
+const SliderItem = ({
+  asset,
+  onClick,
+  actionLabel,
+}: {
+  asset: MedicalAsset;
+  onClick: () => void;
+  actionLabel: string;
+}) => (
+  <article className="group relative w-[82vw] max-w-[760px] shrink-0 snap-center overflow-hidden rounded-lg bg-slate-950 shadow-2xl shadow-slate-950/20 ring-1 ring-slate-200 sm:w-[68vw] lg:w-[58vw]">
+    <button
+      type="button"
+      onClick={onClick}
+      className="relative block aspect-[16/10] w-full cursor-zoom-in overflow-hidden bg-slate-900 text-left focus:outline-none focus:ring-4 focus:ring-blue-600/20"
+      aria-label={`${actionLabel}: ${asset.alt || 'Procedure image'}`}
+    >
+      <Image
+        src={asset.url || ''}
+        alt={asset.alt || 'Medical procedure image'}
+        fill
+        sizes="(max-width: 768px) 82vw, 760px"
+        className="object-cover transition duration-700 group-hover:scale-105"
+        loading="lazy"
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/25 to-transparent" />
+      <div className="absolute inset-x-0 bottom-0 p-5 sm:p-7">
+        <p className="max-w-3xl text-lg font-extrabold leading-7 text-white sm:text-2xl">
+          {asset.caption || asset.alt || 'Procedure image'}
+        </p>
+        <span className="mt-4 inline-flex rounded-lg bg-white/95 px-4 py-2 text-xs font-extrabold uppercase tracking-[0.14em] text-slate-950 opacity-0 transition group-hover:opacity-100">
+          {actionLabel}
+        </span>
+      </div>
+    </button>
+  </article>
+);
+
 /**
  * Enhanced DoctorGallery
  * Strategy: Dynamic Grid + Optimized Lightbox.
@@ -81,8 +119,10 @@ export default function DoctorGallery({
   title = 'Our Medical Facilities',
   eyebrow,
   itemActionLabel = 'Examine Image',
+  variant = 'grid',
 }: DoctorGalleryProps) {
   const [index, setIndex] = useState<number>(-1);
+  const sliderRef = useRef<HTMLDivElement | null>(null);
 
   // 1. DATA SANITIZATION: Strict check for populated assets only
   const validImages = useMemo(() => images.filter(isMedicalAsset), [images]);
@@ -110,34 +150,83 @@ export default function DoctorGallery({
 
   if (imageCount === 0) return null;
 
+  const scrollSlider = (direction: 'previous' | 'next') => {
+    const slider = sliderRef.current;
+    if (!slider) return;
+
+    const distance = slider.clientWidth * 0.82;
+    slider.scrollBy({
+      left: direction === 'next' ? distance : -distance,
+      behavior: 'smooth',
+    });
+  };
+
   return (
-    <section className="w-full py-20 bg-slate-50 border-t border-slate-200">
+    <section className={`w-full border-t border-slate-200 py-20 ${variant === 'slider' ? 'bg-white' : 'bg-slate-50'}`}>
       <div className="container mx-auto px-4">
-        <header className="mb-12 text-center">
-          {eyebrow && (
-            <p className="mb-3 text-sm font-bold uppercase tracking-[0.2em] text-blue-700">
-              {eyebrow}
-            </p>
-          )}
-          <h2 className="text-3xl font-extrabold text-slate-900 tracking-tight sm:text-4xl">
-            {title}
-          </h2>
-          <div className="mt-4 flex justify-center">
-            <span className="h-1.5 w-24 rounded-full bg-blue-600" aria-hidden="true" />
+        <header className={`mb-12 ${variant === 'slider' ? 'flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between' : 'text-center'}`}>
+          <div>
+            {eyebrow && (
+              <p className="mb-3 text-sm font-bold uppercase tracking-[0.2em] text-blue-700">
+                {eyebrow}
+              </p>
+            )}
+            <h2 className="text-3xl font-extrabold text-slate-900 tracking-tight sm:text-4xl">
+              {title}
+            </h2>
+            <div className={`mt-4 flex ${variant === 'slider' ? 'justify-start' : 'justify-center'}`}>
+              <span className="h-1.5 w-24 rounded-full bg-blue-600" aria-hidden="true" />
+            </div>
           </div>
+
+          {variant === 'slider' && imageCount > 1 && (
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={() => scrollSlider('previous')}
+                className="rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm font-extrabold text-slate-900 shadow-sm transition hover:border-blue-300 hover:text-blue-700"
+                aria-label="Previous procedure image"
+              >
+                Prev
+              </button>
+              <button
+                type="button"
+                onClick={() => scrollSlider('next')}
+                className="rounded-lg bg-slate-950 px-4 py-3 text-sm font-extrabold text-white shadow-sm transition hover:bg-blue-700"
+                aria-label="Next procedure image"
+              >
+                Next
+              </button>
+            </div>
+          )}
         </header>
 
-        {/* Dynamic Grid System */}
-        <div className={gridConfig}>
-          {validImages.map((item, idx) => (
-            <GalleryItem 
-              key={item.id} 
-              asset={item} 
-              onClick={() => setIndex(idx)}
-              actionLabel={itemActionLabel}
-            />
-          ))}
-        </div>
+        {variant === 'slider' ? (
+          <div
+            ref={sliderRef}
+            className="-mx-4 flex snap-x snap-mandatory gap-5 overflow-x-auto px-4 pb-6 [scrollbar-width:thin] sm:gap-6"
+          >
+            {validImages.map((item, idx) => (
+              <SliderItem
+                key={item.id}
+                asset={item}
+                onClick={() => setIndex(idx)}
+                actionLabel={itemActionLabel}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className={gridConfig}>
+            {validImages.map((item, idx) => (
+              <GalleryItem
+                key={item.id}
+                asset={item}
+                onClick={() => setIndex(idx)}
+                actionLabel={itemActionLabel}
+              />
+            ))}
+          </div>
+        )}
 
         {/* Lightbox Component */}
         <Lightbox

@@ -454,6 +454,7 @@ export default async function DoctorProfilePage({ params }: DoctorProfileProps) 
           eyebrow="Clinical procedure gallery"
           title={`${doctor.fullName} Procedure Gallery`}
           itemActionLabel="View procedure image"
+          variant="slider"
         />
       )}
 
