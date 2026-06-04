@@ -86,7 +86,7 @@ const SliderItem = ({
     <button
       type="button"
       onClick={onClick}
-      className="relative block aspect-[16/10] w-full cursor-zoom-in overflow-hidden bg-slate-900 text-left focus:outline-none focus:ring-4 focus:ring-blue-600/20"
+      className="relative block aspect-video w-full cursor-zoom-in overflow-hidden bg-slate-900 text-left focus:outline-none focus:ring-4 focus:ring-blue-600/20"
       aria-label={`${actionLabel}: ${asset.alt || 'Procedure image'}`}
     >
       <Image
