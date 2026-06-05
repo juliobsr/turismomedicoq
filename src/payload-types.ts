@@ -1611,9 +1611,21 @@ export interface SiteSetting {
   companyName: string;
   contactEmail: string;
   /**
+   * Backend notification email for new patient consultations. Falls back to Contact Email or ADMIN_NOTIFICATION_EMAIL.
+   */
+  leadNotificationEmail?: string | null;
+  /**
    * Recommended format: +1 (555) 123-4567 for global Click-to-Call compatibility.
    */
   contactPhone: string;
+  /**
+   * Verified Resend sender address used for lead notifications and patient emails. Example: notifications@yourdomain.com.
+   */
+  transactionalEmailFromAddress?: string | null;
+  /**
+   * Sender display name for patient-facing emails.
+   */
+  transactionalEmailFromName?: string | null;
   address: {
     street?: string | null;
     city?: string | null;
@@ -1749,7 +1761,10 @@ export interface WhyQueretaro {
 export interface SiteSettingsSelect<T extends boolean = true> {
   companyName?: T;
   contactEmail?: T;
+  leadNotificationEmail?: T;
   contactPhone?: T;
+  transactionalEmailFromAddress?: T;
+  transactionalEmailFromName?: T;
   address?:
     | T
     | {

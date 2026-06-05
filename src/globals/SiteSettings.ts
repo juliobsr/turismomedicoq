@@ -62,11 +62,40 @@ export const SiteSettings: GlobalConfig = {
                   required: true,
                 },
                 {
+                  name: 'leadNotificationEmail',
+                  type: 'email',
+                  required: false,
+                  admin: {
+                    description: 'Backend notification email for new patient consultations. Falls back to Contact Email or ADMIN_NOTIFICATION_EMAIL.',
+                  },
+                },
+                {
                   name: 'contactPhone',
                   type: 'text',
                   required: true,
                   admin: {
                     description: 'Recommended format: +1 (555) 123-4567 for global Click-to-Call compatibility.',
+                  },
+                },
+              ],
+            },
+            {
+              type: 'row',
+              fields: [
+                {
+                  name: 'transactionalEmailFromAddress',
+                  type: 'email',
+                  required: false,
+                  admin: {
+                    description: 'Verified Resend sender address used for lead notifications and patient emails. Example: notifications@yourdomain.com.',
+                  },
+                },
+                {
+                  name: 'transactionalEmailFromName',
+                  type: 'text',
+                  required: false,
+                  admin: {
+                    description: 'Sender display name for patient-facing emails.',
                   },
                 },
               ],

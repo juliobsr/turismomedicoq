@@ -82,7 +82,7 @@ const SliderItem = ({
   onClick: () => void;
   actionLabel: string;
 }) => (
-  <article className="group relative w-[58vw] max-w-[260px] shrink-0 snap-center overflow-hidden rounded-lg bg-slate-950 shadow-2xl shadow-slate-950/20 ring-1 ring-slate-200 sm:w-[42vw] sm:max-w-[320px] md:w-[34vw] lg:w-[28vw] lg:max-w-[380px]">
+  <article className="group relative w-[calc(100vw-2rem)] max-w-none shrink-0 snap-center overflow-hidden rounded-lg bg-slate-950 shadow-2xl shadow-slate-950/20 ring-1 ring-slate-200 sm:w-[42vw] sm:max-w-[320px] md:w-[34vw] lg:w-[28vw] lg:max-w-[380px]">
     <button
       type="button"
       onClick={onClick}
@@ -93,7 +93,7 @@ const SliderItem = ({
         src={asset.url || ''}
         alt={asset.alt || 'Medical procedure image'}
         fill
-        sizes="(max-width: 640px) 58vw, (max-width: 1024px) 34vw, 380px"
+        sizes="(max-width: 640px) calc(100vw - 2rem), (max-width: 1024px) 34vw, 380px"
         className="object-cover transition duration-700 group-hover:scale-105"
         loading="lazy"
       />
