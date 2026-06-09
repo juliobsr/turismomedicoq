@@ -5,6 +5,7 @@ import {
   type LeadResponseTemplate,
 } from '@/lib/leadResponseTemplates'
 import { formatFromAddress, getEmailDeliverySettings } from '@/lib/emailDeliverySettings'
+import { buildLeadReplyToAddress } from '@/lib/leadReplyAddress'
 
 export const sendLeadResponse: CollectionAfterChangeHook = async ({
   doc,
@@ -35,13 +36,17 @@ export const sendLeadResponse: CollectionAfterChangeHook = async ({
 
     const emailSettings = await getEmailDeliverySettings(req.payload)
     const from = formatFromAddress(emailSettings)
+    const replyTo = buildLeadReplyToAddress(caseFolio, emailSettings)
     const result = await req.payload.sendEmail({
       from,
       to: doc.email,
-      replyTo: emailSettings.replyTo,
+      replyTo,
       subject,
       html: email.html,
       text: email.plainText,
+      headers: {
+        'X-Lead-Folio': caseFolio,
+      },
     })
 
     const communicationHistory = Array.isArray(doc.communicationHistory)
@@ -62,7 +67,7 @@ export const sendLeadResponse: CollectionAfterChangeHook = async ({
             eventType: 'email_sent',
             template,
             subject,
-            message: `${doc.responseMessage || email.plainText}\n\nProvider result: ${JSON.stringify(result)}`,
+            message: `${doc.responseMessage || email.plainText}\n\nReply-To: ${replyTo}\nProvider result: ${JSON.stringify(result)}`,
             occurredAt: new Date().toISOString(),
             createdBy: req.user?.email || req.user?.id || 'admin',
           },

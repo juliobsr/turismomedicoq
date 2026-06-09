@@ -1,6 +1,6 @@
 import type { Payload } from 'payload'
 
-type EmailDeliverySettings = {
+export type EmailDeliverySettings = {
   adminEmail?: string
   fromAddress: string
   fromName: string

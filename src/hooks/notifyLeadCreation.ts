@@ -1,6 +1,7 @@
 // src/hooks/notifyLeadCreation.ts
 import { CollectionAfterChangeHook } from 'payload'
 import { formatFromAddress, getEmailDeliverySettings } from '@/lib/emailDeliverySettings'
+import { buildLeadReplyToAddress } from '@/lib/leadReplyAddress'
 import { getSiteUrl } from '@/lib/siteUrl'
 
 /**
@@ -22,6 +23,7 @@ export const notifyLeadCreation: CollectionAfterChangeHook = async ({
 
   const emailSettings = await getEmailDeliverySettings(payload);
   const from = formatFromAddress(emailSettings);
+  const replyTo = buildLeadReplyToAddress(caseFolio, emailSettings);
 
   try {
     if (!process.env.RESEND_API_KEY) {
@@ -34,9 +36,12 @@ export const notifyLeadCreation: CollectionAfterChangeHook = async ({
     const patientResult = await payload.sendEmail({
       from,
       to: doc.email,
-      replyTo: emailSettings.replyTo,
+      replyTo,
       subject: `Inquiry Received - Folio: ${caseFolio}`,
       html: `<h2>Hello ${patientName}</h2><p>Your request is being processed.</p>`,
+      headers: {
+        'X-Lead-Folio': caseFolio,
+      },
     });
 
     // 2. Admin Alert
