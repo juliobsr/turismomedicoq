@@ -29,6 +29,10 @@ export const sendLeadResponse: CollectionAfterChangeHook = async ({
   const subject = doc.responseSubject?.trim() || email.subject
 
   try {
+    if (!process.env.RESEND_API_KEY) {
+      throw new Error('RESEND_API_KEY is not configured in this environment.')
+    }
+
     const emailSettings = await getEmailDeliverySettings(req.payload)
     const from = formatFromAddress(emailSettings)
     const result = await req.payload.sendEmail({

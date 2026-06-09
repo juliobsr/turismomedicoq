@@ -1,6 +1,7 @@
 // src/hooks/notifyLeadCreation.ts
 import { CollectionAfterChangeHook } from 'payload'
 import { formatFromAddress, getEmailDeliverySettings } from '@/lib/emailDeliverySettings'
+import { getSiteUrl } from '@/lib/siteUrl'
 
 /**
  * Enterprise Notification Hook
@@ -17,16 +18,16 @@ export const notifyLeadCreation: CollectionAfterChangeHook = async ({
   // Logic: Ensure we have a fallback if folio or name are missing in the doc object
   const patientName = doc.name || 'Value Patient';
   const caseFolio = doc.folio || 'N/A';
-  const siteUrl =
-    process.env.NEXT_PUBLIC_SITE_URL ||
-    process.env.NEXT_PUBLIC_SERVER_URL ||
-    'http://localhost:3000';
-  const adminLeadUrl = `${siteUrl.replace(/\/$/, '')}/admin/collections/leads/${doc.id}`;
+  const adminLeadUrl = `${getSiteUrl()}/admin/collections/leads/${doc.id}`;
 
   const emailSettings = await getEmailDeliverySettings(payload);
   const from = formatFromAddress(emailSettings);
 
   try {
+    if (!process.env.RESEND_API_KEY) {
+      throw new Error('RESEND_API_KEY is not configured in this environment.')
+    }
+
     payload.logger.info(`[Email Dispatch] Sending lead creation emails for Folio: ${caseFolio} from ${from}`);
 
     // 1. Patient Confirmation
@@ -75,5 +76,31 @@ export const notifyLeadCreation: CollectionAfterChangeHook = async ({
     }
   } catch (error: any) {
     payload.logger.error(`[Resend Failure] Critical Error: ${error.message}`);
+
+    const communicationHistory = Array.isArray(doc.communicationHistory)
+      ? doc.communicationHistory
+      : []
+
+    await req.payload.update({
+      collection: 'leads',
+      id: doc.id,
+      data: {
+        communicationHistory: [
+          ...communicationHistory,
+          {
+            direction: 'internal',
+            eventType: 'email_failed',
+            subject: `Lead creation notification failed - ${caseFolio}`,
+            message: `From: ${from}\nAdmin recipient: ${emailSettings.adminEmail || 'not configured'}\nPatient recipient: ${doc.email}\nError: ${error.message}`,
+            occurredAt: new Date().toISOString(),
+            createdBy: 'system',
+          },
+        ],
+      },
+      req,
+      context: {
+        skipLeadResponse: true,
+      },
+    })
   }
 }

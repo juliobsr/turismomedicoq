@@ -1,3 +1,5 @@
+import { getSiteUrl } from '@/lib/siteUrl'
+
 export type LeadResponseTemplate = 'request_medical_records' | 'consultation_next_steps' | 'general_follow_up'
 
 type LeadTemplateInput = {
@@ -21,12 +23,7 @@ const wrapEmail = (title: string, body: string) => `
 `
 
 export const getLeadUploadUrl = (folio: string) => {
-  const baseUrl =
-    process.env.NEXT_PUBLIC_SITE_URL ||
-    process.env.NEXT_PUBLIC_SERVER_URL ||
-    'http://localhost:3000'
-
-  return `${baseUrl.replace(/\/$/, '')}/lead-upload/${encodeURIComponent(folio)}`
+  return `${getSiteUrl()}/lead-upload/${encodeURIComponent(folio)}`
 }
 
 export const buildLeadResponseEmail = (
