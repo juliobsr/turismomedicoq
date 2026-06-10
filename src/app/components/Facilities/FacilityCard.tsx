@@ -17,6 +17,10 @@ const isImageMedia = (asset?: FacilitiesMedia): asset is FacilitiesMedia => {
   return !asset.mimeType || asset.mimeType.startsWith('image/')
 }
 
+const isVideoMedia = (asset?: FacilitiesMedia): asset is FacilitiesMedia => {
+  return Boolean(asset?.url && asset.mimeType?.startsWith('video/'))
+}
+
 /**
  * Enterprise Interface for FacilityCard
  * Strictly typed to handle Payload CMS relational data.
@@ -41,12 +45,17 @@ export default function FacilityCard({ facility, priority = false }: FacilityCar
     slug,
     city,
     heroImage,
+    infrastructureGallery,
     specialtiesOffered,
   } = facility;
 
   // Type Casting for the Media object (assuming Depth 1)
   const heroMedia = publicFacilityMedia(heroImage as FacilitiesMedia | undefined);
-  const image = isImageMedia(heroMedia) ? heroMedia : undefined;
+  const galleryImage = ((infrastructureGallery as FacilitiesMedia[] | undefined) || [])
+    .map(publicFacilityMedia)
+    .find(isImageMedia);
+  const image = isImageMedia(heroMedia) ? heroMedia : galleryImage;
+  const previewVideo = !image && isVideoMedia(heroMedia) ? heroMedia : undefined;
   
   // Extracting and limiting specialties for UI consistency
   const displayedSpecialties = (specialtiesOffered as Specialty[] | undefined)?.slice(0, 3);
@@ -71,6 +80,26 @@ export default function FacilityCard({ facility, priority = false }: FacilityCar
             className="object-cover transition-transform duration-500 group-hover:scale-105"
             priority={priority}
           />
+        ) : previewVideo?.url ? (
+          <>
+            <video
+              className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+              muted
+              playsInline
+              preload="metadata"
+              aria-label={previewVideo.alt || `${name} facility video preview`}
+            >
+              <source src={previewVideo.url} type={previewVideo.mimeType || 'video/mp4'} />
+            </video>
+            <div className="absolute inset-0 bg-slate-950/20" />
+            <div className="absolute inset-0 flex items-center justify-center">
+              <span className="flex h-12 w-12 items-center justify-center rounded-full bg-white/95 text-slate-950 shadow-lg">
+                <svg className="ml-0.5 h-5 w-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M8 5v14l11-7z" />
+                </svg>
+              </span>
+            </div>
+          </>
         ) : (
           <div className="flex items-center justify-center h-full text-slate-400 bg-slate-50">
             <span className="text-[10px] uppercase font-bold tracking-tighter">No Preview Available</span>
