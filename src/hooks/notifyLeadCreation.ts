@@ -2,7 +2,7 @@
 import { CollectionAfterChangeHook } from 'payload'
 import { formatFromAddress, getEmailDeliverySettings } from '@/lib/emailDeliverySettings'
 import { buildLeadReplyToAddress } from '@/lib/leadReplyAddress'
-import { getLeadReplyUrl } from '@/lib/leadResponseTemplates'
+import { buildLeadCreationConfirmationEmail, getLeadReplyUrl } from '@/lib/leadResponseTemplates'
 import { getSiteUrl } from '@/lib/siteUrl'
 
 /**
@@ -18,7 +18,7 @@ export const notifyLeadCreation: CollectionAfterChangeHook = async ({
 
   const { payload } = req;
   // Logic: Ensure we have a fallback if folio or name are missing in the doc object
-  const patientName = doc.name || 'Value Patient';
+  const patientName = doc.name || 'Valued Patient';
   const caseFolio = doc.folio || 'N/A';
   const adminLeadUrl = `${getSiteUrl()}/admin/collections/leads/${doc.id}`;
 
@@ -26,6 +26,11 @@ export const notifyLeadCreation: CollectionAfterChangeHook = async ({
   const from = formatFromAddress(emailSettings);
   const replyTo = buildLeadReplyToAddress(caseFolio, emailSettings);
   const secureReplyUrl = getLeadReplyUrl(caseFolio);
+  const patientEmail = buildLeadCreationConfirmationEmail({
+    patientName,
+    caseFolio,
+    replyUrl: secureReplyUrl,
+  })
 
   try {
     if (!process.env.RESEND_API_KEY) {
@@ -39,25 +44,9 @@ export const notifyLeadCreation: CollectionAfterChangeHook = async ({
       from,
       to: doc.email,
       replyTo,
-      subject: `Inquiry Received - Folio: ${caseFolio}`,
-      html: `
-        <div style="font-family: Arial, sans-serif; color: #0f172a; line-height: 1.6;">
-          <h2>Hello ${patientName}</h2>
-          <p>Your request is being processed.</p>
-          <p>
-            <a href="${secureReplyUrl}" style="display: inline-block; background: #0f172a; color: #ffffff; padding: 12px 18px; border-radius: 8px; text-decoration: none; font-weight: 700;">
-              Reply securely to my coordinator
-            </a>
-          </p>
-          <p>If the button does not work, copy this link into your browser:<br />${secureReplyUrl}</p>
-        </div>
-      `,
-      text: [
-        `Hello ${patientName}`,
-        'Your request is being processed.',
-        `Secure reply link: ${secureReplyUrl}`,
-        `Case folio: ${caseFolio}`,
-      ].join('\n'),
+      subject: patientEmail.subject,
+      html: patientEmail.html,
+      text: patientEmail.plainText,
       headers: {
         'X-Lead-Folio': caseFolio,
       },
