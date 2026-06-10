@@ -181,6 +181,7 @@ export default async function DoctorProfilePage({ params }: DoctorProfileProps) 
   const procedureGallery = doctor.procedureGallery
     ? (doctor.procedureGallery as any[]).filter((img) => typeof img === 'object')
     : []
+  const procedureVideoLinks = (doctor as any).procedureVideoLinks || []
   const officeGallery = doctor.officeGallery
     ? (doctor.officeGallery as any[]).filter((img) => typeof img === 'object')
     : []
@@ -448,9 +449,10 @@ export default async function DoctorProfilePage({ params }: DoctorProfileProps) 
         </section>
       )}
 
-      {procedureGallery.length > 0 && (
+      {(procedureGallery.length > 0 || procedureVideoLinks.length > 0) && (
         <DoctorGallery
           images={procedureGallery}
+          videoLinks={procedureVideoLinks}
           eyebrow="Clinical procedure gallery"
           title={`${doctor.fullName} Procedure Gallery`}
           itemActionLabel="View procedure image"

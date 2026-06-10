@@ -17,6 +17,7 @@ import type { Procedure, MedicalAsset, Doctor, Facility } from '@/payload-types'
 import { getSiteSettings } from '@/lib/globals'
 import { LexicalRenderer } from '@/app/components/LexicalRenderer'
 import { LeadCaptureForm } from '@/app/components/LeadCaptureForm'
+import DoctorGallery from '@/app/components/DoctorsGallery'
 
 interface ProcedurePageProps {
   params: Promise<{
@@ -155,6 +156,10 @@ export default async function ProcedurePage({ params }: ProcedurePageProps) {
 
   // Visual Branding Fallbacks
   const coverImage = procedure.coverImage as MedicalAsset | undefined
+  const procedureGallery = (procedure as any).procedureGallery
+    ? ((procedure as any).procedureGallery as any[]).filter((item) => typeof item === 'object')
+    : []
+  const procedureVideoLinks = (procedure as any).procedureVideoLinks || []
   const brandPrimaryColor = settings?.primaryColor || '#1e3a8a'
 
   // ==========================================================================
@@ -288,6 +293,17 @@ export default async function ProcedurePage({ params }: ProcedurePageProps) {
             </h2>
             <LexicalRenderer data={procedure.fullDescription} />
           </article>
+
+          {(procedureGallery.length > 0 || procedureVideoLinks.length > 0) && (
+            <DoctorGallery
+              images={procedureGallery}
+              videoLinks={procedureVideoLinks}
+              eyebrow="Procedure media"
+              title={`${procedure.name} Gallery`}
+              itemActionLabel="View procedure image"
+              variant="slider"
+            />
+          )}
 
           {/* FAQs Section */}
           {procedure.faqs && procedure.faqs.length > 0 && (

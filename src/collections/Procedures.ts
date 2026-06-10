@@ -123,6 +123,55 @@ export const Procedures: CollectionConfig = {
           ],
         },
         {
+          label: 'Media Gallery',
+          fields: [
+            {
+              name: 'procedureGallery',
+              type: 'relationship',
+              relationTo: 'procedures-media',
+              hasMany: true,
+              required: false,
+              label: 'Procedure gallery media',
+              admin: {
+                description: 'Images or uploaded videos shown in the public procedure gallery.',
+              },
+            },
+            {
+              name: 'procedureVideoLinks',
+              type: 'array',
+              label: 'Procedure gallery video links',
+              admin: {
+                description: 'External YouTube, Vimeo or public video URLs shown inside the procedure gallery.',
+              },
+              fields: [
+                {
+                  name: 'title',
+                  type: 'text',
+                  required: true,
+                },
+                {
+                  name: 'url',
+                  type: 'text',
+                  required: true,
+                  label: 'Video URL',
+                },
+                {
+                  name: 'caption',
+                  type: 'textarea',
+                },
+                {
+                  name: 'thumbnail',
+                  type: 'relationship',
+                  relationTo: 'procedures-media',
+                  admin: {
+                    description: 'Optional image thumbnail for this external procedure video.',
+                  },
+                },
+              ],
+            },
+          ],
+        },
+        {
           label: 'SEO & FAQs',
           fields: [
             {

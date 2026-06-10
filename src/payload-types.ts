@@ -295,9 +295,24 @@ export interface Doctor {
    */
   heroVideoUrl?: string | null;
   /**
-   * Procedure, technology, OR or treatment images shown as a clinical gallery on the doctor profile.
+   * Procedure, technology, OR or treatment images/videos shown as a clinical gallery on the doctor profile.
    */
   procedureGallery?: (number | DoctorsMedia)[] | null;
+  /**
+   * External YouTube, Vimeo or public video URLs shown inside the procedure gallery.
+   */
+  procedureVideoLinks?:
+    | {
+        title: string;
+        url: string;
+        caption?: string | null;
+        /**
+         * Optional image thumbnail for this external procedure video.
+         */
+        thumbnail?: (number | null) | DoctorsMedia;
+        id?: string | null;
+      }[]
+    | null;
   patientTestimonials?:
     | {
         title: string;
@@ -322,6 +337,8 @@ export interface Doctor {
   createdAt: string;
 }
 /**
+ * Images and short videos used for doctor portraits, clinical galleries, and profile backgrounds.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "doctors-media".
  */
@@ -416,6 +433,25 @@ export interface Procedure {
   surgeryDuration: string;
   anesthesiaType?: ('general' | 'local_sedation' | 'local') | null;
   /**
+   * Images or uploaded videos shown in the public procedure gallery.
+   */
+  procedureGallery?: (number | ProceduresMedia)[] | null;
+  /**
+   * External YouTube, Vimeo or public video URLs shown inside the procedure gallery.
+   */
+  procedureVideoLinks?:
+    | {
+        title: string;
+        url: string;
+        caption?: string | null;
+        /**
+         * Optional image thumbnail for this external procedure video.
+         */
+        thumbnail?: (number | null) | ProceduresMedia;
+        id?: string | null;
+      }[]
+    | null;
+  /**
    * Provide common questions regarding this medical procedure.
    */
   faqs?:
@@ -430,6 +466,8 @@ export interface Procedure {
   createdAt: string;
 }
 /**
+ * Images and short videos used for procedure covers and media galleries.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "procedures-media".
  */
@@ -1113,6 +1151,15 @@ export interface DoctorsSelect<T extends boolean = true> {
   heroBackground?: T;
   heroVideoUrl?: T;
   procedureGallery?: T;
+  procedureVideoLinks?:
+    | T
+    | {
+        title?: T;
+        url?: T;
+        caption?: T;
+        thumbnail?: T;
+        id?: T;
+      };
   patientTestimonials?:
     | T
     | {
@@ -1261,6 +1308,16 @@ export interface ProceduresSelect<T extends boolean = true> {
   recoveryTime?: T;
   surgeryDuration?: T;
   anesthesiaType?: T;
+  procedureGallery?: T;
+  procedureVideoLinks?:
+    | T
+    | {
+        title?: T;
+        url?: T;
+        caption?: T;
+        thumbnail?: T;
+        id?: T;
+      };
   faqs?:
     | T
     | {

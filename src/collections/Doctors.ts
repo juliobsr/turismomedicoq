@@ -142,8 +142,41 @@ export const Doctors: CollectionConfig = {
               hasMany: true,
               required: false,
               admin: {
-                description: 'Procedure, technology, OR or treatment images shown as a clinical gallery on the doctor profile.',
+                description: 'Procedure, technology, OR or treatment images/videos shown as a clinical gallery on the doctor profile.',
               },
+            },
+            {
+              name: 'procedureVideoLinks',
+              type: 'array',
+              label: 'Procedure gallery video links',
+              admin: {
+                description: 'External YouTube, Vimeo or public video URLs shown inside the procedure gallery.',
+              },
+              fields: [
+                {
+                  name: 'title',
+                  type: 'text',
+                  required: true,
+                },
+                {
+                  name: 'url',
+                  type: 'text',
+                  required: true,
+                  label: 'Video URL',
+                },
+                {
+                  name: 'caption',
+                  type: 'textarea',
+                },
+                {
+                  name: 'thumbnail',
+                  type: 'relationship',
+                  relationTo: 'doctors-media',
+                  admin: {
+                    description: 'Optional image thumbnail for this external procedure video.',
+                  },
+                },
+              ],
             },
             {
               name: 'patientTestimonials',
