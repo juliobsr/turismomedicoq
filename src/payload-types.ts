@@ -512,13 +512,28 @@ export interface Facility {
   doctors?: (number | Doctor)[] | null;
   accreditations?: (number | Certificate)[] | null;
   /**
-   * Main image for the facility header and cards.
+   * Main image or short video used as the facility hero background. Images are also used for cards and SEO previews.
    */
   heroImage: number | FacilitiesMedia;
   /**
-   * Showcase photos of rooms and equipment.
+   * Showcase photos or uploaded videos of rooms, equipment and patient areas.
    */
   infrastructureGallery?: (number | FacilitiesMedia)[] | null;
+  /**
+   * External video links shown inside the facility gallery. Use this for YouTube, Vimeo, Instagram or other public video URLs.
+   */
+  infrastructureVideoLinks?:
+    | {
+        title: string;
+        url: string;
+        caption?: string | null;
+        /**
+         * Optional image thumbnail for this external video link.
+         */
+        thumbnail?: (number | null) | FacilitiesMedia;
+        id?: string | null;
+      }[]
+    | null;
   isActive?: boolean | null;
   updatedAt: string;
   createdAt: string;
@@ -599,6 +614,8 @@ export interface CertificatesMedia {
   };
 }
 /**
+ * Images and short videos used for facility hero backgrounds and galleries.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "facilities-media".
  */
@@ -1136,6 +1153,15 @@ export interface FacilitiesSelect<T extends boolean = true> {
   accreditations?: T;
   heroImage?: T;
   infrastructureGallery?: T;
+  infrastructureVideoLinks?:
+    | T
+    | {
+        title?: T;
+        url?: T;
+        caption?: T;
+        thumbnail?: T;
+        id?: T;
+      };
   isActive?: T;
   updatedAt?: T;
   createdAt?: T;

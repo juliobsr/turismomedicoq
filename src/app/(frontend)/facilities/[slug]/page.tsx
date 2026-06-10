@@ -16,11 +16,11 @@ import {
   SparklesIcon,
   UserGroupIcon,
 } from '@heroicons/react/24/outline';
-import type { Facility, MedicalAsset, Specialty, Doctor } from '@/payload-types';
+import type { Facility, FacilitiesMedia, MedicalAsset, Specialty, Doctor } from '@/payload-types';
 
 // Components
 import { LexicalRenderer } from '@/app/components/LexicalRenderer';
-import { FacilityGallery } from '@/app/components/Facilities/FacilityGallery';
+import { FacilityGallery, type FacilityGalleryItem } from '@/app/components/Facilities/FacilityGallery';
 
 interface FacilityPageProps {
   params: Promise<{
@@ -31,7 +31,7 @@ interface FacilityPageProps {
 // ISR: Revalidate the static page every hour to keep doctor rosters and gallery fresh
 export const revalidate = 3600; 
 
-const publicFacilityImage = (asset?: MedicalAsset): MedicalAsset | undefined => {
+const publicFacilityMedia = (asset?: FacilitiesMedia): FacilitiesMedia | undefined => {
   if (!asset?.filename?.startsWith('hospital-angeles-')) return asset
 
   return {
@@ -39,6 +39,17 @@ const publicFacilityImage = (asset?: MedicalAsset): MedicalAsset | undefined => 
     url: `/media/facilities/${asset.filename}`,
   }
 }
+
+const isImageMedia = (asset?: FacilitiesMedia): asset is FacilitiesMedia => {
+  if (!asset?.url) return false
+  return !asset.mimeType || asset.mimeType.startsWith('image/')
+}
+
+const isVideoMedia = (asset?: FacilitiesMedia): asset is FacilitiesMedia => {
+  return Boolean(asset?.url && asset.mimeType?.startsWith('video/'))
+}
+
+type FacilityVideoLink = NonNullable<Facility['infrastructureVideoLinks']>[number]
 
 /**
  * Enterprise Architecture: Static Path Generation (SSG)
@@ -80,7 +91,8 @@ export async function generateMetadata({ params }: FacilityPageProps): Promise<M
   const facility = docs[0] as Facility | undefined;
   if (!facility) return {};
 
-  const primaryImage = publicFacilityImage(facility.heroImage as MedicalAsset | undefined)?.url;
+  const heroMedia = publicFacilityMedia(facility.heroImage as FacilitiesMedia | undefined);
+  const primaryImage = isImageMedia(heroMedia) ? heroMedia.url : undefined;
 
   const title = `${facility.name} | Tier 1 Private Hospital in Queretaro`
   const description = `Explore ${facility.name}, a Tier 1 private hospital environment in Queretaro with advanced technology, modern infrastructure and specialist care for international patients.`
@@ -127,12 +139,39 @@ export default async function FacilityDetailPage({ params }: FacilityPageProps) 
   }
 
   // Defensive Type Casting and Safety Fallbacks
-  const heroImage = publicFacilityImage(facility.heroImage as MedicalAsset | undefined);
+  const heroMedia = publicFacilityMedia(facility.heroImage as FacilitiesMedia | undefined);
+  const heroIsVideo = Boolean(heroMedia?.url && heroMedia.mimeType?.startsWith('video/'));
+  const heroIsImage = Boolean(heroMedia?.url && (!heroMedia.mimeType || heroMedia.mimeType.startsWith('image/')));
   const specialties = (facility.specialtiesOffered as Specialty[] | undefined) || [];
   const doctors = (facility.doctors as Doctor[] | undefined) || [];
-  const galleryImages = ((facility.infrastructureGallery as MedicalAsset[] | undefined) || []).map(
-    publicFacilityImage
-  ).filter((asset): asset is MedicalAsset => Boolean(asset));
+  const galleryMedia = ((facility.infrastructureGallery as FacilitiesMedia[] | undefined) || [])
+    .map(publicFacilityMedia)
+    .filter((asset): asset is FacilitiesMedia => Boolean(asset?.url));
+  const galleryVideoLinks = (facility.infrastructureVideoLinks || []).filter(
+    (item): item is FacilityVideoLink => Boolean(item?.url)
+  );
+  const galleryItems: FacilityGalleryItem[] = [
+    ...galleryMedia
+      .filter((asset) => isImageMedia(asset) || isVideoMedia(asset))
+      .map((asset) => (
+        isVideoMedia(asset)
+          ? ({ type: 'video', media: asset } as const)
+          : ({ type: 'image', media: asset } as const)
+      )),
+    ...galleryVideoLinks.map((item) => {
+      const thumbnail = typeof item.thumbnail === 'object' && item.thumbnail
+        ? publicFacilityMedia(item.thumbnail)
+        : undefined;
+
+      return {
+        type: 'videoLink',
+        title: item.title,
+        url: item.url,
+        caption: item.caption,
+        thumbnail: thumbnail && isImageMedia(thumbnail) ? thumbnail : undefined,
+      } as const;
+    }),
+  ];
   const isHospitalAngeles = facility.slug === 'hospital-angeles-centro-sur'
 
   const premiumPoints = [
@@ -164,7 +203,7 @@ export default async function FacilityDetailPage({ params }: FacilityPageProps) 
     '@context': 'https://schema.org',
     '@type': 'MedicalClinic',
     name: facility.name,
-    image: heroImage?.url,
+    image: heroIsImage ? heroMedia?.url : undefined,
     address: {
       '@type': 'PostalAddress',
       addressLocality: facility.city,
@@ -183,16 +222,28 @@ export default async function FacilityDetailPage({ params }: FacilityPageProps) 
 
       {/* Hero Section with LCP Optimization */}
       <section className="relative min-h-[680px] w-full bg-slate-900">
-        {heroImage?.url && (
+        {heroIsVideo && heroMedia?.url ? (
+          <video
+            className="absolute inset-0 h-full w-full object-cover opacity-55"
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="metadata"
+            aria-label={heroMedia.alt || `${facility.name} facility video`}
+          >
+            <source src={heroMedia.url!} type={heroMedia.mimeType || 'video/mp4'} />
+          </video>
+        ) : heroIsImage && heroMedia?.url ? (
           <Image
-            src={heroImage.url}
-            alt={heroImage.alt || facility.name}
+            src={heroMedia.url!}
+            alt={heroMedia.alt || facility.name}
             fill
             className="object-cover opacity-55"
             priority // Critical for Core Web Vitals (LCP)
             sizes="100vw"
           />
-        )}
+        ) : null}
         <div className="absolute inset-0 bg-slate-950/55" />
         
         <div className="relative z-10 mx-auto flex min-h-[680px] max-w-7xl flex-col justify-end px-4 py-16">
@@ -288,7 +339,7 @@ export default async function FacilityDetailPage({ params }: FacilityPageProps) 
           )}
 
           {/* Infrastructure Gallery Client Component */}
-          {galleryImages.length > 0 && (
+          {galleryItems.length > 0 && (
             <div className="mt-12">
               <div className="mb-6 flex items-end justify-between gap-6">
                 <div>
@@ -302,7 +353,7 @@ export default async function FacilityDetailPage({ params }: FacilityPageProps) 
                 <SparklesIcon className="hidden h-8 w-8 text-blue-700 md:block" />
               </div>
               {/* Reusing a client-side Lightbox gallery approach */}
-              <FacilityGallery images={galleryImages} />
+              <FacilityGallery items={galleryItems} />
             </div>
           )}
         </div>

@@ -5,10 +5,16 @@ import { backendAccess } from '@/access/backendRoles'
  * Enterprise Base Media Configuration
  * Purpose: Provides standard upload settings, access control, and SEO fields.
  */
+type CreateMediaCollectionOptions = {
+  mimeTypes?: string[]
+  adminDescription?: string
+}
+
 export const createMediaCollection = (
   slug: string, 
   label: string, 
-  uploadFolder: string
+  uploadFolder: string,
+  options: CreateMediaCollectionOptions = {}
 ): CollectionConfig => ({
   slug,
   labels: {
@@ -25,6 +31,7 @@ export const createMediaCollection = (
   admin: {
     useAsTitle: 'filename',
     group: 'Media Assets',
+    description: options.adminDescription,
   },
   upload: {
     staticDir: `../storage/${uploadFolder}`,
@@ -49,7 +56,7 @@ export const createMediaCollection = (
       },
     ],
     adminThumbnail: 'thumbnail',
-    mimeTypes: ['image/*'],
+    mimeTypes: options.mimeTypes || ['image/*'],
   },
   fields: [
     {

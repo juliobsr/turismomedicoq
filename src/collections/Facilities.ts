@@ -92,8 +92,9 @@ export const Facilities: CollectionConfig = {
               type: 'relationship',
               relationTo: 'facilities-media',
               required: true,
+              label: 'Hero background media',
               admin: {
-                description: 'Main image for the facility header and cards.',
+                description: 'Main image or short video used as the facility hero background. Images are also used for cards and SEO previews.',
               },
             },
             {
@@ -101,9 +102,43 @@ export const Facilities: CollectionConfig = {
               type: 'relationship',
               relationTo: 'facilities-media',
               hasMany: true,
+              label: 'Infrastructure gallery media',
               admin: {
-                description: 'Showcase photos of rooms and equipment.',
+                description: 'Showcase photos or uploaded videos of rooms, equipment and patient areas.',
               },
+            },
+            {
+              name: 'infrastructureVideoLinks',
+              type: 'array',
+              label: 'Gallery video links',
+              admin: {
+                description: 'External video links shown inside the facility gallery. Use this for YouTube, Vimeo, Instagram or other public video URLs.',
+              },
+              fields: [
+                {
+                  name: 'title',
+                  type: 'text',
+                  required: true,
+                },
+                {
+                  name: 'url',
+                  type: 'text',
+                  required: true,
+                  label: 'Video URL',
+                },
+                {
+                  name: 'caption',
+                  type: 'textarea',
+                },
+                {
+                  name: 'thumbnail',
+                  type: 'relationship',
+                  relationTo: 'facilities-media',
+                  admin: {
+                    description: 'Optional image thumbnail for this external video link.',
+                  },
+                },
+              ],
             },
           ],
         },

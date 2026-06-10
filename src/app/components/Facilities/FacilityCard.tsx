@@ -1,15 +1,20 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Facility, MedicalAsset, Specialty } from '@/payload-types';
+import { Facility, FacilitiesMedia, Specialty } from '@/payload-types';
 
-const publicFacilityImage = (asset?: MedicalAsset): MedicalAsset | undefined => {
+const publicFacilityMedia = (asset?: FacilitiesMedia): FacilitiesMedia | undefined => {
   if (!asset?.filename?.startsWith('hospital-angeles-')) return asset
 
   return {
     ...asset,
     url: `/media/facilities/${asset.filename}`,
   }
+}
+
+const isImageMedia = (asset?: FacilitiesMedia): asset is FacilitiesMedia => {
+  if (!asset?.url) return false
+  return !asset.mimeType || asset.mimeType.startsWith('image/')
 }
 
 /**
@@ -40,7 +45,8 @@ export default function FacilityCard({ facility, priority = false }: FacilityCar
   } = facility;
 
   // Type Casting for the Media object (assuming Depth 1)
-  const image = publicFacilityImage(heroImage as MedicalAsset | undefined);
+  const heroMedia = publicFacilityMedia(heroImage as FacilitiesMedia | undefined);
+  const image = isImageMedia(heroMedia) ? heroMedia : undefined;
   
   // Extracting and limiting specialties for UI consistency
   const displayedSpecialties = (specialtiesOffered as Specialty[] | undefined)?.slice(0, 3);
