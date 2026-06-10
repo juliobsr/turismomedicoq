@@ -94,6 +94,7 @@ export default buildConfig({
 
     vercelBlobStorage({
       enabled: !!process.env.BLOB_READ_WRITE_TOKEN, // Solo se activa si el token existe
+      addRandomSuffix: true,
       collections: {
         'medical-assets': true,
         'certificates-media': true,
