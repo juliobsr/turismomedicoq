@@ -34,24 +34,33 @@ const escapeHtml = (value: string) =>
 
 const formatMultilineHtml = (value: string) => escapeHtml(value).replace(/\n/g, '<br />')
 
-const button = (href: string, label: string, variant: 'primary' | 'dark' = 'primary') => {
-  const background = variant === 'primary' ? '#0ea5a3' : '#0f172a'
+const button = (href: string, label: string, variant: 'primary' | 'reply' = 'primary') => {
+  const background = variant === 'reply' ? '#f97316' : '#0ea5a3'
+  const shadow = variant === 'reply' ? '0 12px 28px rgba(249, 115, 22, 0.28)' : '0 10px 24px rgba(14, 165, 163, 0.22)'
+  const padding = variant === 'reply' ? '17px 28px' : '14px 22px'
+  const fontSize = variant === 'reply' ? '16px' : '14px'
 
   return `
-    <a href="${href}" style="display: inline-block; background: ${background}; color: #ffffff; padding: 14px 22px; border-radius: 999px; text-decoration: none; font-weight: 800; font-size: 14px; letter-spacing: 0.01em;">
-      ${label}
-    </a>
+    <table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse: separate;">
+      <tr>
+        <td bgcolor="${background}" style="border-radius: 999px; background: ${background}; box-shadow: ${shadow};">
+          <a href="${href}" style="display: inline-block; background: ${background}; color: #ffffff; padding: ${padding}; border-radius: 999px; text-decoration: none; font-weight: 900; font-size: ${fontSize}; line-height: 1.2; letter-spacing: 0.01em;">
+            ${label}
+          </a>
+        </td>
+      </tr>
+    </table>
   `
 }
 
 const replyNotice = (replyUrl: string) => `
-  <div style="margin-top: 24px; padding: 18px; border-radius: 18px; background: #ecfeff; border: 1px solid #bae6fd;">
-    <p style="margin: 0 0 10px; color: #0f172a; font-size: 15px; font-weight: 800;">Please use the secure reply link</p>
-    <p style="margin: 0 0 16px; color: #334155; font-size: 14px; line-height: 1.65;">
+  <div style="margin-top: 28px; padding: 24px; border-radius: 20px; background: #f0fdfa; border: 1px solid #99f6e4;">
+    <p style="margin: 0 0 10px; color: #0f172a; font-size: 16px; font-weight: 900;">Please use the secure reply link</p>
+    <p style="margin: 0 0 20px; color: #334155; font-size: 14px; line-height: 1.7;">
       For your privacy and information security, please respond through your secure patient page. This email reply address is not monitored.
     </p>
-    ${button(replyUrl, 'Reply securely to my coordinator', 'dark')}
-    <p style="margin: 14px 0 0; color: #64748b; font-size: 12px; line-height: 1.5;">
+    ${button(replyUrl, 'Reply securely to my coordinator', 'reply')}
+    <p style="margin: 18px 0 0; color: #475569; font-size: 12px; line-height: 1.55;">
       Secure reply link:<br />
       <a href="${replyUrl}" style="color: #0f766e; word-break: break-all;">${replyUrl}</a>
     </p>
@@ -87,13 +96,13 @@ const wrapEmail = (title: string, subtitle: string, body: string) => `
               </td>
             </tr>
             <tr>
-              <td style="overflow: hidden; border-radius: 26px; background: #ffffff; box-shadow: 0 24px 70px rgba(15, 23, 42, 0.12);">
-                <div style="padding: 34px 32px 28px; background: linear-gradient(135deg, #083344 0%, #0f766e 58%, #0ea5a3 100%);">
-                  <p style="margin: 0 0 10px; color: #ccfbf1; font-size: 12px; font-weight: 900; letter-spacing: 0.12em; text-transform: uppercase;">${brandName}</p>
-                  <h1 style="margin: 0; color: #ffffff; font-size: 30px; line-height: 1.15; font-weight: 900;">${title}</h1>
-                  <p style="margin: 12px 0 0; color: #e0f2fe; font-size: 15px; line-height: 1.6;">${subtitle}</p>
+              <td style="overflow: hidden; border-radius: 26px; background: #ffffff; border: 1px solid #dbeafe; box-shadow: 0 24px 70px rgba(15, 23, 42, 0.10);">
+                <div style="padding: 34px 32px 34px; background: #f0fdfa; border-bottom: 1px solid #99f6e4;">
+                  <p style="margin: 0 0 10px; color: #0f766e; font-size: 12px; font-weight: 900; letter-spacing: 0.12em; text-transform: uppercase;">${brandName}</p>
+                  <h1 style="margin: 0; color: #0f172a; font-size: 30px; line-height: 1.15; font-weight: 900;">${title}</h1>
+                  <p style="margin: 12px 0 0; color: #334155; font-size: 15px; line-height: 1.6;">${subtitle}</p>
                 </div>
-                <div style="padding: 30px 32px 32px; color: #334155; font-size: 15px; line-height: 1.7;">
+                <div style="padding: 32px 32px 44px; color: #334155; font-size: 15px; line-height: 1.7;">
                   ${body}
                 </div>
               </td>
