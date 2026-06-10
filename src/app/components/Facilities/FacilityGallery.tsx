@@ -35,7 +35,9 @@ interface FacilityGalleryProps {
   items: FacilityGalleryItem[];
 }
 
-const getVideoEmbed = (url: string): { type: 'direct' | 'iframe'; src: string } => {
+type VideoEmbed = { type: 'direct' | 'iframe'; src: string; thumbnail?: string }
+
+const getVideoEmbed = (url: string): VideoEmbed => {
   try {
     const parsed = new URL(url);
     const hostname = parsed.hostname.replace(/^www\./, '');
@@ -47,17 +49,29 @@ const getVideoEmbed = (url: string): { type: 'direct' | 'iframe'; src: string } 
 
     if (hostname === 'youtu.be') {
       const id = pathname.split('/').filter(Boolean)[0];
-      if (id) return { type: 'iframe', src: `https://www.youtube.com/embed/${id}` };
+      if (id) {
+        return {
+          type: 'iframe',
+          src: `https://www.youtube.com/embed/${id}?autoplay=1&rel=0`,
+          thumbnail: `https://img.youtube.com/vi/${id}/hqdefault.jpg`,
+        };
+      }
     }
 
     if (hostname === 'youtube.com' || hostname === 'm.youtube.com') {
       const id = parsed.searchParams.get('v') || pathname.split('/').filter(Boolean).pop();
-      if (id) return { type: 'iframe', src: `https://www.youtube.com/embed/${id}` };
+      if (id) {
+        return {
+          type: 'iframe',
+          src: `https://www.youtube.com/embed/${id}?autoplay=1&rel=0`,
+          thumbnail: `https://img.youtube.com/vi/${id}/hqdefault.jpg`,
+        };
+      }
     }
 
     if (hostname === 'vimeo.com') {
       const id = pathname.split('/').filter(Boolean).pop();
-      if (id) return { type: 'iframe', src: `https://player.vimeo.com/video/${id}` };
+      if (id) return { type: 'iframe', src: `https://player.vimeo.com/video/${id}?autoplay=1` };
     }
   } catch {
     return { type: 'iframe', src: url };
@@ -76,6 +90,11 @@ const getVideoEmbed = (url: string): { type: 'direct' | 'iframe'; src: string } 
  */
 export const FacilityGallery = ({ items = [] }: FacilityGalleryProps) => {
   const [lightboxIndex, setLightboxIndex] = useState<number>(-1);
+  const [activeVideo, setActiveVideo] = useState<{
+    title: string;
+    caption?: string | null;
+    embed: VideoEmbed;
+  } | null>(null);
 
   const validItems = useMemo(() => items.filter((item) => {
     if (item.type === 'videoLink') return Boolean(item.url);
@@ -97,8 +116,8 @@ export const FacilityGallery = ({ items = [] }: FacilityGalleryProps) => {
     if (itemCount === 2) return `${baseClasses} grid-cols-1 sm:grid-cols-2 max-w-5xl`;
     if (itemCount === 3) return `${baseClasses} grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 max-w-7xl`;
     
-    // Default for 4+ images
-    return `${baseClasses} grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 max-w-7xl`;
+    // Default for 4+ media items: larger thumbnails for better inspection.
+    return `${baseClasses} grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 max-w-7xl`;
   }, [itemCount]);
 
   // 3. LIGHTBOX SLIDES PREPARATION: Mapping Payload Media to Lightbox format
@@ -126,34 +145,40 @@ export const FacilityGallery = ({ items = [] }: FacilityGalleryProps) => {
             return (
               <figure
                 key={`image-${img.id}`}
-                onClick={() => setLightboxIndex(lightboxImageIndex)}
-                className="group relative aspect-[4/3] w-full cursor-zoom-in overflow-hidden rounded-lg bg-slate-100 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
+                className="group overflow-hidden rounded-lg bg-white shadow-sm ring-1 ring-slate-200 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
               >
-                <Image
-                  src={img.url!}
-                  alt={img.alt || 'Hospital infrastructure'}
-                  fill
-                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                  className="object-cover transition-transform duration-700 group-hover:scale-105"
-                  loading="lazy"
-                />
+                <button
+                  type="button"
+                  onClick={() => setLightboxIndex(lightboxImageIndex)}
+                  className="group relative block aspect-video w-full cursor-zoom-in overflow-hidden bg-slate-100 text-left"
+                  aria-label={`Enlarge ${img.alt || 'hospital infrastructure image'}`}
+                >
+                  <Image
+                    src={img.url!}
+                    alt={img.alt || 'Hospital infrastructure'}
+                    fill
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    className="object-cover transition-transform duration-700 group-hover:scale-105"
+                    loading="lazy"
+                  />
+
+                  <div className="absolute inset-0 flex items-center justify-center bg-slate-900/0 transition-all duration-300 group-hover:bg-slate-900/25">
+                    <div className="translate-y-4 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
+                      <span className="flex items-center gap-2 rounded-lg bg-white/95 px-5 py-2.5 text-sm font-bold text-slate-900 shadow-lg backdrop-blur-sm">
+                        <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
+                        </svg>
+                        Enlarge
+                      </span>
+                    </div>
+                  </div>
+                </button>
 
                 {img.caption && (
-                  <figcaption className="absolute inset-x-0 bottom-0 bg-slate-950/70 px-4 py-3 text-sm font-semibold text-white backdrop-blur-sm">
+                  <figcaption className="px-4 py-3 text-sm font-semibold leading-6 text-slate-700">
                     {img.caption}
                   </figcaption>
                 )}
-                
-                <div className="absolute inset-0 flex items-center justify-center bg-slate-900/0 transition-all duration-300 group-hover:bg-slate-900/30">
-                  <div className="translate-y-4 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
-                    <span className="flex items-center gap-2 rounded-lg bg-white/95 px-5 py-2.5 text-sm font-bold text-slate-900 shadow-lg backdrop-blur-sm">
-                      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
-                      </svg>
-                      Enlarge
-                    </span>
-                  </div>
-                </div>
               </figure>
             );
           }
@@ -164,71 +189,78 @@ export const FacilityGallery = ({ items = [] }: FacilityGalleryProps) => {
             return (
               <figure
                 key={`video-${video.id}`}
-                className="overflow-hidden rounded-lg bg-slate-950 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
+                className="overflow-hidden rounded-lg bg-white shadow-sm ring-1 ring-slate-200 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
               >
-                <div className="aspect-video w-full bg-slate-950">
+                <button
+                  type="button"
+                  onClick={() => setActiveVideo({
+                    title: video.alt || 'Facility video',
+                    caption: video.caption,
+                    embed: { type: 'direct', src: video.url! },
+                  })}
+                  className="group relative block aspect-video w-full overflow-hidden bg-slate-950 text-left"
+                  aria-label={`Play ${video.alt || 'facility video'}`}
+                >
                   <video
-                    className="h-full w-full object-cover"
-                    controls
+                    className="h-full w-full object-cover opacity-90 transition group-hover:scale-105"
+                    muted
                     playsInline
                     preload="metadata"
                   >
                     <source src={video.url!} type={video.mimeType || 'video/mp4'} />
                   </video>
-                </div>
-                <figcaption className="flex items-center justify-between gap-3 bg-white px-4 py-3 text-sm font-semibold text-slate-700">
+                  <span className="absolute inset-0 flex items-center justify-center bg-slate-950/20">
+                    <span className="flex h-14 w-14 items-center justify-center rounded-full bg-white text-slate-950 shadow-xl transition group-hover:scale-105">
+                      <svg className="ml-1 h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M8 5v14l11-7z" />
+                      </svg>
+                    </span>
+                  </span>
+                </button>
+                <figcaption className="px-4 py-3 text-sm font-semibold leading-6 text-slate-700">
                   <span>{video.caption || video.alt || 'Facility video'}</span>
-                  <a
-                    href={video.url!}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="shrink-0 rounded-md bg-slate-950 px-3 py-1.5 text-xs font-extrabold uppercase tracking-[0.12em] text-white transition hover:bg-blue-700"
-                  >
-                    Open video
-                  </a>
                 </figcaption>
               </figure>
             );
           }
 
           const embed = getVideoEmbed(item.url);
+          const thumbnailUrl = item.thumbnail?.url || embed.thumbnail;
 
           return (
             <figure
               key={`link-${item.url}`}
               className="overflow-hidden rounded-lg bg-white shadow-sm ring-1 ring-slate-200 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
             >
-              <div className="aspect-video w-full bg-slate-950">
-                {embed.type === 'direct' ? (
-                  <video className="h-full w-full object-cover" controls playsInline preload="metadata">
-                    <source src={embed.src} />
-                  </video>
-                ) : (
-                  <iframe
-                    className="h-full w-full"
-                    src={embed.src}
-                    title={item.title}
+              <button
+                type="button"
+                onClick={() => setActiveVideo({ title: item.title, caption: item.caption, embed })}
+                className="group relative block aspect-video w-full overflow-hidden bg-slate-950 text-left"
+                aria-label={`Play ${item.title}`}
+              >
+                {thumbnailUrl ? (
+                  <Image
+                    src={thumbnailUrl}
+                    alt={item.thumbnail?.alt || item.title}
+                    fill
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    className="object-cover opacity-90 transition-transform duration-700 group-hover:scale-105"
                     loading="lazy"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                    allowFullScreen
                   />
+                ) : (
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,#0ea5e9,transparent_35%),linear-gradient(135deg,#0f172a,#111827)]" />
                 )}
-              </div>
+                <span className="absolute inset-0 flex items-center justify-center bg-slate-950/25">
+                  <span className="flex h-14 w-14 items-center justify-center rounded-full bg-white text-slate-950 shadow-xl transition group-hover:scale-105">
+                    <svg className="ml-1 h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M8 5v14l11-7z" />
+                    </svg>
+                  </span>
+                </span>
+              </button>
               <figcaption className="p-4">
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <p className="text-sm font-black uppercase tracking-[0.12em] text-blue-700">Video tour</p>
-                    <h4 className="mt-1 text-lg font-extrabold text-slate-950">{item.title}</h4>
-                  </div>
-                  <a
-                    href={item.url}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="shrink-0 rounded-md bg-slate-950 px-3 py-1.5 text-xs font-extrabold uppercase tracking-[0.12em] text-white transition hover:bg-blue-700"
-                  >
-                    Open
-                  </a>
-                </div>
+                <p className="text-sm font-black uppercase tracking-[0.12em] text-blue-700">Video tour</p>
+                <h4 className="mt-1 text-lg font-extrabold text-slate-950">{item.title}</h4>
                 {item.caption && <p className="mt-2 text-sm leading-6 text-slate-600">{item.caption}</p>}
               </figcaption>
             </figure>
@@ -253,6 +285,50 @@ export const FacilityGallery = ({ items = [] }: FacilityGalleryProps) => {
           buttonNext: imageItems.length <= 1 ? () => null : undefined,
         }}
       />
+
+      {activeVideo && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/90 px-4 py-8"
+          role="dialog"
+          aria-modal="true"
+          aria-label={activeVideo.title}
+          onClick={() => setActiveVideo(null)}
+        >
+          <div
+            className="w-full max-w-5xl overflow-hidden rounded-lg bg-white shadow-2xl"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="flex items-center justify-between gap-4 border-b border-slate-200 px-4 py-3">
+              <div>
+                <h4 className="text-lg font-extrabold text-slate-950">{activeVideo.title}</h4>
+                {activeVideo.caption && <p className="text-sm text-slate-600">{activeVideo.caption}</p>}
+              </div>
+              <button
+                type="button"
+                onClick={() => setActiveVideo(null)}
+                className="rounded-md bg-slate-100 px-3 py-2 text-sm font-extrabold uppercase tracking-[0.12em] text-slate-700 transition hover:bg-slate-200"
+              >
+                Close
+              </button>
+            </div>
+            <div className="aspect-video w-full bg-slate-950">
+              {activeVideo.embed.type === 'direct' ? (
+                <video className="h-full w-full" controls autoPlay playsInline>
+                  <source src={activeVideo.embed.src} />
+                </video>
+              ) : (
+                <iframe
+                  className="h-full w-full"
+                  src={activeVideo.embed.src}
+                  title={activeVideo.title}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                />
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

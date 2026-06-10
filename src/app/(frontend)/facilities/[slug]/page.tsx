@@ -274,7 +274,7 @@ export default async function FacilityDetailPage({ params }: FacilityPageProps) 
       <section className="relative min-h-[680px] w-full bg-slate-900">
         {externalHeroVideo?.type === 'direct' ? (
           <video
-            className="absolute inset-0 h-full w-full object-cover opacity-55"
+            className="absolute inset-0 h-full w-full object-cover opacity-80"
             autoPlay
             muted
             loop
@@ -286,7 +286,7 @@ export default async function FacilityDetailPage({ params }: FacilityPageProps) 
           </video>
         ) : externalHeroVideo?.type === 'iframe' ? (
           <iframe
-            className="pointer-events-none absolute left-1/2 top-1/2 h-[120vh] w-[213.33vh] min-h-full min-w-full -translate-x-1/2 -translate-y-1/2 opacity-55"
+            className="pointer-events-none absolute left-1/2 top-1/2 h-[120vh] w-[213.33vh] min-h-full min-w-full -translate-x-1/2 -translate-y-1/2 opacity-80"
             src={externalHeroVideo.src}
             title={`${facility.name} facility background video`}
             allow="autoplay; encrypted-media; picture-in-picture"
@@ -294,7 +294,7 @@ export default async function FacilityDetailPage({ params }: FacilityPageProps) 
           />
         ) : heroIsVideo && heroMedia?.url ? (
           <video
-            className="absolute inset-0 h-full w-full object-cover opacity-55"
+            className="absolute inset-0 h-full w-full object-cover opacity-80"
             autoPlay
             muted
             loop
@@ -309,12 +309,12 @@ export default async function FacilityDetailPage({ params }: FacilityPageProps) 
             src={heroMedia.url!}
             alt={heroMedia.alt || facility.name}
             fill
-            className="object-cover opacity-55"
+            className="object-cover opacity-75"
             priority // Critical for Core Web Vitals (LCP)
             sizes="100vw"
           />
         ) : null}
-        <div className="absolute inset-0 bg-slate-950/55" />
+        <div className="absolute inset-0 bg-slate-950/35" />
         
         <div className="relative z-10 mx-auto flex min-h-[680px] max-w-7xl flex-col justify-end px-4 py-16">
           <div className="max-w-4xl">
