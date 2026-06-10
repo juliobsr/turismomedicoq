@@ -1,6 +1,7 @@
 import type { CollectionAfterChangeHook } from 'payload'
 import {
   buildLeadResponseEmail,
+  getLeadReplyUrl,
   getLeadUploadUrl,
   type LeadResponseTemplate,
 } from '@/lib/leadResponseTemplates'
@@ -21,10 +22,12 @@ export const sendLeadResponse: CollectionAfterChangeHook = async ({
   const template = (doc.responseTemplate || 'general_follow_up') as LeadResponseTemplate
   const caseFolio = doc.folio || `LEAD-${doc.id}`
   const uploadUrl = getLeadUploadUrl(caseFolio)
+  const replyUrl = getLeadReplyUrl(caseFolio)
   const email = buildLeadResponseEmail(template, {
     patientName: doc.name || 'Patient',
     caseFolio,
     uploadUrl,
+    replyUrl,
     customMessage: doc.responseMessage,
   })
   const rawSubject = doc.responseSubject?.trim() || email.subject

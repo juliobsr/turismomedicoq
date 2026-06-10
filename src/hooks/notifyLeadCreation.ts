@@ -2,6 +2,7 @@
 import { CollectionAfterChangeHook } from 'payload'
 import { formatFromAddress, getEmailDeliverySettings } from '@/lib/emailDeliverySettings'
 import { buildLeadReplyToAddress } from '@/lib/leadReplyAddress'
+import { getLeadReplyUrl } from '@/lib/leadResponseTemplates'
 import { getSiteUrl } from '@/lib/siteUrl'
 
 /**
@@ -24,6 +25,7 @@ export const notifyLeadCreation: CollectionAfterChangeHook = async ({
   const emailSettings = await getEmailDeliverySettings(payload);
   const from = formatFromAddress(emailSettings);
   const replyTo = buildLeadReplyToAddress(caseFolio, emailSettings);
+  const secureReplyUrl = getLeadReplyUrl(caseFolio);
 
   try {
     if (!process.env.RESEND_API_KEY) {
@@ -38,7 +40,24 @@ export const notifyLeadCreation: CollectionAfterChangeHook = async ({
       to: doc.email,
       replyTo,
       subject: `Inquiry Received - Folio: ${caseFolio}`,
-      html: `<h2>Hello ${patientName}</h2><p>Your request is being processed.</p>`,
+      html: `
+        <div style="font-family: Arial, sans-serif; color: #0f172a; line-height: 1.6;">
+          <h2>Hello ${patientName}</h2>
+          <p>Your request is being processed.</p>
+          <p>
+            <a href="${secureReplyUrl}" style="display: inline-block; background: #0f172a; color: #ffffff; padding: 12px 18px; border-radius: 8px; text-decoration: none; font-weight: 700;">
+              Reply securely to my coordinator
+            </a>
+          </p>
+          <p>If the button does not work, copy this link into your browser:<br />${secureReplyUrl}</p>
+        </div>
+      `,
+      text: [
+        `Hello ${patientName}`,
+        'Your request is being processed.',
+        `Secure reply link: ${secureReplyUrl}`,
+        `Case folio: ${caseFolio}`,
+      ].join('\n'),
       headers: {
         'X-Lead-Folio': caseFolio,
       },

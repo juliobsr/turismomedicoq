@@ -6,6 +6,7 @@ type LeadTemplateInput = {
   patientName: string
   caseFolio: string
   uploadUrl: string
+  replyUrl: string
   customMessage?: string | null
 }
 
@@ -26,6 +27,19 @@ export const getLeadUploadUrl = (folio: string) => {
   return `${getSiteUrl()}/lead-upload/${encodeURIComponent(folio)}`
 }
 
+export const getLeadReplyUrl = (folio: string) => {
+  return `${getSiteUrl()}/lead-reply/${encodeURIComponent(folio)}`
+}
+
+const replyButton = (replyUrl: string) => `
+  <p>
+    <a href="${replyUrl}" style="display: inline-block; background: #0f172a; color: #ffffff; padding: 12px 18px; border-radius: 8px; text-decoration: none; font-weight: 700;">
+      Reply securely to my coordinator
+    </a>
+  </p>
+  <p>If you prefer not to reply by email, use this secure link:<br />${replyUrl}</p>
+`
+
 export const buildLeadResponseEmail = (
   template: LeadResponseTemplate,
   input: LeadTemplateInput
@@ -42,6 +56,7 @@ export const buildLeadResponseEmail = (
       'Thank you for contacting us. To help the medical team review your case, please upload any relevant PDF or image files from your studies, imaging reports, lab results or previous medical notes.',
       '',
       `Secure upload link: ${input.uploadUrl}`,
+      `Secure reply link: ${input.replyUrl}`,
       '',
       input.customMessage || '',
       '',
@@ -63,6 +78,7 @@ export const buildLeadResponseEmail = (
             </a>
           </p>
           <p>If the button does not work, copy this link into your browser:<br />${input.uploadUrl}</p>
+          ${replyButton(input.replyUrl)}
           <p>Case folio: <strong>${input.caseFolio}</strong></p>
         `
       ),
@@ -77,6 +93,7 @@ export const buildLeadResponseEmail = (
       'Our coordination team has received your inquiry. The next step is to review your medical background and confirm the right specialist or procedure pathway.',
       '',
       input.customMessage || '',
+      `Secure reply link: ${input.replyUrl}`,
       '',
       `Case folio: ${input.caseFolio}`,
     ].filter(Boolean).join('\n')
@@ -90,6 +107,7 @@ export const buildLeadResponseEmail = (
           <p>Hello ${input.patientName},</p>
           <p>Our coordination team has received your inquiry. The next step is to review your medical background and confirm the right specialist or procedure pathway.</p>
           ${customBlock}
+          ${replyButton(input.replyUrl)}
           <p>Case folio: <strong>${input.caseFolio}</strong></p>
         `
       ),
@@ -101,6 +119,7 @@ export const buildLeadResponseEmail = (
     `Hello ${input.patientName},`,
     '',
     input.customMessage || 'Thank you for contacting us. A medical coordinator is following up on your request.',
+    `Secure reply link: ${input.replyUrl}`,
     '',
     `Case folio: ${input.caseFolio}`,
   ].join('\n')
@@ -113,6 +132,7 @@ export const buildLeadResponseEmail = (
       `
         <p>Hello ${input.patientName},</p>
         ${customBlock || '<p>Thank you for contacting us. A medical coordinator is following up on your request.</p>'}
+        ${replyButton(input.replyUrl)}
         <p>Case folio: <strong>${input.caseFolio}</strong></p>
       `
     ),
