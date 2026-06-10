@@ -19,6 +19,11 @@ export const buildLeadReplyToAddress = (
   }
 
   const localPart = process.env.LEAD_REPLY_EMAIL_LOCAL_PART || 'leads'
+  const usePlusAddressing = process.env.LEAD_REPLY_USE_PLUS_ADDRESSING === 'true'
 
-  return `${emailSettings.fromName} <${localPart}+${safeFolioForEmail(folio)}@${configuredDomain}>`
+  if (usePlusAddressing) {
+    return `${emailSettings.fromName} <${localPart}+${safeFolioForEmail(folio)}@${configuredDomain}>`
+  }
+
+  return `${emailSettings.fromName} <${localPart}@${configuredDomain}>`
 }

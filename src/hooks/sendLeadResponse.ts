@@ -27,7 +27,8 @@ export const sendLeadResponse: CollectionAfterChangeHook = async ({
     uploadUrl,
     customMessage: doc.responseMessage,
   })
-  const subject = doc.responseSubject?.trim() || email.subject
+  const rawSubject = doc.responseSubject?.trim() || email.subject
+  const subject = rawSubject.includes(caseFolio) ? rawSubject : `[${caseFolio}] ${rawSubject}`
 
   try {
     if (!process.env.RESEND_API_KEY) {

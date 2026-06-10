@@ -122,6 +122,57 @@ const extractFolio = (email: InboundEmail) => {
   return haystack.match(folioPattern)?.[0]?.toUpperCase()
 }
 
+const findLeadByFolio = async (payload: Awaited<ReturnType<typeof getPayload>>, folio: string) => {
+  const result = await payload.find({
+    collection: 'leads',
+    depth: 0,
+    limit: 1,
+    where: {
+      folio: {
+        equals: folio,
+      },
+    },
+  })
+
+  return result.docs[0]
+}
+
+const appendInternalHistory = async ({
+  payload,
+  lead,
+  subject,
+  message,
+  createdBy,
+}: {
+  payload: Awaited<ReturnType<typeof getPayload>>
+  lead: any
+  subject: string
+  message: string
+  createdBy: string
+}) => {
+  const communicationHistory = Array.isArray(lead.communicationHistory)
+    ? lead.communicationHistory
+    : []
+
+  await payload.update({
+    collection: 'leads',
+    id: lead.id,
+    data: {
+      communicationHistory: [
+        ...communicationHistory,
+        {
+          direction: 'internal',
+          eventType: 'internal_note',
+          subject,
+          message,
+          occurredAt: new Date().toISOString(),
+          createdBy,
+        },
+      ],
+    },
+  })
+}
+
 const summarizePayload = (payload: Record<string, unknown>, inboundEmail: InboundEmail) => {
   const data = (payload.data || payload.email || payload.message || payload) as Record<string, unknown>
 
@@ -145,31 +196,35 @@ export async function POST(request: NextRequest) {
   const body = await parseBody(request)
   const inboundEmail = normalizeInboundEmail(body as Record<string, unknown>)
   const payload = await getPayload({ config: configPromise })
+  const folio = extractFolio(inboundEmail)
 
   if (isTransactionalEmailEvent(body as Record<string, unknown>, inboundEmail)) {
-    payload.logger.info(`[Inbound Email] Ignored transactional Resend event: ${JSON.stringify(summarizePayload(body as Record<string, unknown>, inboundEmail))}`)
+    const summary = summarizePayload(body as Record<string, unknown>, inboundEmail)
+    payload.logger.info(`[Inbound Email] Ignored transactional Resend event: ${JSON.stringify(summary)}`)
+
+    if (folio) {
+      const lead = await findLeadByFolio(payload, folio)
+
+      if (lead) {
+        await appendInternalHistory({
+          payload,
+          lead,
+          subject: `Ignored Resend event for ${folio}`,
+          message: JSON.stringify(summary, null, 2),
+          createdBy: 'resend webhook',
+        })
+      }
+    }
+
     return NextResponse.json({ ok: true, ignored: 'transactional_email_event' }, { status: 202 })
   }
-
-  const folio = extractFolio(inboundEmail)
 
   if (!folio) {
     payload.logger.warn(`[Inbound Email] No folio found: ${JSON.stringify(summarizePayload(body as Record<string, unknown>, inboundEmail))}`)
     return NextResponse.json({ error: 'No lead folio found in inbound email.' }, { status: 422 })
   }
 
-  const result = await payload.find({
-    collection: 'leads',
-    depth: 0,
-    limit: 1,
-    where: {
-      folio: {
-        equals: folio,
-      },
-    },
-  })
-
-  const lead = result.docs[0]
+  const lead = await findLeadByFolio(payload, folio)
 
   if (!lead) {
     return NextResponse.json({ error: `Lead ${folio} was not found.` }, { status: 404 })
