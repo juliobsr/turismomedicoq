@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getPayload } from 'payload'
 import configPromise from '@payload-config'
+import { formatFromAddress, getEmailDeliverySettings } from '@/lib/emailDeliverySettings'
+import { getSiteUrl } from '@/lib/siteUrl'
 
 type InboundEmail = {
   from?: unknown
@@ -24,6 +26,14 @@ const stringifyValue = (value: unknown): string => {
   return String(value)
 }
 
+const escapeHtml = (value: string) =>
+  value
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;')
+
 const getField = (record: Record<string, unknown>, keys: string[]) => {
   for (const key of keys) {
     if (record[key] !== undefined && record[key] !== null) return record[key]
@@ -34,12 +44,12 @@ const normalizeInboundEmail = (payload: Record<string, unknown>): InboundEmail =
   const data = (payload.data || payload.email || payload.message || payload) as Record<string, unknown>
 
   return {
-    from: getField(data, ['from', 'sender']),
-    to: getField(data, ['to', 'recipient', 'recipients']),
+    from: getField(data, ['from', 'sender', 'from_email']),
+    to: getField(data, ['to', 'recipient', 'recipients', 'delivered_to', 'envelope_to']),
     subject: getField(data, ['subject']),
-    text: getField(data, ['text', 'text_body', 'plain', 'plainText']),
-    html: getField(data, ['html', 'html_body']),
-    headers: getField(data, ['headers']),
+    text: getField(data, ['text', 'text_body', 'plain', 'plainText', 'plain_text', 'body']),
+    html: getField(data, ['html', 'html_body', 'htmlBody']),
+    headers: getField(data, ['headers', 'raw_headers']),
   }
 }
 
@@ -52,7 +62,16 @@ const isTransactionalEmailEvent = (payload: Record<string, unknown>, inboundEmai
 
   if (!eventType) return !hasReadableBody
 
-  return eventType.startsWith('email.') && !eventType.includes('inbound') && !eventType.includes('received')
+  return [
+    'email.sent',
+    'email.delivered',
+    'email.delivery_delayed',
+    'email.complained',
+    'email.bounced',
+    'email.failed',
+    'email.opened',
+    'email.clicked',
+  ].includes(eventType)
 }
 
 const parseBody = async (request: NextRequest) => {
@@ -103,6 +122,21 @@ const extractFolio = (email: InboundEmail) => {
   return haystack.match(folioPattern)?.[0]?.toUpperCase()
 }
 
+const summarizePayload = (payload: Record<string, unknown>, inboundEmail: InboundEmail) => {
+  const data = (payload.data || payload.email || payload.message || payload) as Record<string, unknown>
+
+  return {
+    eventType: getWebhookEventType(payload) || 'unknown',
+    topLevelKeys: Object.keys(payload).sort(),
+    dataKeys: Object.keys(data).sort(),
+    from: stringifyValue(inboundEmail.from),
+    to: stringifyValue(inboundEmail.to),
+    subject: stringifyValue(inboundEmail.subject),
+    hasText: Boolean(stringifyValue(inboundEmail.text)),
+    hasHtml: Boolean(stringifyValue(inboundEmail.html)),
+  }
+}
+
 export async function POST(request: NextRequest) {
   if (!verifyWebhookSecret(request)) {
     return NextResponse.json({ error: 'Unauthorized webhook request.' }, { status: 401 })
@@ -110,18 +144,20 @@ export async function POST(request: NextRequest) {
 
   const body = await parseBody(request)
   const inboundEmail = normalizeInboundEmail(body as Record<string, unknown>)
+  const payload = await getPayload({ config: configPromise })
 
   if (isTransactionalEmailEvent(body as Record<string, unknown>, inboundEmail)) {
+    payload.logger.info(`[Inbound Email] Ignored transactional Resend event: ${JSON.stringify(summarizePayload(body as Record<string, unknown>, inboundEmail))}`)
     return NextResponse.json({ ok: true, ignored: 'transactional_email_event' }, { status: 202 })
   }
 
   const folio = extractFolio(inboundEmail)
 
   if (!folio) {
+    payload.logger.warn(`[Inbound Email] No folio found: ${JSON.stringify(summarizePayload(body as Record<string, unknown>, inboundEmail))}`)
     return NextResponse.json({ error: 'No lead folio found in inbound email.' }, { status: 422 })
   }
 
-  const payload = await getPayload({ config: configPromise })
   const result = await payload.find({
     collection: 'leads',
     depth: 0,
@@ -168,6 +204,52 @@ export async function POST(request: NextRequest) {
       ],
     },
   })
+
+  const emailSettings = await getEmailDeliverySettings(payload)
+  const adminLeadUrl = `${getSiteUrl()}/admin/collections/leads/${lead.id}`
+
+  if (emailSettings.adminEmail && process.env.RESEND_API_KEY) {
+    try {
+      const bodyText = stringifyValue(inboundEmail.text) || stringifyValue(inboundEmail.html) || 'No readable email body was provided.'
+
+      await payload.sendEmail({
+        from: formatFromAddress(emailSettings),
+        to: emailSettings.adminEmail,
+        replyTo: stringifyValue(inboundEmail.from) || emailSettings.replyTo,
+        subject: `[LEAD REPLY] ${folio} - ${lead.name || 'Patient'}`,
+        html: `
+          <div style="font-family: Arial, sans-serif; color: #0f172a; line-height: 1.6;">
+            <h2>New patient reply</h2>
+            <p>A patient replied to a lead email.</p>
+            <ul>
+              <li><strong>Folio:</strong> ${escapeHtml(folio)}</li>
+              <li><strong>Patient:</strong> ${escapeHtml(stringifyValue(lead.name) || 'N/A')}</li>
+              <li><strong>From:</strong> ${escapeHtml(stringifyValue(inboundEmail.from) || 'unknown sender')}</li>
+              <li><strong>Subject:</strong> ${escapeHtml(subject)}</li>
+            </ul>
+            <p style="white-space: pre-line;">${escapeHtml(bodyText)}</p>
+            <p>
+              <a href="${adminLeadUrl}" style="display: inline-block; background: #1d4ed8; color: #ffffff; padding: 12px 18px; border-radius: 8px; text-decoration: none; font-weight: 700;">
+                Open lead in backend
+              </a>
+            </p>
+          </div>
+        `,
+        text: [
+          `New patient reply for ${folio}`,
+          `Patient: ${lead.name || 'N/A'}`,
+          `From: ${stringifyValue(inboundEmail.from) || 'unknown sender'}`,
+          `Subject: ${subject}`,
+          '',
+          bodyText,
+          '',
+          adminLeadUrl,
+        ].join('\n'),
+      })
+    } catch (error: any) {
+      payload.logger.error(`[Inbound Email] Admin notification failed for lead ${folio}: ${error.message}`)
+    }
+  }
 
   payload.logger.info(`[Inbound Email] Registered patient reply for lead ${folio}.`)
 
