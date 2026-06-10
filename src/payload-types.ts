@@ -512,9 +512,13 @@ export interface Facility {
   doctors?: (number | Doctor)[] | null;
   accreditations?: (number | Certificate)[] | null;
   /**
-   * Main image or short video used as the facility hero background. Images are also used for cards and SEO previews.
+   * Main uploaded image or video used as the facility hero background. Images are also used for cards and SEO previews.
    */
   heroImage: number | FacilitiesMedia;
+  /**
+   * Optional YouTube, Vimeo or direct MP4/WebM URL for the hero background. If filled, it takes priority over the uploaded hero media.
+   */
+  heroVideoUrl?: string | null;
   /**
    * Showcase photos or uploaded videos of rooms, equipment and patient areas.
    */
@@ -1152,6 +1156,7 @@ export interface FacilitiesSelect<T extends boolean = true> {
   doctors?: T;
   accreditations?: T;
   heroImage?: T;
+  heroVideoUrl?: T;
   infrastructureGallery?: T;
   infrastructureVideoLinks?:
     | T

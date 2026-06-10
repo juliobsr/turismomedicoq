@@ -29,7 +29,8 @@ interface FacilityPageProps {
 }
 
 // ISR: Revalidate the static page every hour to keep doctor rosters and gallery fresh
-export const revalidate = 3600; 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 const publicFacilityMedia = (asset?: FacilitiesMedia): FacilitiesMedia | undefined => {
   if (!asset?.filename?.startsWith('hospital-angeles-')) return asset
@@ -50,6 +51,54 @@ const isVideoMedia = (asset?: FacilitiesMedia): asset is FacilitiesMedia => {
 }
 
 type FacilityVideoLink = NonNullable<Facility['infrastructureVideoLinks']>[number]
+
+const getExternalVideoBackground = (url?: string | null): { type: 'direct' | 'iframe'; src: string } | undefined => {
+  if (!url) return undefined;
+
+  try {
+    const parsed = new URL(url);
+    const hostname = parsed.hostname.replace(/^www\./, '');
+    const pathname = parsed.pathname;
+
+    if (/\.(mp4|webm|ogg)(\?.*)?$/i.test(url)) {
+      return { type: 'direct', src: url };
+    }
+
+    if (hostname === 'youtu.be') {
+      const id = pathname.split('/').filter(Boolean)[0];
+      if (id) {
+        return {
+          type: 'iframe',
+          src: `https://www.youtube.com/embed/${id}?autoplay=1&mute=1&loop=1&controls=0&playsinline=1&playlist=${id}`,
+        };
+      }
+    }
+
+    if (hostname === 'youtube.com' || hostname === 'm.youtube.com') {
+      const id = parsed.searchParams.get('v') || pathname.split('/').filter(Boolean).pop();
+      if (id) {
+        return {
+          type: 'iframe',
+          src: `https://www.youtube.com/embed/${id}?autoplay=1&mute=1&loop=1&controls=0&playsinline=1&playlist=${id}`,
+        };
+      }
+    }
+
+    if (hostname === 'vimeo.com') {
+      const id = pathname.split('/').filter(Boolean).pop();
+      if (id) {
+        return {
+          type: 'iframe',
+          src: `https://player.vimeo.com/video/${id}?background=1&autoplay=1&muted=1&loop=1`,
+        };
+      }
+    }
+  } catch {
+    return { type: 'iframe', src: url };
+  }
+
+  return { type: 'iframe', src: url };
+}
 
 /**
  * Enterprise Architecture: Static Path Generation (SSG)
@@ -140,6 +189,7 @@ export default async function FacilityDetailPage({ params }: FacilityPageProps) 
 
   // Defensive Type Casting and Safety Fallbacks
   const heroMedia = publicFacilityMedia(facility.heroImage as FacilitiesMedia | undefined);
+  const externalHeroVideo = getExternalVideoBackground(facility.heroVideoUrl);
   const heroIsVideo = Boolean(heroMedia?.url && heroMedia.mimeType?.startsWith('video/'));
   const heroIsImage = Boolean(heroMedia?.url && (!heroMedia.mimeType || heroMedia.mimeType.startsWith('image/')));
   const specialties = (facility.specialtiesOffered as Specialty[] | undefined) || [];
@@ -222,7 +272,27 @@ export default async function FacilityDetailPage({ params }: FacilityPageProps) 
 
       {/* Hero Section with LCP Optimization */}
       <section className="relative min-h-[680px] w-full bg-slate-900">
-        {heroIsVideo && heroMedia?.url ? (
+        {externalHeroVideo?.type === 'direct' ? (
+          <video
+            className="absolute inset-0 h-full w-full object-cover opacity-55"
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="metadata"
+            aria-label={`${facility.name} facility video`}
+          >
+            <source src={externalHeroVideo.src} />
+          </video>
+        ) : externalHeroVideo?.type === 'iframe' ? (
+          <iframe
+            className="pointer-events-none absolute left-1/2 top-1/2 h-[120vh] w-[213.33vh] min-h-full min-w-full -translate-x-1/2 -translate-y-1/2 opacity-55"
+            src={externalHeroVideo.src}
+            title={`${facility.name} facility background video`}
+            allow="autoplay; encrypted-media; picture-in-picture"
+            aria-hidden="true"
+          />
+        ) : heroIsVideo && heroMedia?.url ? (
           <video
             className="absolute inset-0 h-full w-full object-cover opacity-55"
             autoPlay

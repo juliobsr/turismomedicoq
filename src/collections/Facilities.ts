@@ -94,7 +94,15 @@ export const Facilities: CollectionConfig = {
               required: true,
               label: 'Hero background media',
               admin: {
-                description: 'Main image or short video used as the facility hero background. Images are also used for cards and SEO previews.',
+                description: 'Main uploaded image or video used as the facility hero background. Images are also used for cards and SEO previews.',
+              },
+            },
+            {
+              name: 'heroVideoUrl',
+              type: 'text',
+              label: 'Hero external video URL',
+              admin: {
+                description: 'Optional YouTube, Vimeo or direct MP4/WebM URL for the hero background. If filled, it takes priority over the uploaded hero media.',
               },
             },
             {

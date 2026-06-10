@@ -35,6 +35,37 @@ interface FacilityGalleryProps {
   items: FacilityGalleryItem[];
 }
 
+const getVideoEmbed = (url: string): { type: 'direct' | 'iframe'; src: string } => {
+  try {
+    const parsed = new URL(url);
+    const hostname = parsed.hostname.replace(/^www\./, '');
+    const pathname = parsed.pathname;
+
+    if (/\.(mp4|webm|ogg)(\?.*)?$/i.test(url)) {
+      return { type: 'direct', src: url };
+    }
+
+    if (hostname === 'youtu.be') {
+      const id = pathname.split('/').filter(Boolean)[0];
+      if (id) return { type: 'iframe', src: `https://www.youtube.com/embed/${id}` };
+    }
+
+    if (hostname === 'youtube.com' || hostname === 'm.youtube.com') {
+      const id = parsed.searchParams.get('v') || pathname.split('/').filter(Boolean).pop();
+      if (id) return { type: 'iframe', src: `https://www.youtube.com/embed/${id}` };
+    }
+
+    if (hostname === 'vimeo.com') {
+      const id = pathname.split('/').filter(Boolean).pop();
+      if (id) return { type: 'iframe', src: `https://player.vimeo.com/video/${id}` };
+    }
+  } catch {
+    return { type: 'iframe', src: url };
+  }
+
+  return { type: 'iframe', src: url };
+};
+
 /**
  * FacilityGallery Component
  * 
@@ -160,41 +191,47 @@ export const FacilityGallery = ({ items = [] }: FacilityGalleryProps) => {
             );
           }
 
+          const embed = getVideoEmbed(item.url);
+
           return (
-            <a
+            <figure
               key={`link-${item.url}`}
-              href={item.url}
-              target="_blank"
-              rel="noreferrer"
-              className="group overflow-hidden rounded-lg bg-white shadow-sm ring-1 ring-slate-200 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
+              className="overflow-hidden rounded-lg bg-white shadow-sm ring-1 ring-slate-200 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
             >
-              <div className="relative aspect-video bg-slate-900">
-                {item.thumbnail?.url ? (
-                  <Image
-                    src={item.thumbnail.url}
-                    alt={item.thumbnail.alt || item.title}
-                    fill
-                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                    className="object-cover opacity-85 transition-transform duration-700 group-hover:scale-105"
-                    loading="lazy"
-                  />
+              <div className="aspect-video w-full bg-slate-950">
+                {embed.type === 'direct' ? (
+                  <video className="h-full w-full object-cover" controls playsInline preload="metadata">
+                    <source src={embed.src} />
+                  </video>
                 ) : (
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,#0ea5e9,transparent_35%),linear-gradient(135deg,#0f172a,#111827)]" />
+                  <iframe
+                    className="h-full w-full"
+                    src={embed.src}
+                    title={item.title}
+                    loading="lazy"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowFullScreen
+                  />
                 )}
-                <div className="absolute inset-0 flex items-center justify-center bg-slate-950/25">
-                  <span className="flex h-14 w-14 items-center justify-center rounded-full bg-white text-slate-950 shadow-xl transition group-hover:scale-105">
-                    <svg className="ml-1 h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M8 5v14l11-7z" />
-                    </svg>
-                  </span>
+              </div>
+              <figcaption className="p-4">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <p className="text-sm font-black uppercase tracking-[0.12em] text-blue-700">Video tour</p>
+                    <h4 className="mt-1 text-lg font-extrabold text-slate-950">{item.title}</h4>
+                  </div>
+                  <a
+                    href={item.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="shrink-0 rounded-md bg-slate-950 px-3 py-1.5 text-xs font-extrabold uppercase tracking-[0.12em] text-white transition hover:bg-blue-700"
+                  >
+                    Open
+                  </a>
                 </div>
-              </div>
-              <div className="p-4">
-                <p className="text-sm font-black uppercase tracking-[0.12em] text-blue-700">Video tour</p>
-                <h4 className="mt-1 text-lg font-extrabold text-slate-950">{item.title}</h4>
                 {item.caption && <p className="mt-2 text-sm leading-6 text-slate-600">{item.caption}</p>}
-              </div>
-            </a>
+              </figcaption>
+            </figure>
           );
         })}
       </div>
