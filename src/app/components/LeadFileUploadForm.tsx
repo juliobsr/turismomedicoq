@@ -45,19 +45,20 @@ export const LeadFileUploadForm = ({ folio }: LeadFileUploadFormProps) => {
 
         <div>
           <label htmlFor="file" className="mb-2 block text-sm font-extrabold text-slate-800">
-            Medical file
+            Medical files
           </label>
           <input
             id="file"
             name="file"
             type="file"
+            multiple
             required
             accept="application/pdf,image/*"
             disabled={isPending}
             className="block w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 file:mr-4 file:rounded-lg file:border-0 file:bg-blue-50 file:px-4 file:py-2 file:text-sm file:font-bold file:text-blue-700 focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-600/20"
           />
           <p className="mt-2 text-xs leading-5 text-slate-500">
-            Accepted formats: PDF, JPG, PNG or other image files. Maximum size: 15 MB.
+            Accepted formats: PDF, JPG, PNG or other image files. Maximum size: 15 MB per file, up to 10 files at a time.
           </p>
         </div>
 
@@ -80,7 +81,7 @@ export const LeadFileUploadForm = ({ folio }: LeadFileUploadFormProps) => {
           disabled={isPending}
           className="w-full rounded-lg bg-blue-700 px-5 py-3 text-sm font-extrabold uppercase tracking-[0.14em] text-white shadow-lg shadow-blue-900/20 transition hover:bg-blue-800 disabled:cursor-not-allowed disabled:opacity-70"
         >
-          {isPending ? 'Uploading securely...' : 'Upload file'}
+          {isPending ? 'Uploading securely...' : 'Upload files'}
         </button>
       </form>
     </div>
