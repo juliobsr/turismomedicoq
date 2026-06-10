@@ -43,6 +43,18 @@ const normalizeInboundEmail = (payload: Record<string, unknown>): InboundEmail =
   }
 }
 
+const getWebhookEventType = (payload: Record<string, unknown>) =>
+  stringifyValue(payload.type || payload.event || payload.event_type)
+
+const isTransactionalEmailEvent = (payload: Record<string, unknown>, inboundEmail: InboundEmail) => {
+  const eventType = getWebhookEventType(payload).toLowerCase()
+  const hasReadableBody = Boolean(stringifyValue(inboundEmail.text) || stringifyValue(inboundEmail.html))
+
+  if (!eventType) return !hasReadableBody
+
+  return eventType.startsWith('email.') && !eventType.includes('inbound') && !eventType.includes('received')
+}
+
 const parseBody = async (request: NextRequest) => {
   const contentType = request.headers.get('content-type') || ''
 
@@ -98,6 +110,11 @@ export async function POST(request: NextRequest) {
 
   const body = await parseBody(request)
   const inboundEmail = normalizeInboundEmail(body as Record<string, unknown>)
+
+  if (isTransactionalEmailEvent(body as Record<string, unknown>, inboundEmail)) {
+    return NextResponse.json({ ok: true, ignored: 'transactional_email_event' }, { status: 202 })
+  }
+
   const folio = extractFolio(inboundEmail)
 
   if (!folio) {
