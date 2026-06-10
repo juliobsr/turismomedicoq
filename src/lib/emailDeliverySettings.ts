@@ -5,6 +5,12 @@ export type EmailDeliverySettings = {
   fromAddress: string
   fromName: string
   replyTo?: string
+  brandName: string
+  primaryColor: string
+  secondaryColor: string
+  accentColor: string
+  backgroundColor: string
+  textColor: string
 }
 
 export const getEmailDeliverySettings = async (payload: Payload): Promise<EmailDeliverySettings> => {
@@ -36,6 +42,12 @@ export const getEmailDeliverySettings = async (payload: Payload): Promise<EmailD
       process.env.EMAIL_FROM_NAME ||
       'Queretaro Medical',
     replyTo: contactEmail,
+    brandName: settings?.companyName || process.env.EMAIL_FROM_NAME || 'Elite Medical Journey',
+    primaryColor: settings?.primaryColor || '#0EA5A3',
+    secondaryColor: settings?.secondaryColor || '#0F172A',
+    accentColor: settings?.accentColor || '#F97316',
+    backgroundColor: settings?.backgroundColor || '#F4F7FB',
+    textColor: settings?.textColor || '#0F172A',
   }
 }
 

@@ -23,12 +23,15 @@ export const sendLeadResponse: CollectionAfterChangeHook = async ({
   const caseFolio = doc.folio || `LEAD-${doc.id}`
   const uploadUrl = getLeadUploadUrl(caseFolio)
   const replyUrl = getLeadReplyUrl(caseFolio)
+
+  const emailSettings = await getEmailDeliverySettings(req.payload)
   const email = buildLeadResponseEmail(template, {
     patientName: doc.name || 'Patient',
     caseFolio,
     uploadUrl,
     replyUrl,
     customMessage: doc.responseMessage,
+    brand: emailSettings,
   })
   const rawSubject = doc.responseSubject?.trim() || email.subject
   const subject = rawSubject.includes(caseFolio) ? rawSubject : `[${caseFolio}] ${rawSubject}`
@@ -38,7 +41,6 @@ export const sendLeadResponse: CollectionAfterChangeHook = async ({
       throw new Error('RESEND_API_KEY is not configured in this environment.')
     }
 
-    const emailSettings = await getEmailDeliverySettings(req.payload)
     const from = formatFromAddress(emailSettings)
     const replyTo = buildLeadReplyToAddress(caseFolio, emailSettings)
     const result = await req.payload.sendEmail({

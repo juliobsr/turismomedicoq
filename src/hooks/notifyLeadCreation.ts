@@ -30,6 +30,7 @@ export const notifyLeadCreation: CollectionAfterChangeHook = async ({
     patientName,
     caseFolio,
     replyUrl: secureReplyUrl,
+    brand: emailSettings,
   })
 
   try {
