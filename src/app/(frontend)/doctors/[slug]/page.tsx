@@ -226,10 +226,10 @@ export default async function DoctorProfilePage({ params }: DoctorProfileProps) 
       />
 
       {/* Hero Section with Dynamic Media Background */}
-      <section style={{ backgroundColor: brandPrimaryColor }} className="relative overflow-hidden text-white py-16 lg:py-24 transition-colors duration-300">
+      <section style={{ backgroundColor: brandPrimaryColor }} className="relative flex min-h-[620px] items-center overflow-hidden text-white py-20 transition-colors duration-300 lg:min-h-[760px] lg:py-28">
         {doctor.heroVideoUrl && isDirectVideoUrl(doctor.heroVideoUrl) ? (
           <video
-            className="absolute inset-0 h-full w-full object-cover opacity-45"
+            className="absolute inset-0 h-full w-full object-cover opacity-80"
             autoPlay
             muted
             loop
@@ -243,12 +243,12 @@ export default async function DoctorProfilePage({ params }: DoctorProfileProps) 
             src={heroImage.url}
             alt={heroImage.alt || doctor.fullName}
             fill
-            className="absolute inset-0 object-cover opacity-45"
+            className="absolute inset-0 object-cover opacity-75"
             priority
             sizes="100vw"
           />
         ) : null}
-        <div className="absolute inset-0 bg-slate-950/55" />
+        <div className="absolute inset-0 bg-slate-950/30" />
         <div className="relative z-10 max-w-7xl mx-auto px-4 flex flex-col md:flex-row gap-12 items-center">
           <div className="relative w-48 h-48 md:w-64 md:h-64 rounded-full overflow-hidden border-4 border-white/20 flex-shrink-0 shadow-xl bg-white/10">
             {profilePicture?.url && (
