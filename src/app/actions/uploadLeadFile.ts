@@ -3,6 +3,7 @@
 import { getPayload } from 'payload'
 import configPromise from '@payload-config'
 import { z } from 'zod'
+import { sendLeadFilesUploadNotification } from '@/hooks/notifyLeadFileUpload'
 
 const uploadLeadFileSchema = z.object({
   folio: z.string().min(4),
@@ -104,6 +105,9 @@ export async function uploadLeadFileAction(
           name: file.name,
           size: file.size,
         },
+        context: {
+          skipLeadFileNotification: true,
+        },
       })
 
       uploadedFiles.push(uploadedFile)
@@ -138,6 +142,12 @@ export async function uploadLeadFileAction(
         skipLeadResponse: true,
         skipLeadUpdateNotification: true,
       },
+    })
+
+    await sendLeadFilesUploadNotification({
+      payload,
+      leadId: lead.id,
+      files: uploadedFiles,
     })
 
     return {
