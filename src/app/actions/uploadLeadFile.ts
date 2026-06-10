@@ -115,6 +115,7 @@ export async function uploadLeadFileAction(
       },
       context: {
         skipLeadResponse: true,
+        skipLeadUpdateNotification: true,
       },
     })
 

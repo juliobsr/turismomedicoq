@@ -5,6 +5,7 @@ import configPromise from '@payload-config'
 import { z } from 'zod'
 import { formatFromAddress, getEmailDeliverySettings } from '@/lib/emailDeliverySettings'
 import { getSiteUrl } from '@/lib/siteUrl'
+import { getLeadEmailContext, leadContextHtml, leadContextPlainText } from '@/lib/leadEmailContext'
 
 const leadReplySchema = z.object({
   folio: z.string().min(4),
@@ -71,6 +72,7 @@ export async function submitLeadReplyAction(
       : []
     const subject = `Patient reply - ${lead.folio}`
     const adminLeadUrl = `${getSiteUrl()}/admin/collections/leads/${lead.id}`
+    const leadContext = await getLeadEmailContext(payload, lead.id)
 
     await payload.update({
       collection: 'leads',
@@ -95,6 +97,7 @@ export async function submitLeadReplyAction(
       },
       context: {
         skipLeadResponse: true,
+        skipLeadUpdateNotification: true,
       },
     })
 
@@ -102,6 +105,9 @@ export async function submitLeadReplyAction(
 
     if (emailSettings.adminEmail && process.env.RESEND_API_KEY) {
       try {
+        const contextHtml = leadContextHtml(leadContext)
+        const contextText = leadContextPlainText(leadContext)
+
         await payload.sendEmail({
           from: formatFromAddress(emailSettings),
           to: emailSettings.adminEmail,
@@ -116,6 +122,7 @@ export async function submitLeadReplyAction(
                 <li><strong>Patient:</strong> ${escapeHtml(parsed.data.patientName)}</li>
                 <li><strong>Email:</strong> ${escapeHtml(parsed.data.patientEmail)}</li>
               </ul>
+              ${contextHtml}
               <p style="white-space: pre-line;">${escapeHtml(parsed.data.message)}</p>
               <p>
                 <a href="${adminLeadUrl}" style="display: inline-block; background: #1d4ed8; color: #ffffff; padding: 12px 18px; border-radius: 8px; text-decoration: none; font-weight: 700;">
@@ -128,6 +135,7 @@ export async function submitLeadReplyAction(
             `New patient reply for ${lead.folio}`,
             `Patient: ${parsed.data.patientName}`,
             `Email: ${parsed.data.patientEmail}`,
+            contextText,
             '',
             parsed.data.message,
             '',

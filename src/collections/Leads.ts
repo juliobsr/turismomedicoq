@@ -6,6 +6,7 @@ import type {
 } from 'payload'
 import { notifyLeadCreation } from '../hooks/notifyLeadCreation';
 import { sendLeadResponse } from '../hooks/sendLeadResponse'
+import { notifyLeadUpdate } from '@/hooks/notifyLeadUpdate'
 import { backendAccess } from '@/access/backendRoles'
 import crypto from 'crypto'
 import {
@@ -66,7 +67,7 @@ export const Leads: CollectionConfig = {
 
   hooks: {
     beforeChange: [generateSecureFolio],
-    afterChange: [notifyLeadCreation, sendLeadResponse],
+    afterChange: [notifyLeadCreation, notifyLeadUpdate, sendLeadResponse],
   },
 
   fields: [
@@ -221,6 +222,15 @@ export const Leads: CollectionConfig = {
         {
           label: 'Uploaded Files',
           fields: [
+            {
+              name: 'patientFilesViewer',
+              type: 'ui',
+              admin: {
+                components: {
+                  Field: 'src/app/components/admin/LeadFilesViewer#LeadFilesViewer',
+                },
+              },
+            },
             {
               name: 'uploadedFiles',
               type: 'relationship',

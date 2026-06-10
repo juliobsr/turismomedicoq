@@ -4,6 +4,7 @@ import { formatFromAddress, getEmailDeliverySettings } from '@/lib/emailDelivery
 import { buildLeadReplyToAddress } from '@/lib/leadReplyAddress'
 import { buildLeadCreationConfirmationEmail, getLeadReplyUrl } from '@/lib/leadResponseTemplates'
 import { getSiteUrl } from '@/lib/siteUrl'
+import { getLeadEmailContext, leadContextHtml } from '@/lib/leadEmailContext'
 
 /**
  * Enterprise Notification Hook
@@ -26,12 +27,15 @@ export const notifyLeadCreation: CollectionAfterChangeHook = async ({
   const from = formatFromAddress(emailSettings);
   const replyTo = buildLeadReplyToAddress(caseFolio, emailSettings);
   const secureReplyUrl = getLeadReplyUrl(caseFolio);
+  const leadContext = await getLeadEmailContext(payload, doc.id)
   const patientEmail = buildLeadCreationConfirmationEmail({
     patientName,
     caseFolio,
     replyUrl: secureReplyUrl,
     brand: emailSettings,
+    leadContext,
   })
+  const contextHtml = leadContextHtml(leadContext)
 
   try {
     if (!process.env.RESEND_API_KEY) {
@@ -71,6 +75,7 @@ export const notifyLeadCreation: CollectionAfterChangeHook = async ({
               <li><strong>Phone:</strong> ${doc.phone}</li>
               <li><strong>Status:</strong> ${doc.status || 'new'}</li>
             </ul>
+            ${contextHtml}
             ${doc.notes ? `<p><strong>Patient notes:</strong><br />${doc.notes}</p>` : ''}
             <p>
               <a href="${adminLeadUrl}" style="display: inline-block; background: #1d4ed8; color: #ffffff; padding: 12px 18px; border-radius: 8px; text-decoration: none; font-weight: 700;">
@@ -114,6 +119,7 @@ export const notifyLeadCreation: CollectionAfterChangeHook = async ({
       req,
       context: {
         skipLeadResponse: true,
+        skipLeadUpdateNotification: true,
       },
     })
   }

@@ -7,6 +7,7 @@ import {
 } from '@/lib/leadResponseTemplates'
 import { formatFromAddress, getEmailDeliverySettings } from '@/lib/emailDeliverySettings'
 import { buildLeadReplyToAddress } from '@/lib/leadReplyAddress'
+import { getLeadEmailContext } from '@/lib/leadEmailContext'
 
 export const sendLeadResponse: CollectionAfterChangeHook = async ({
   doc,
@@ -25,6 +26,7 @@ export const sendLeadResponse: CollectionAfterChangeHook = async ({
   const replyUrl = getLeadReplyUrl(caseFolio)
 
   const emailSettings = await getEmailDeliverySettings(req.payload)
+  const leadContext = await getLeadEmailContext(req.payload, doc.id)
   const email = buildLeadResponseEmail(template, {
     patientName: doc.name || 'Patient',
     caseFolio,
@@ -32,6 +34,7 @@ export const sendLeadResponse: CollectionAfterChangeHook = async ({
     replyUrl,
     customMessage: doc.responseMessage,
     brand: emailSettings,
+    leadContext,
   })
   const rawSubject = doc.responseSubject?.trim() || email.subject
   const subject = rawSubject.includes(caseFolio) ? rawSubject : `[${caseFolio}] ${rawSubject}`
@@ -82,6 +85,7 @@ export const sendLeadResponse: CollectionAfterChangeHook = async ({
       req,
       context: {
         skipLeadResponse: true,
+        skipLeadUpdateNotification: true,
       },
     })
 
@@ -114,6 +118,7 @@ export const sendLeadResponse: CollectionAfterChangeHook = async ({
       req,
       context: {
         skipLeadResponse: true,
+        skipLeadUpdateNotification: true,
       },
     })
   }

@@ -1,5 +1,6 @@
 import type { CollectionConfig } from 'payload'
 import { backendAccess } from '@/access/backendRoles'
+import { notifyLeadFileUpload } from '@/hooks/notifyLeadFileUpload'
 
 export const LeadFiles: CollectionConfig = {
   slug: 'lead-files',
@@ -21,6 +22,9 @@ export const LeadFiles: CollectionConfig = {
   upload: {
     staticDir: '../storage/lead-files',
     mimeTypes: ['application/pdf', 'image/*'],
+  },
+  hooks: {
+    afterChange: [notifyLeadFileUpload],
   },
   fields: [
     {

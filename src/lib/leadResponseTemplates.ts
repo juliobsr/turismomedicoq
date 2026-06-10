@@ -1,5 +1,6 @@
 import { getSiteUrl } from '@/lib/siteUrl'
 import type { EmailDeliverySettings } from '@/lib/emailDeliverySettings'
+import { leadContextHtml, leadContextPlainText, type LeadEmailContext } from '@/lib/leadEmailContext'
 
 export type LeadResponseTemplate = 'request_medical_records' | 'consultation_next_steps' | 'general_follow_up'
 
@@ -15,6 +16,7 @@ type LeadTemplateInput = {
   replyUrl: string
   customMessage?: string | null
   brand?: EmailBrandSettings
+  leadContext?: LeadEmailContext
 }
 
 type LeadCreationInput = {
@@ -22,6 +24,7 @@ type LeadCreationInput = {
   caseFolio: string
   replyUrl: string
   brand?: EmailBrandSettings
+  leadContext?: LeadEmailContext
 }
 
 type LeadTemplateOutput = {
@@ -173,11 +176,14 @@ export const buildLeadCreationConfirmationEmail = (
   const brand = resolveBrand(input.brand)
   const patientName = escapeHtml(input.patientName)
   const replyUrl = escapeHtml(input.replyUrl)
+  const contextText = leadContextPlainText(input.leadContext || {})
+  const contextHtml = leadContextHtml(input.leadContext || {})
   const subject = `Inquiry received - ${input.caseFolio}`
   const plainText = [
     `Hello ${input.patientName},`,
     '',
     `Thank you for contacting ${brand.brandName}. Your request has been received and our coordination team is reviewing your information.`,
+    contextText,
     '',
     `Secure reply link: ${input.replyUrl}`,
     'For privacy and information security, please use the secure reply link instead of replying to this email. This reply address is not monitored.',
@@ -194,6 +200,7 @@ export const buildLeadCreationConfirmationEmail = (
       `
         <p style="margin: 0 0 16px;">Hello ${patientName},</p>
         <p style="margin: 0 0 18px;">Thank you for contacting ${escapeHtml(brand.brandName)}. Your request has been received and our coordination team is reviewing your information.</p>
+        ${contextHtml}
         <div style="margin: 22px 0; padding: 18px; border-radius: 18px; background: #f8fafc; border: 1px solid #e2e8f0;">
           <p style="margin: 0 0 8px; color: #0f172a; font-weight: 800;">What to expect</p>
           <p style="margin: 0; color: #475569;">A bilingual medical coordinator will review your request and follow up with the next step for your consultation, medical record review, or procedure pathway.</p>
@@ -214,6 +221,8 @@ export const buildLeadResponseEmail = (
   const patientName = escapeHtml(input.patientName)
   const replyUrl = escapeHtml(input.replyUrl)
   const uploadUrl = escapeHtml(input.uploadUrl)
+  const contextText = leadContextPlainText(input.leadContext || {})
+  const contextHtml = leadContextHtml(input.leadContext || {})
   const customBlock = input.customMessage
     ? `<div style="margin: 22px 0; padding: 18px; border-left: 4px solid ${brand.primaryColor}; background: #f8fafc; border-radius: 0 16px 16px 0; color: #334155;">${formatMultilineHtml(input.customMessage)}</div>`
     : ''
@@ -224,6 +233,7 @@ export const buildLeadResponseEmail = (
       `Hello ${input.patientName},`,
       '',
       'Thank you for contacting us. To help the medical team review your case, please upload any relevant PDF or image files from your studies, imaging reports, lab results or previous medical notes.',
+      contextText,
       '',
       `Secure upload link: ${input.uploadUrl}`,
       '',
@@ -241,6 +251,7 @@ export const buildLeadResponseEmail = (
         `
           <p style="margin: 0 0 16px;">Hello ${patientName},</p>
           <p style="margin: 0 0 18px;">Thank you for contacting ${escapeHtml(brand.brandName)}. To help the medical team review your case, please upload any relevant PDF or image files from your studies, imaging reports, lab results, or previous medical notes.</p>
+          ${contextHtml}
           ${customBlock}
           <div style="margin: 22px 0;">
             ${button(uploadUrl, 'Upload my medical files', brand)}
@@ -259,6 +270,7 @@ export const buildLeadResponseEmail = (
       `Hello ${input.patientName},`,
       '',
       'Our coordination team has received your inquiry. The next step is to review your medical background and confirm the right specialist or procedure pathway.',
+      contextText,
       '',
       input.customMessage || '',
       `Secure reply link: ${input.replyUrl}`,
@@ -276,6 +288,7 @@ export const buildLeadResponseEmail = (
         `
           <p style="margin: 0 0 16px;">Hello ${patientName},</p>
           <p style="margin: 0 0 18px;">Our coordination team has received your inquiry. The next step is to review your medical background and confirm the right specialist or procedure pathway.</p>
+          ${contextHtml}
           ${customBlock}
           <div style="margin: 22px 0; padding: 18px; border-radius: 18px; background: #f8fafc; border: 1px solid #e2e8f0;">
             <p style="margin: 0 0 8px; color: #0f172a; font-weight: 800;">What happens next</p>
@@ -294,6 +307,7 @@ export const buildLeadResponseEmail = (
     `Hello ${input.patientName},`,
     '',
     input.customMessage || 'Thank you for contacting us. A medical coordinator is following up on your request.',
+    contextText,
     `Secure reply link: ${input.replyUrl}`,
     'For privacy and information security, please use the secure reply link instead of replying to this email. This reply address is not monitored.',
     '',
@@ -308,6 +322,7 @@ export const buildLeadResponseEmail = (
       `A dedicated coordinator from ${brand.brandName} is following up on your consultation request.`,
       `
         <p style="margin: 0 0 16px;">Hello ${patientName},</p>
+        ${contextHtml}
         ${customBlock || `<p style="margin: 0 0 18px;">Thank you for contacting ${escapeHtml(brand.brandName)}. A medical coordinator is following up on your request.</p>`}
         ${replyNotice(replyUrl, brand)}
         ${caseCard(input.caseFolio, brand)}
