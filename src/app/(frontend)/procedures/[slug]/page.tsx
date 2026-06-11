@@ -29,6 +29,19 @@ export const revalidate = 3600 // ISR: Cache for 1 hour
 
 const procedureFallbackImage = '/media/globals/queretaro-panoramica-1-1920x1080.jpg'
 
+const isDirectVideoUrl = (url?: string | null) => {
+  if (!url) return false
+  return /\.(mp4|webm|ogg)(\?.*)?$/i.test(url)
+}
+
+const isVideoMedia = (media?: MedicalAsset | null) => {
+  return Boolean(media?.mimeType?.startsWith('video/'))
+}
+
+const isImageMedia = (media?: MedicalAsset | null) => {
+  return Boolean(media?.url && (!media.mimeType || media.mimeType.startsWith('image/')))
+}
+
 // ============================================================================
 // SSG: STATIC PATH GENERATION
 // Pre-builds all active procedures at compile time for 0ms TTFB.
@@ -67,7 +80,8 @@ export async function generateMetadata({ params }: ProcedurePageProps): Promise<
   if (!procedure) return {}
 
   const companyName = settings?.companyName || 'Medical Network'
-  const coverImage = (procedure.coverImage as MedicalAsset)?.url || procedureFallbackImage
+  const heroBackground = procedure.heroBackground as MedicalAsset | undefined
+  const coverImage = (isImageMedia(heroBackground) ? heroBackground?.url : undefined) || (procedure.coverImage as MedicalAsset)?.url || procedureFallbackImage
   
   const pageTitle = `${procedure.name} | Spine Surgery in Queretaro for US Patients`
   const description = `${procedure.shortSummary} Learn candidacy, recovery planning, bilingual support and treatment options in Queretaro, Mexico.`
@@ -156,10 +170,14 @@ export default async function ProcedurePage({ params }: ProcedurePageProps) {
 
   // Visual Branding Fallbacks
   const coverImage = procedure.coverImage as MedicalAsset | undefined
+  const heroBackground = procedure.heroBackground as MedicalAsset | undefined
   const procedureGallery = (procedure as any).procedureGallery
     ? ((procedure as any).procedureGallery as any[]).filter((item) => typeof item === 'object')
     : []
   const procedureVideoLinks = (procedure as any).procedureVideoLinks || []
+  const heroMedia = heroBackground || coverImage
+  const heroVideoUrl = isDirectVideoUrl(procedure.heroVideoUrl) ? procedure.heroVideoUrl : undefined
+  const heroPoster = (isImageMedia(heroMedia) ? heroMedia?.url : coverImage?.url) || undefined
   const brandPrimaryColor = settings?.primaryColor || '#1e3a8a'
 
   // ==========================================================================
@@ -215,17 +233,43 @@ export default async function ProcedurePage({ params }: ProcedurePageProps) {
       {/* Hero Section */}
       <section
         style={{ backgroundColor: brandPrimaryColor }}
-        className="relative flex min-h-[560px] w-full items-center overflow-hidden transition-colors duration-300"
+        className="relative flex min-h-[640px] w-full items-center overflow-hidden py-24 transition-colors duration-300 lg:min-h-[780px] lg:py-32"
       >
-        <Image
-          src={coverImage?.url || procedureFallbackImage}
-          alt={coverImage?.alt || procedure.name}
-          fill
-          className="absolute inset-0 z-0 object-cover object-center opacity-45"
-          priority
-          sizes="100vw"
-        />
-        <div className="absolute inset-0 z-0 bg-slate-950/55" />
+        {heroVideoUrl ? (
+          <video
+            className="absolute inset-0 z-0 h-full w-full object-cover opacity-85"
+            autoPlay
+            muted
+            loop
+            playsInline
+            poster={heroPoster}
+          >
+            <source src={heroVideoUrl} />
+          </video>
+        ) : isVideoMedia(heroMedia) && heroMedia?.url ? (
+          <video
+            className="absolute inset-0 z-0 h-full w-full object-cover opacity-85"
+            autoPlay
+            muted
+            loop
+            playsInline
+            aria-label={heroMedia.alt || `${procedure.name} procedure video`}
+            poster={coverImage?.url || undefined}
+          >
+            <source src={heroMedia.url} type={heroMedia.mimeType || 'video/mp4'} />
+          </video>
+        ) : (
+          <Image
+            src={heroMedia?.url || procedureFallbackImage}
+            alt={heroMedia?.alt || procedure.name}
+            fill
+            className="absolute inset-0 z-0 object-cover object-center opacity-80"
+            priority
+            sizes="100vw"
+          />
+        )}
+        <div className="absolute inset-0 z-0 bg-slate-950/30" />
+        <div className="absolute inset-x-0 bottom-0 z-0 h-1/2 bg-gradient-to-t from-slate-950/55 to-transparent" />
         <div className="relative z-10 mx-auto max-w-5xl px-4 pt-24 text-center">
           <p className="mb-5 inline-flex items-center gap-2 rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-xs font-bold uppercase tracking-[0.18em] text-blue-100 backdrop-blur">
             <ShieldCheckIcon className="h-4 w-4" />

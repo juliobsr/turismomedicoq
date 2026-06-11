@@ -126,6 +126,25 @@ export const Procedures: CollectionConfig = {
           label: 'Media Gallery',
           fields: [
             {
+              name: 'heroBackground',
+              type: 'relationship',
+              relationTo: 'procedures-media',
+              required: false,
+              label: 'Hero background media',
+              admin: {
+                description: 'Optional image or uploaded video used as the public procedure hero background. If empty, the cover image is used.',
+              },
+            },
+            {
+              name: 'heroVideoUrl',
+              type: 'text',
+              required: false,
+              label: 'Hero external video URL',
+              admin: {
+                description: 'Optional direct MP4/WebM URL for the procedure hero background. If present, it overrides the hero media and cover image.',
+              },
+            },
+            {
               name: 'procedureGallery',
               type: 'relationship',
               relationTo: 'procedures-media',

@@ -433,6 +433,14 @@ export interface Procedure {
   surgeryDuration: string;
   anesthesiaType?: ('general' | 'local_sedation' | 'local') | null;
   /**
+   * Optional image or uploaded video used as the public procedure hero background. If empty, the cover image is used.
+   */
+  heroBackground?: (number | null) | ProceduresMedia;
+  /**
+   * Optional direct MP4/WebM URL for the procedure hero background. If present, it overrides the hero media and cover image.
+   */
+  heroVideoUrl?: string | null;
+  /**
    * Images or uploaded videos shown in the public procedure gallery.
    */
   procedureGallery?: (number | ProceduresMedia)[] | null;
@@ -1308,6 +1316,8 @@ export interface ProceduresSelect<T extends boolean = true> {
   recoveryTime?: T;
   surgeryDuration?: T;
   anesthesiaType?: T;
+  heroBackground?: T;
+  heroVideoUrl?: T;
   procedureGallery?: T;
   procedureVideoLinks?:
     | T
