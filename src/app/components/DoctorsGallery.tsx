@@ -109,13 +109,11 @@ const GalleryImage = ({
     className="group relative h-80 w-full cursor-zoom-in overflow-hidden rounded-2xl bg-slate-200 shadow-sm transition-all duration-500 hover:shadow-2xl focus:outline-none focus:ring-4 focus:ring-blue-600/20"
     aria-label={`${actionLabel}: ${asset.alt || 'Medical image'}`}
   >
-    <Image
+    <img
       src={asset.url || ''}
       alt={asset.alt || 'Medical image'}
-      fill
-      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-      className="object-cover transition-transform duration-700 group-hover:scale-110"
       loading="lazy"
+      className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
     />
     <div className="absolute inset-0 flex items-center justify-center bg-slate-900/0 transition-all duration-300 group-hover:bg-slate-900/40">
       <div className="translate-y-4 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
@@ -183,13 +181,11 @@ const SliderImage = ({
       className="relative block aspect-[9/16] w-full cursor-zoom-in overflow-hidden bg-slate-900 text-left focus:outline-none focus:ring-4 focus:ring-blue-600/20"
       aria-label={`${actionLabel}: ${asset.alt || 'Procedure image'}`}
     >
-      <Image
+      <img
         src={asset.url || ''}
         alt={asset.alt || 'Medical procedure image'}
-        fill
-        sizes="(max-width: 640px) calc(100vw - 2rem), (max-width: 1024px) 34vw, 380px"
-        className="object-cover transition duration-700 group-hover:scale-105"
         loading="lazy"
+        className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
       />
       <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/25 to-transparent" />
       <div className="absolute inset-x-0 bottom-0 p-4 sm:p-5">
