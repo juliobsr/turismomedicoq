@@ -65,29 +65,31 @@ export default buildConfig({
   },
 
   collections: [
-    Users,
-    BackendRoles,
-   
-    Specialties,  // 2. Dependency
-    Doctors,      // 3. Main Entity
-    Certificates,
-    Facilities,
-    Institutions,
     Leads,
     LeadFiles,
+
+    Doctors,
     Procedures,
+    Specialties,
+    Facilities,
+    Institutions,
+    Certificates,
+
     DoctorsMedia,
+    ProceduresMedia,
     FacilitiesMedia,
     InstitutionsMedia,
     CertificatesMedia,
-    ProceduresMedia,
-    GlobalMedia
+    GlobalMedia,
+
+    Users,
+    BackendRoles,
   ],
 
   globals: [
-    SiteSettings,
     PatientJourney,
     WhyQueretaro,
+    SiteSettings,
   ],
 
   plugins: [

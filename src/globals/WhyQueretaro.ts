@@ -55,7 +55,7 @@ const AdvantageSection: Block = {
 export const WhyQueretaro: GlobalConfig = {
   slug: 'why-queretaro',
   admin: {
-    group: 'Platform Content',
+    group: 'Website Content',
   },
   access: {
     read: () => true,

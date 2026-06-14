@@ -11,7 +11,7 @@ export const Procedures: CollectionConfig = {
   slug: 'procedures',
   admin: {
     useAsTitle: 'name',
-    group: 'Medical Directory',
+    group: 'Medical Network',
     defaultColumns: ['name', 'specialty', 'isActive'],
   },
   access: {

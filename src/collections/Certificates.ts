@@ -12,7 +12,7 @@ export const Certificates: CollectionConfig = {
   slug: 'certificates',
   admin: {
     useAsTitle: 'name',
-    group: 'Medical Directory',
+    group: 'Medical Network',
     defaultColumns: ['name', 'issuer', 'isActive'],
   },
   access: {

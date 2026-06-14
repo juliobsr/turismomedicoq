@@ -51,7 +51,7 @@ export const Leads: CollectionConfig = {
   slug: 'leads',
   admin: {
     useAsTitle: 'name', 
-    group: 'Medical Directory',
+    group: 'Patient Care',
     defaultColumns: ['folio', 'name','doctor','procedure', 'status', 'createdAt'],
   },
   

@@ -12,7 +12,7 @@ export const Institutions: CollectionConfig = {
   slug: 'institutions',
   admin: {
     useAsTitle: 'name',
-    group: 'Medical Directory',
+    group: 'Medical Network',
     defaultColumns: ['name', 'website', 'isActive'],
   },
   access: {

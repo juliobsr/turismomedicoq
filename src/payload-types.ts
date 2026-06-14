@@ -67,22 +67,22 @@ export interface Config {
   };
   blocks: {};
   collections: {
-    users: User;
-    'backend-roles': BackendRole;
-    specialties: Specialty;
-    doctors: Doctor;
-    certificates: Certificate;
-    facilities: Facility;
-    institutions: Institution;
     leads: Lead;
     'lead-files': LeadFile;
+    doctors: Doctor;
     procedures: Procedure;
+    specialties: Specialty;
+    facilities: Facility;
+    institutions: Institution;
+    certificates: Certificate;
     'doctors-media': DoctorsMedia;
+    'procedures-media': ProceduresMedia;
     'facilities-media': FacilitiesMedia;
     'institutions-media': InstitutionsMedia;
     'certificates-media': CertificatesMedia;
-    'procedures-media': ProceduresMedia;
     'medical-assets': MedicalAsset;
+    users: User;
+    'backend-roles': BackendRole;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -90,22 +90,22 @@ export interface Config {
   };
   collectionsJoins: {};
   collectionsSelect: {
-    users: UsersSelect<false> | UsersSelect<true>;
-    'backend-roles': BackendRolesSelect<false> | BackendRolesSelect<true>;
-    specialties: SpecialtiesSelect<false> | SpecialtiesSelect<true>;
-    doctors: DoctorsSelect<false> | DoctorsSelect<true>;
-    certificates: CertificatesSelect<false> | CertificatesSelect<true>;
-    facilities: FacilitiesSelect<false> | FacilitiesSelect<true>;
-    institutions: InstitutionsSelect<false> | InstitutionsSelect<true>;
     leads: LeadsSelect<false> | LeadsSelect<true>;
     'lead-files': LeadFilesSelect<false> | LeadFilesSelect<true>;
+    doctors: DoctorsSelect<false> | DoctorsSelect<true>;
     procedures: ProceduresSelect<false> | ProceduresSelect<true>;
+    specialties: SpecialtiesSelect<false> | SpecialtiesSelect<true>;
+    facilities: FacilitiesSelect<false> | FacilitiesSelect<true>;
+    institutions: InstitutionsSelect<false> | InstitutionsSelect<true>;
+    certificates: CertificatesSelect<false> | CertificatesSelect<true>;
     'doctors-media': DoctorsMediaSelect<false> | DoctorsMediaSelect<true>;
+    'procedures-media': ProceduresMediaSelect<false> | ProceduresMediaSelect<true>;
     'facilities-media': FacilitiesMediaSelect<false> | FacilitiesMediaSelect<true>;
     'institutions-media': InstitutionsMediaSelect<false> | InstitutionsMediaSelect<true>;
     'certificates-media': CertificatesMediaSelect<false> | CertificatesMediaSelect<true>;
-    'procedures-media': ProceduresMediaSelect<false> | ProceduresMediaSelect<true>;
     'medical-assets': MedicalAssetsSelect<false> | MedicalAssetsSelect<true>;
+    users: UsersSelect<false> | UsersSelect<true>;
+    'backend-roles': BackendRolesSelect<false> | BackendRolesSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -116,14 +116,14 @@ export interface Config {
   };
   fallbackLocale: null;
   globals: {
-    'site-settings': SiteSetting;
     'patient-journey': PatientJourney;
     'why-queretaro': WhyQueretaro;
+    'site-settings': SiteSetting;
   };
   globalsSelect: {
-    'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
     'patient-journey': PatientJourneySelect<false> | PatientJourneySelect<true>;
     'why-queretaro': WhyQueretaroSelect<false> | WhyQueretaroSelect<true>;
+    'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
   };
   locale: null;
   widgets: {
@@ -155,93 +155,79 @@ export interface UserAuthOperations {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "users".
+ * via the `definition` "leads".
  */
-export interface User {
+export interface Lead {
   id: number;
   /**
-   * The Admin option is the principal administrator role and can create backend roles.
+   * Auto-generated secure tracking identifier.
    */
-  roles: ('admin' | 'doctor' | 'patient')[];
+  folio?: string | null;
+  status?: ('new' | 'contacted' | 'scheduled' | 'completed' | 'cancelled') | null;
   /**
-   * Configurable backend permissions. Only the principal admin can assign these roles.
+   * Internal notes for lead follow-up. Not visible to the patient.
    */
-  backendRoles?: (number | BackendRole)[] | null;
-  fullName: string;
-  updatedAt: string;
-  createdAt: string;
+  contactNotes?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Last manual response sent from the backend.
+   */
+  lastResponseSentAt?: string | null;
+  name: string;
   email: string;
-  resetPasswordToken?: string | null;
-  resetPasswordExpiration?: string | null;
-  salt?: string | null;
-  hash?: string | null;
-  loginAttempts?: number | null;
-  lockUntil?: string | null;
-  sessions?:
+  phone: string;
+  doctor: number | Doctor;
+  procedure?: (number | null) | Procedure;
+  notes?: string | null;
+  /**
+   * Choose the email template to send to the patient.
+   */
+  responseTemplate?: ('request_medical_records' | 'consultation_next_steps' | 'general_follow_up') | null;
+  /**
+   * Optional. Leave empty to use the template subject.
+   */
+  responseSubject?: string | null;
+  /**
+   * Optional custom message added to the selected template.
+   */
+  responseMessage?: string | null;
+  /**
+   * Check this box and save the lead to email the selected response to the patient.
+   */
+  sendResponseNow?: boolean | null;
+  /**
+   * Files uploaded by the patient through the secure folio link.
+   */
+  uploadedFiles?: (number | LeadFile)[] | null;
+  /**
+   * Audit trail for patient contact, file uploads and internal follow-up events.
+   */
+  communicationHistory?:
     | {
-        id: string;
-        createdAt?: string | null;
-        expiresAt: string;
+        direction: 'inbound' | 'outbound' | 'internal';
+        eventType: 'lead_created' | 'email_sent' | 'email_failed' | 'file_uploaded' | 'internal_note';
+        template?: string | null;
+        subject?: string | null;
+        message?: string | null;
+        file?: (number | null) | LeadFile;
+        occurredAt: string;
+        createdBy?: string | null;
+        id?: string | null;
       }[]
     | null;
-  password?: string | null;
-  collection: 'users';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "backend-roles".
- */
-export interface BackendRole {
-  id: number;
-  name: string;
-  /**
-   * Internal identifier, for example lead-coordinator or content-editor.
-   */
-  slug: string;
-  description?: string | null;
-  isActive?: boolean | null;
-  permissions: {
-    target:
-      | 'users'
-      | 'backend-roles'
-      | 'specialties'
-      | 'doctors'
-      | 'certificates'
-      | 'facilities'
-      | 'institutions'
-      | 'leads'
-      | 'lead-files'
-      | 'procedures'
-      | 'doctors-media'
-      | 'facilities-media'
-      | 'institutions-media'
-      | 'certificates-media'
-      | 'procedures-media'
-      | 'medical-assets'
-      | 'site-settings'
-      | 'patient-journey'
-      | 'why-queretaro';
-    read?: boolean | null;
-    create?: boolean | null;
-    update?: boolean | null;
-    delete?: boolean | null;
-    id?: string | null;
-  }[];
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "specialties".
- */
-export interface Specialty {
-  id: number;
-  title: string;
-  slug: string;
-  /**
-   * Brief description of the specialty for the category landing page.
-   */
-  description: string;
   updatedAt: string;
   createdAt: string;
 }
@@ -386,6 +372,21 @@ export interface DoctorsMedia {
       filename?: string | null;
     };
   };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "specialties".
+ */
+export interface Specialty {
+  id: number;
+  title: string;
+  slug: string;
+  /**
+   * Brief description of the specialty for the category landing page.
+   */
+  description: string;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -716,6 +717,27 @@ export interface FacilitiesMedia {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "lead-files".
+ */
+export interface LeadFile {
+  id: number;
+  lead: number | Lead;
+  originalName: string;
+  patientNote?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
+  focalX?: number | null;
+  focalY?: number | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "institutions".
  */
 export interface Institution {
@@ -805,105 +827,6 @@ export interface InstitutionsMedia {
   };
 }
 /**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "leads".
- */
-export interface Lead {
-  id: number;
-  /**
-   * Auto-generated secure tracking identifier.
-   */
-  folio?: string | null;
-  status?: ('new' | 'contacted' | 'scheduled' | 'completed' | 'cancelled') | null;
-  /**
-   * Internal notes for lead follow-up. Not visible to the patient.
-   */
-  contactNotes?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
-  /**
-   * Last manual response sent from the backend.
-   */
-  lastResponseSentAt?: string | null;
-  name: string;
-  email: string;
-  phone: string;
-  doctor: number | Doctor;
-  procedure?: (number | null) | Procedure;
-  notes?: string | null;
-  /**
-   * Choose the email template to send to the patient.
-   */
-  responseTemplate?: ('request_medical_records' | 'consultation_next_steps' | 'general_follow_up') | null;
-  /**
-   * Optional. Leave empty to use the template subject.
-   */
-  responseSubject?: string | null;
-  /**
-   * Optional custom message added to the selected template.
-   */
-  responseMessage?: string | null;
-  /**
-   * Check this box and save the lead to email the selected response to the patient.
-   */
-  sendResponseNow?: boolean | null;
-  /**
-   * Files uploaded by the patient through the secure folio link.
-   */
-  uploadedFiles?: (number | LeadFile)[] | null;
-  /**
-   * Audit trail for patient contact, file uploads and internal follow-up events.
-   */
-  communicationHistory?:
-    | {
-        direction: 'inbound' | 'outbound' | 'internal';
-        eventType: 'lead_created' | 'email_sent' | 'email_failed' | 'file_uploaded' | 'internal_note';
-        template?: string | null;
-        subject?: string | null;
-        message?: string | null;
-        file?: (number | null) | LeadFile;
-        occurredAt: string;
-        createdBy?: string | null;
-        id?: string | null;
-      }[]
-    | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "lead-files".
- */
-export interface LeadFile {
-  id: number;
-  lead: number | Lead;
-  originalName: string;
-  patientNote?: string | null;
-  updatedAt: string;
-  createdAt: string;
-  url?: string | null;
-  thumbnailURL?: string | null;
-  filename?: string | null;
-  mimeType?: string | null;
-  filesize?: number | null;
-  width?: number | null;
-  height?: number | null;
-  focalX?: number | null;
-  focalY?: number | null;
-}
-/**
  * Media assets exclusively for global pages like the Patient Journey.
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -956,6 +879,83 @@ export interface MedicalAsset {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "users".
+ */
+export interface User {
+  id: number;
+  /**
+   * The Admin option is the principal administrator role and can create backend roles.
+   */
+  roles: ('admin' | 'doctor' | 'patient')[];
+  /**
+   * Configurable backend permissions. Only the principal admin can assign these roles.
+   */
+  backendRoles?: (number | BackendRole)[] | null;
+  fullName: string;
+  updatedAt: string;
+  createdAt: string;
+  email: string;
+  resetPasswordToken?: string | null;
+  resetPasswordExpiration?: string | null;
+  salt?: string | null;
+  hash?: string | null;
+  loginAttempts?: number | null;
+  lockUntil?: string | null;
+  sessions?:
+    | {
+        id: string;
+        createdAt?: string | null;
+        expiresAt: string;
+      }[]
+    | null;
+  password?: string | null;
+  collection: 'users';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "backend-roles".
+ */
+export interface BackendRole {
+  id: number;
+  name: string;
+  /**
+   * Internal identifier, for example lead-coordinator or content-editor.
+   */
+  slug: string;
+  description?: string | null;
+  isActive?: boolean | null;
+  permissions: {
+    target:
+      | 'users'
+      | 'backend-roles'
+      | 'specialties'
+      | 'doctors'
+      | 'certificates'
+      | 'facilities'
+      | 'institutions'
+      | 'leads'
+      | 'lead-files'
+      | 'procedures'
+      | 'doctors-media'
+      | 'facilities-media'
+      | 'institutions-media'
+      | 'certificates-media'
+      | 'procedures-media'
+      | 'medical-assets'
+      | 'site-settings'
+      | 'patient-journey'
+      | 'why-queretaro';
+    read?: boolean | null;
+    create?: boolean | null;
+    update?: boolean | null;
+    delete?: boolean | null;
+    id?: string | null;
+  }[];
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -979,24 +979,24 @@ export interface PayloadLockedDocument {
   id: number;
   document?:
     | ({
-        relationTo: 'users';
-        value: number | User;
+        relationTo: 'leads';
+        value: number | Lead;
       } | null)
     | ({
-        relationTo: 'backend-roles';
-        value: number | BackendRole;
-      } | null)
-    | ({
-        relationTo: 'specialties';
-        value: number | Specialty;
+        relationTo: 'lead-files';
+        value: number | LeadFile;
       } | null)
     | ({
         relationTo: 'doctors';
         value: number | Doctor;
       } | null)
     | ({
-        relationTo: 'certificates';
-        value: number | Certificate;
+        relationTo: 'procedures';
+        value: number | Procedure;
+      } | null)
+    | ({
+        relationTo: 'specialties';
+        value: number | Specialty;
       } | null)
     | ({
         relationTo: 'facilities';
@@ -1007,20 +1007,16 @@ export interface PayloadLockedDocument {
         value: number | Institution;
       } | null)
     | ({
-        relationTo: 'leads';
-        value: number | Lead;
-      } | null)
-    | ({
-        relationTo: 'lead-files';
-        value: number | LeadFile;
-      } | null)
-    | ({
-        relationTo: 'procedures';
-        value: number | Procedure;
+        relationTo: 'certificates';
+        value: number | Certificate;
       } | null)
     | ({
         relationTo: 'doctors-media';
         value: number | DoctorsMedia;
+      } | null)
+    | ({
+        relationTo: 'procedures-media';
+        value: number | ProceduresMedia;
       } | null)
     | ({
         relationTo: 'facilities-media';
@@ -1035,12 +1031,16 @@ export interface PayloadLockedDocument {
         value: number | CertificatesMedia;
       } | null)
     | ({
-        relationTo: 'procedures-media';
-        value: number | ProceduresMedia;
-      } | null)
-    | ({
         relationTo: 'medical-assets';
         value: number | MedicalAsset;
+      } | null)
+    | ({
+        relationTo: 'users';
+        value: number | User;
+      } | null)
+    | ({
+        relationTo: 'backend-roles';
+        value: number | BackendRole;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -1083,162 +1083,6 @@ export interface PayloadMigration {
   batch?: number | null;
   updatedAt: string;
   createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "users_select".
- */
-export interface UsersSelect<T extends boolean = true> {
-  roles?: T;
-  backendRoles?: T;
-  fullName?: T;
-  updatedAt?: T;
-  createdAt?: T;
-  email?: T;
-  resetPasswordToken?: T;
-  resetPasswordExpiration?: T;
-  salt?: T;
-  hash?: T;
-  loginAttempts?: T;
-  lockUntil?: T;
-  sessions?:
-    | T
-    | {
-        id?: T;
-        createdAt?: T;
-        expiresAt?: T;
-      };
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "backend-roles_select".
- */
-export interface BackendRolesSelect<T extends boolean = true> {
-  name?: T;
-  slug?: T;
-  description?: T;
-  isActive?: T;
-  permissions?:
-    | T
-    | {
-        target?: T;
-        read?: T;
-        create?: T;
-        update?: T;
-        delete?: T;
-        id?: T;
-      };
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "specialties_select".
- */
-export interface SpecialtiesSelect<T extends boolean = true> {
-  title?: T;
-  slug?: T;
-  description?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "doctors_select".
- */
-export interface DoctorsSelect<T extends boolean = true> {
-  fullName?: T;
-  slug?: T;
-  medicalLicense?: T;
-  profilePicture?: T;
-  officeGallery?: T;
-  specialties?: T;
-  procedures?: T;
-  facilities?: T;
-  biography?: T;
-  heroBackground?: T;
-  heroVideoUrl?: T;
-  procedureGallery?: T;
-  procedureVideoLinks?:
-    | T
-    | {
-        title?: T;
-        url?: T;
-        caption?: T;
-        thumbnail?: T;
-        id?: T;
-      };
-  patientTestimonials?:
-    | T
-    | {
-        title?: T;
-        videoUrl?: T;
-        patientLocation?: T;
-        quote?: T;
-        id?: T;
-      };
-  metaTitle?: T;
-  metaDescription?: T;
-  phone?: T;
-  email?: T;
-  isActive?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "certificates_select".
- */
-export interface CertificatesSelect<T extends boolean = true> {
-  name?: T;
-  issuer?: T;
-  verificationUrl?: T;
-  logo?: T;
-  isActive?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "facilities_select".
- */
-export interface FacilitiesSelect<T extends boolean = true> {
-  name?: T;
-  slug?: T;
-  description?: T;
-  city?: T;
-  specialtiesOffered?: T;
-  doctors?: T;
-  accreditations?: T;
-  heroImage?: T;
-  heroVideoUrl?: T;
-  infrastructureGallery?: T;
-  infrastructureVideoLinks?:
-    | T
-    | {
-        title?: T;
-        url?: T;
-        caption?: T;
-        thumbnail?: T;
-        id?: T;
-      };
-  isActive?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "institutions_select".
- */
-export interface InstitutionsSelect<T extends boolean = true> {
-  name?: T;
-  slug?: T;
-  description?: T;
-  logo?: T;
-  website?: T;
-  isActive?: T;
-  updatedAt?: T;
-  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1298,6 +1142,49 @@ export interface LeadFilesSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "doctors_select".
+ */
+export interface DoctorsSelect<T extends boolean = true> {
+  fullName?: T;
+  slug?: T;
+  medicalLicense?: T;
+  profilePicture?: T;
+  officeGallery?: T;
+  specialties?: T;
+  procedures?: T;
+  facilities?: T;
+  biography?: T;
+  heroBackground?: T;
+  heroVideoUrl?: T;
+  procedureGallery?: T;
+  procedureVideoLinks?:
+    | T
+    | {
+        title?: T;
+        url?: T;
+        caption?: T;
+        thumbnail?: T;
+        id?: T;
+      };
+  patientTestimonials?:
+    | T
+    | {
+        title?: T;
+        videoUrl?: T;
+        patientLocation?: T;
+        quote?: T;
+        id?: T;
+      };
+  metaTitle?: T;
+  metaDescription?: T;
+  phone?: T;
+  email?: T;
+  isActive?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "procedures_select".
  */
 export interface ProceduresSelect<T extends boolean = true> {
@@ -1341,9 +1228,128 @@ export interface ProceduresSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "specialties_select".
+ */
+export interface SpecialtiesSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  description?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "facilities_select".
+ */
+export interface FacilitiesSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  description?: T;
+  city?: T;
+  specialtiesOffered?: T;
+  doctors?: T;
+  accreditations?: T;
+  heroImage?: T;
+  heroVideoUrl?: T;
+  infrastructureGallery?: T;
+  infrastructureVideoLinks?:
+    | T
+    | {
+        title?: T;
+        url?: T;
+        caption?: T;
+        thumbnail?: T;
+        id?: T;
+      };
+  isActive?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "institutions_select".
+ */
+export interface InstitutionsSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  description?: T;
+  logo?: T;
+  website?: T;
+  isActive?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "certificates_select".
+ */
+export interface CertificatesSelect<T extends boolean = true> {
+  name?: T;
+  issuer?: T;
+  verificationUrl?: T;
+  logo?: T;
+  isActive?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "doctors-media_select".
  */
 export interface DoctorsMediaSelect<T extends boolean = true> {
+  alt?: T;
+  caption?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  url?: T;
+  thumbnailURL?: T;
+  filename?: T;
+  mimeType?: T;
+  filesize?: T;
+  width?: T;
+  height?: T;
+  focalX?: T;
+  focalY?: T;
+  sizes?:
+    | T
+    | {
+        thumbnail?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        card?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        hero?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+      };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "procedures-media_select".
+ */
+export interface ProceduresMediaSelect<T extends boolean = true> {
   alt?: T;
   caption?: T;
   updatedAt?: T;
@@ -1553,59 +1559,6 @@ export interface CertificatesMediaSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "procedures-media_select".
- */
-export interface ProceduresMediaSelect<T extends boolean = true> {
-  alt?: T;
-  caption?: T;
-  updatedAt?: T;
-  createdAt?: T;
-  url?: T;
-  thumbnailURL?: T;
-  filename?: T;
-  mimeType?: T;
-  filesize?: T;
-  width?: T;
-  height?: T;
-  focalX?: T;
-  focalY?: T;
-  sizes?:
-    | T
-    | {
-        thumbnail?:
-          | T
-          | {
-              url?: T;
-              width?: T;
-              height?: T;
-              mimeType?: T;
-              filesize?: T;
-              filename?: T;
-            };
-        card?:
-          | T
-          | {
-              url?: T;
-              width?: T;
-              height?: T;
-              mimeType?: T;
-              filesize?: T;
-              filename?: T;
-            };
-        hero?:
-          | T
-          | {
-              url?: T;
-              width?: T;
-              height?: T;
-              mimeType?: T;
-              filesize?: T;
-              filename?: T;
-            };
-      };
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "medical-assets_select".
  */
 export interface MedicalAssetsSelect<T extends boolean = true> {
@@ -1659,6 +1612,53 @@ export interface MedicalAssetsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "users_select".
+ */
+export interface UsersSelect<T extends boolean = true> {
+  roles?: T;
+  backendRoles?: T;
+  fullName?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  email?: T;
+  resetPasswordToken?: T;
+  resetPasswordExpiration?: T;
+  salt?: T;
+  hash?: T;
+  loginAttempts?: T;
+  lockUntil?: T;
+  sessions?:
+    | T
+    | {
+        id?: T;
+        createdAt?: T;
+        expiresAt?: T;
+      };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "backend-roles_select".
+ */
+export interface BackendRolesSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  description?: T;
+  isActive?: T;
+  permissions?:
+    | T
+    | {
+        target?: T;
+        read?: T;
+        create?: T;
+        update?: T;
+        delete?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv_select".
  */
 export interface PayloadKvSelect<T extends boolean = true> {
@@ -1696,63 +1696,6 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   batch?: T;
   updatedAt?: T;
   createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "site-settings".
- */
-export interface SiteSetting {
-  id: number;
-  /**
-   * The official name of the business. Used in SEO meta tags and footers.
-   */
-  companyName: string;
-  contactEmail: string;
-  /**
-   * Backend notification email for new patient consultations. Falls back to Contact Email or ADMIN_NOTIFICATION_EMAIL.
-   */
-  leadNotificationEmail?: string | null;
-  /**
-   * Recommended format: +1 (555) 123-4567 for global Click-to-Call compatibility.
-   */
-  contactPhone: string;
-  /**
-   * Verified Resend sender address used for lead notifications and patient emails. Example: notifications@yourdomain.com.
-   */
-  transactionalEmailFromAddress?: string | null;
-  /**
-   * Sender display name for patient-facing emails.
-   */
-  transactionalEmailFromName?: string | null;
-  address: {
-    street?: string | null;
-    city?: string | null;
-    state?: string | null;
-    zipCode?: string | null;
-    country: string;
-  };
-  /**
-   * Main brand color (Buttons, active links).
-   */
-  primaryColor: string;
-  /**
-   * Secondary elements (Headers, footers, accents).
-   */
-  secondaryColor: string;
-  /**
-   * Call to Actions, highlight badges, alert icons.
-   */
-  accentColor: string;
-  /**
-   * Global application background color.
-   */
-  backgroundColor: string;
-  /**
-   * Default typography color for high contrast.
-   */
-  textColor: string;
-  updatedAt?: string | null;
-  createdAt?: string | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1854,32 +1797,60 @@ export interface WhyQueretaro {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "site-settings_select".
+ * via the `definition` "site-settings".
  */
-export interface SiteSettingsSelect<T extends boolean = true> {
-  companyName?: T;
-  contactEmail?: T;
-  leadNotificationEmail?: T;
-  contactPhone?: T;
-  transactionalEmailFromAddress?: T;
-  transactionalEmailFromName?: T;
-  address?:
-    | T
-    | {
-        street?: T;
-        city?: T;
-        state?: T;
-        zipCode?: T;
-        country?: T;
-      };
-  primaryColor?: T;
-  secondaryColor?: T;
-  accentColor?: T;
-  backgroundColor?: T;
-  textColor?: T;
-  updatedAt?: T;
-  createdAt?: T;
-  globalType?: T;
+export interface SiteSetting {
+  id: number;
+  /**
+   * The official name of the business. Used in SEO meta tags and footers.
+   */
+  companyName: string;
+  contactEmail: string;
+  /**
+   * Backend notification email for new patient consultations. Falls back to Contact Email or ADMIN_NOTIFICATION_EMAIL.
+   */
+  leadNotificationEmail?: string | null;
+  /**
+   * Recommended format: +1 (555) 123-4567 for global Click-to-Call compatibility.
+   */
+  contactPhone: string;
+  /**
+   * Verified Resend sender address used for lead notifications and patient emails. Example: notifications@yourdomain.com.
+   */
+  transactionalEmailFromAddress?: string | null;
+  /**
+   * Sender display name for patient-facing emails.
+   */
+  transactionalEmailFromName?: string | null;
+  address: {
+    street?: string | null;
+    city?: string | null;
+    state?: string | null;
+    zipCode?: string | null;
+    country: string;
+  };
+  /**
+   * Main brand color (Buttons, active links).
+   */
+  primaryColor: string;
+  /**
+   * Secondary elements (Headers, footers, accents).
+   */
+  secondaryColor: string;
+  /**
+   * Call to Actions, highlight badges, alert icons.
+   */
+  accentColor: string;
+  /**
+   * Global application background color.
+   */
+  backgroundColor: string;
+  /**
+   * Default typography color for high contrast.
+   */
+  textColor: string;
+  updatedAt?: string | null;
+  createdAt?: string | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1950,6 +1921,35 @@ export interface WhyQueretaroSelect<T extends boolean = true> {
         metaTitle?: T;
         metaDescription?: T;
       };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "site-settings_select".
+ */
+export interface SiteSettingsSelect<T extends boolean = true> {
+  companyName?: T;
+  contactEmail?: T;
+  leadNotificationEmail?: T;
+  contactPhone?: T;
+  transactionalEmailFromAddress?: T;
+  transactionalEmailFromName?: T;
+  address?:
+    | T
+    | {
+        street?: T;
+        city?: T;
+        state?: T;
+        zipCode?: T;
+        country?: T;
+      };
+  primaryColor?: T;
+  secondaryColor?: T;
+  accentColor?: T;
+  backgroundColor?: T;
+  textColor?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

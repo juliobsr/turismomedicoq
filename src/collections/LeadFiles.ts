@@ -10,7 +10,7 @@ export const LeadFiles: CollectionConfig = {
   },
   admin: {
     useAsTitle: 'originalName',
-    group: 'Medical Directory',
+    group: 'Patient Care',
     defaultColumns: ['originalName', 'lead', 'createdAt'],
   },
   access: {

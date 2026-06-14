@@ -9,7 +9,7 @@ import { backendAccess } from '@/access/backendRoles'
 export const GlobalMedia: CollectionConfig = {
   slug: 'medical-assets',
   admin: {
-    group: 'Platform Content',
+    group: 'Media Library',
     useAsTitle: 'alt',
     description: 'Media assets exclusively for global pages like the Patient Journey.',
   },

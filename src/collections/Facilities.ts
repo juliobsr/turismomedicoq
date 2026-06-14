@@ -9,7 +9,7 @@ export const Facilities: CollectionConfig = {
   slug: 'facilities',
   admin: {
     useAsTitle: 'name',
-    group: 'Medical Directory',
+    group: 'Medical Network',
     defaultColumns: ['name', 'city', 'isActive'],
   },
   access: {

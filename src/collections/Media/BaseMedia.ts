@@ -30,7 +30,7 @@ export const createMediaCollection = (
   },
   admin: {
     useAsTitle: 'filename',
-    group: 'Media Assets',
+    group: 'Media Library',
     description: options.adminDescription,
   },
   upload: {

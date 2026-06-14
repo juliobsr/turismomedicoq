@@ -10,7 +10,7 @@ import { backendAccess } from '@/access/backendRoles'
 export const PatientJourney: GlobalConfig = {
   slug: 'patient-journey',
   admin: {
-    group: 'Platform Content',
+    group: 'Website Content',
   },
   access: {
     // SECURITY: Publicly readable for Next.js SSR, editable only by authenticated admins

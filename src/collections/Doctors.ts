@@ -12,7 +12,7 @@ export const Doctors: CollectionConfig = {
   slug: 'doctors',
   admin: {
     useAsTitle: 'fullName',
-    group: 'Medical Directory',
+    group: 'Medical Network',
     defaultColumns: ['fullName', 'medicalLicense', 'isActive'],
   },
   access: {

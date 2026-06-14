@@ -11,6 +11,9 @@ import { backendAccess } from '@/access/backendRoles'
 export const SiteSettings: GlobalConfig = {
   slug: 'site-settings',
   label: 'Site Settings & Theme',
+  admin: {
+    group: 'Website Content',
+  },
   access: {
     // SECURITY: Next.js needs public read access to generate the static HTML and CSS
     read: () => true,

@@ -12,7 +12,7 @@ export const Specialties: CollectionConfig = {
   slug: 'specialties',
   admin: {
     useAsTitle: 'title',
-    group: 'Medical Directory',
+    group: 'Medical Network',
   },
   access: {
     read: () => true,
