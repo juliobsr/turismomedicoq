@@ -4,30 +4,30 @@ import { getSiteUrl } from '@/lib/siteUrl'
 
 export const revalidate = 3600
 
-const title = 'Medical Tourism in Mexico | Safe, Affordable Treatment in Queretaro'
+const title = 'Medical Tourism in Mexico | Private Care for U.S. Patients'
 const description =
-  'Explore medical tourism in Mexico for American patients seeking safe, affordable treatment, vetted specialists, bilingual coordination and recovery support in Queretaro.'
+  'Plan medical tourism in Mexico with vetted specialists, private hospitals, bilingual coordination and recovery support in Queretaro for U.S. patients.'
 
 const faqs = [
   {
     question: 'Is medical tourism in Mexico safe for American patients?',
     answer:
-      'Medical tourism can be safer when patients choose vetted specialists, modern private hospitals, clear pre-travel planning and bilingual coordination. Elite Medical Journey focuses on Queretaro because it offers a calmer recovery environment and strong private medical infrastructure.',
+      'Medical tourism can be approached more safely when patients work with vetted specialists, private hospital environments, bilingual coordination and a clear plan before travel. Elite Medical Journey focuses on Queretaro because it combines modern medical infrastructure with a calmer recovery setting.',
   },
   {
     question: 'Why choose Queretaro instead of a border city?',
     answer:
-      'Queretaro gives patients a more planned, less chaotic medical travel experience. The city offers modern hospitals, business-class infrastructure, recovery-friendly zones and access to San Miguel de Allende, Bernal and a historic center that companions can comfortably enjoy.',
+      'Queretaro gives patients a more organized, destination-level medical travel experience. The city offers modern private hospitals, executive infrastructure, recovery-friendly zones and easy access to San Miguel de Allende, Bernal and its UNESCO-listed historic center.',
   },
   {
     question: 'Do doctors and coordinators speak English?',
     answer:
-      'The journey is designed around bilingual communication. Patients receive support with records, appointments, logistics, discharge instructions and follow-up so important medical details are understood before decisions are made.',
+      'The patient journey is designed around bilingual communication. Patients receive English-language support with records, appointments, logistics, discharge instructions and follow-up so important details are understood before decisions are made.',
   },
   {
     question: 'What procedures are available through medical tourism in Mexico?',
     answer:
-      'Patients commonly compare orthopedic, spine, dental, cosmetic and bariatric care in Mexico. Elite Medical Journey currently focuses on vetted procedures and specialists listed in the platform procedure directory.',
+      'U.S. patients commonly compare orthopedic, spine, dental, cosmetic and bariatric care in Mexico. Elite Medical Journey focuses on procedures connected to vetted doctors, private facilities and coordinated recovery planning.',
   },
 ]
 
@@ -80,69 +80,69 @@ export default function MedicalTourismMexicoPage() {
   return (
     <MedicalTourismPage
       eyebrow="Medical tourism Mexico"
-      title="Medical tourism in Mexico, planned around safety and clarity."
-      description="For American patients, Mexico can offer meaningful value in private medical care. The difference is choosing a destination, specialist and recovery plan built around safety instead of shortcuts."
-      primaryCta={{ href: '/procedures', label: 'Compare procedures' }}
+      title="Medical tourism in Mexico, designed for clarity before you travel."
+      description="For U.S. patients facing high self-pay costs, Mexico can offer access to private medical care with meaningful value. The right journey starts with vetted doctors, transparent planning, bilingual support and a recovery plan built around the patient."
+      primaryCta={{ href: '/procedures', label: 'Explore procedures' }}
       secondaryCta={{ href: '/why-queretaro', label: 'Why Queretaro' }}
-      introTitle="Mexico is attractive for medical travel, but the right structure matters."
+      introTitle="A better medical travel experience starts before the flight."
       introBody={[
-        'Many patients begin their search with price. That is understandable, especially when U.S. healthcare costs are high or insurance leaves large gaps. But medical tourism should never be treated like bargain shopping. The better question is where cost, quality, communication and recovery planning meet.',
-        'Elite Medical Journey positions Queretaro as a more refined alternative inside Mexico: a modern city with private hospitals, vetted specialists, bilingual coordination and recovery settings that feel organized rather than improvised.',
+        'Many patients begin researching medical tourism in Mexico because U.S. prices can make treatment feel out of reach. Cost matters, but the strongest decision is not based on a low headline price. It is based on clinical fit, specialist quality, hospital environment, communication and recovery support.',
+        'Elite Medical Journey helps patients move from online research to an organized care pathway in Queretaro. The experience is built for people who want private medical care in Mexico without feeling alone, rushed or unsure about the next step.',
       ]}
-      featuresTitle="What makes medical tourism in Mexico work for patients"
+      featuresTitle="What makes medical tourism in Mexico work for U.S. patients"
       features={[
         {
-          title: 'Lower total cost potential',
+          title: 'Meaningful cost value',
           description:
-            'Mexico can offer private medical care at a lower overall cost than many U.S. self-pay pathways, especially when coordination and recovery logistics are planned early.',
+            'Mexico can offer private treatment pathways at a lower total cost than many U.S. self-pay options, especially when the full plan is reviewed before travel.',
         },
         {
           title: 'Specialist-led decision making',
           description:
-            'Patients should compare credentials, hospital privileges, procedure fit and aftercare, not just the advertised price of a treatment.',
+            'Patients are better served when they compare credentials, hospital privileges, candidacy, procedure fit and aftercare rather than price alone.',
         },
         {
-          title: 'Bilingual coordination',
+          title: 'English-language coordination',
           description:
-            'English-speaking support reduces uncertainty around medical records, instructions, arrival logistics and follow-up communication.',
+            'Bilingual support helps reduce friction around medical records, appointments, arrival logistics, discharge instructions and follow-up communication.',
         },
         {
           title: 'Private hospital environments',
           description:
-            'Modern private hospitals can provide technology, privacy and comfort standards that international patients expect during treatment.',
+            'Modern private hospitals in Queretaro can provide technology, privacy, comfort and clinical environments that international patients expect.',
         },
         {
           title: 'Recovery planning',
           description:
-            'The recovery environment matters: hotel selection, transportation, follow-up visits and fit-to-fly timing can affect the whole experience.',
+            'Hotel selection, private transportation, follow-up visits, medication planning and fit-to-fly timing are part of the journey, not afterthoughts.',
         },
         {
-          title: 'A calmer destination',
+          title: 'A calmer Mexican destination',
           description:
-            'Queretaro offers a safer-feeling, more orderly experience than many high-volume medical tourism corridors.',
+            'Queretaro offers a polished, orderly and recovery-friendly alternative to crowded, high-volume medical tourism corridors.',
         },
       ]}
-      costTitle="Affordable should mean transparent, not cheap."
+      costTitle="Affordable should mean transparent, complete and medically appropriate."
       costBody={[
-        'Patients searching for medical tourism in Mexico often want affordability. That is valid, but price only helps when the full scope is clear: consultation, procedure, facility, anesthesia, imaging, medications, recovery support, transportation and follow-up.',
-        'A low headline price can become expensive if it excludes essential care. Our content and lead process are designed to move patients toward a personalized estimate after clinical review, not a generic quote that ignores risk and complexity.',
+        'Patients searching for medical tourism in Mexico often want affordability. That is reasonable. But an estimate only becomes useful when it explains what is included: consultation, hospital or facility, anesthesia, imaging, medications, recovery support, transportation and follow-up.',
+        'A low advertised price can become stressful if it excludes essential care. Elite Medical Journey is designed to guide patients toward a personalized pathway after clinical review, not a generic quote that ignores medical complexity.',
       ]}
-      safetyTitle="The safer path is informed comparison."
+      safetyTitle="The strongest decision is an informed decision."
       safetyBody={[
-        'Medical tourism carries real responsibility. Patients should understand surgeon training, hospital environment, procedure candidacy, recovery restrictions and what happens if plans change.',
-        'The goal is not to convince every patient to travel. The goal is to help the right patient make a better-informed decision with clear coordination, specialist input and practical recovery planning.',
+        'Medical travel carries real responsibility. Patients should understand the doctor, the hospital environment, candidacy for the procedure, recovery restrictions, travel timing and what support exists if plans change.',
+        'Our goal is not to convince every patient to travel. It is to help the right patient make a confident, well-informed decision with specialist input, bilingual coordination and practical recovery planning.',
       ]}
       faqs={faqs}
       relatedLinks={[
         {
           href: '/affordable-medical-treatments-mexico',
           title: 'Affordable treatments in Mexico',
-          description: 'Understand how patients can compare treatment value without compromising safety.',
+          description: 'Compare treatment value in Mexico while keeping safety, coordination and recovery in focus.',
         },
         {
           href: '/medical-tourism-mexico-costs',
           title: 'Medical tourism costs',
-          description: 'See what affects total cost, from procedure complexity to recovery support.',
+          description: 'Understand what affects total cost, from clinical complexity to recovery support.',
         },
         {
           href: '/why-queretaro',
