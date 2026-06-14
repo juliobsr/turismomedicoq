@@ -192,6 +192,37 @@ export default function WhyQueretaroPage() {
         </div>
       </section>
 
+      <section className="bg-white py-12">
+        <div className="mx-auto grid max-w-7xl gap-4 px-4 sm:px-6 md:grid-cols-3 lg:px-8">
+          {[
+            {
+              href: '/medical-tourism-mexico',
+              title: 'Medical tourism in Mexico',
+              description: 'Understand why Mexico attracts U.S. patients and how Queretaro changes the experience.',
+            },
+            {
+              href: '/affordable-medical-treatments-mexico',
+              title: 'Affordable treatments in Mexico',
+              description: 'Compare treatment value with safety, hospital quality and bilingual coordination in mind.',
+            },
+            {
+              href: '/medical-tourism-mexico-costs',
+              title: 'Medical tourism costs',
+              description: 'Review the factors that shape the real cost of treatment, travel and recovery.',
+            },
+          ].map((resource) => (
+            <Link
+              key={resource.href}
+              href={resource.href}
+              className="rounded-lg border border-slate-200 bg-slate-50 p-5 transition hover:-translate-y-1 hover:border-blue-200 hover:bg-white hover:shadow-xl"
+            >
+              <h2 className="text-lg font-black text-slate-950">{resource.title}</h2>
+              <p className="mt-2 text-sm leading-6 text-slate-600">{resource.description}</p>
+            </Link>
+          ))}
+        </div>
+      </section>
+
       <section className="bg-[#eef5f2] py-24">
         <div className="mx-auto grid max-w-7xl gap-12 px-4 sm:px-6 lg:grid-cols-[0.95fr_1.05fr] lg:items-center lg:px-8">
           <div>

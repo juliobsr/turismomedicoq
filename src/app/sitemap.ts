@@ -27,6 +27,21 @@ const staticRoutes: MetadataRoute.Sitemap = [
     priority: 0.9,
   },
   {
+    url: absoluteUrl('/medical-tourism-mexico'),
+    changeFrequency: 'monthly',
+    priority: 0.95,
+  },
+  {
+    url: absoluteUrl('/affordable-medical-treatments-mexico'),
+    changeFrequency: 'monthly',
+    priority: 0.9,
+  },
+  {
+    url: absoluteUrl('/medical-tourism-mexico-costs'),
+    changeFrequency: 'monthly',
+    priority: 0.9,
+  },
+  {
     url: absoluteUrl('/doctors'),
     changeFrequency: 'weekly',
     priority: 0.85,

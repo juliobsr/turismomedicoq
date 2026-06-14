@@ -100,6 +100,9 @@ export const Footer = ({ settings }: FooterProps) => {
               <div className="mt-10 md:mt-0">
                 <h3 className="text-sm font-bold leading-6 text-brand-primary">PATIENT RESOURCES</h3>
                 <nav className="mt-6 space-y-4">
+                  <Link href="/medical-tourism-mexico" className="block text-sm leading-6 text-gray-200 hover:text-brand-primary transition-colors">Medical Tourism in Mexico</Link>
+                  <Link href="/affordable-medical-treatments-mexico" className="block text-sm leading-6 text-gray-200 hover:text-brand-primary transition-colors">Affordable Treatments Mexico</Link>
+                  <Link href="/medical-tourism-mexico-costs" className="block text-sm leading-6 text-gray-200 hover:text-brand-primary transition-colors">Treatment Costs Guide</Link>
                   <Link href="/procedures/endoscopic-spine-surgery-queretaro" className="block text-sm leading-6 text-gray-200 hover:text-brand-primary transition-colors">Endoscopic Spine Surgery</Link>
                   <Link href="/facilities/hospital-angeles-centro-sur" className="block text-sm leading-6 text-gray-200 hover:text-brand-primary transition-colors">Hospital Ángeles Centro Sur</Link>
                   <Link href="/doctors/dr-jose-larrinua" className="block text-sm leading-6 text-gray-200 hover:text-brand-primary transition-colors">Dr. Larrinua Profile</Link>

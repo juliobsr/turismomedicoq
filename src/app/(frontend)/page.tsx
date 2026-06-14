@@ -230,6 +230,59 @@ export default async function HomePage() {
         </div>
       </section>
 
+      <section className="bg-white py-16">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="grid gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:items-end">
+            <div>
+              <p className="text-sm font-bold uppercase tracking-[0.22em] text-brand-primary">
+                Medical tourism resources
+              </p>
+              <h2 className="mt-3 text-3xl font-black tracking-tight text-slate-950 md:text-4xl">
+                Clear answers for patients comparing Mexico for care.
+              </h2>
+            </div>
+            <p className="text-base leading-7 text-slate-600">
+              Start with the questions U.S. patients search first: safety, affordability, total cost, travel logistics and recovery support.
+            </p>
+          </div>
+
+          <div className="mt-8 grid gap-4 md:grid-cols-3">
+            {[
+              {
+                href: '/medical-tourism-mexico',
+                title: 'Medical tourism in Mexico',
+                description: 'A patient-focused guide to safe treatment planning, bilingual coordination and recovery in Queretaro.',
+              },
+              {
+                href: '/affordable-medical-treatments-mexico',
+                title: 'Affordable treatments in Mexico',
+                description: 'How to compare value, hospital quality and specialist credentials before choosing a procedure.',
+              },
+              {
+                href: '/medical-tourism-mexico-costs',
+                title: 'Medical tourism Mexico costs',
+                description: 'What shapes the real cost of treatment, travel, hospital care and post-procedure recovery.',
+              },
+            ].map((resource) => (
+              <Link
+                key={resource.href}
+                href={resource.href}
+                className="group rounded-lg border border-slate-200 bg-slate-50 p-6 transition hover:-translate-y-1 hover:border-blue-200 hover:bg-white hover:shadow-xl"
+              >
+                <h3 className="text-lg font-black text-slate-950 group-hover:text-brand-primary">
+                  {resource.title}
+                </h3>
+                <p className="mt-3 text-sm leading-6 text-slate-600">{resource.description}</p>
+                <span className="mt-5 inline-flex items-center gap-2 text-sm font-extrabold text-brand-primary">
+                  Read guide
+                  <ArrowRightIcon className="h-4 w-4" />
+                </span>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <section className="bg-[#eef5f2] py-24">
         <div className="mx-auto grid max-w-7xl gap-12 px-4 sm:px-6 lg:grid-cols-[0.9fr_1.1fr] lg:items-center lg:px-8">
           <div className="relative min-h-[520px] overflow-hidden rounded-lg bg-slate-900 shadow-2xl shadow-slate-900/20">

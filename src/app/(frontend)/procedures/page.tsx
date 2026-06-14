@@ -204,6 +204,35 @@ export default async function ProceduresPage() {
           </p>
         </header>
 
+        <section className="mb-10 grid gap-4 md:grid-cols-3" aria-label="Medical tourism planning resources">
+          {[
+            {
+              href: '/medical-tourism-mexico',
+              title: 'Medical tourism in Mexico',
+              description: 'See how treatment, travel, safety and recovery fit together for U.S. patients.',
+            },
+            {
+              href: '/affordable-medical-treatments-mexico',
+              title: 'Affordable treatments',
+              description: 'Learn how to compare value without reducing safety to a price tag.',
+            },
+            {
+              href: '/medical-tourism-mexico-costs',
+              title: 'Cost planning guide',
+              description: 'Understand what affects total treatment cost before requesting a quote.',
+            },
+          ].map((resource) => (
+            <Link
+              key={resource.href}
+              href={resource.href}
+              className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:border-blue-200 hover:shadow-xl"
+            >
+              <h3 className="text-lg font-black text-slate-950">{resource.title}</h3>
+              <p className="mt-2 text-sm leading-6 text-slate-600">{resource.description}</p>
+            </Link>
+          ))}
+        </section>
+
         <ProcedureDirectory procedures={procedures} doctors={doctorOptions} />
       </section>
     </main>
