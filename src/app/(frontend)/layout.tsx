@@ -10,6 +10,7 @@ import { Footer } from '@/app/components/Footer'
 
 // Services & Utils
 import { getSiteSettings } from '@/lib/globals'
+import { getSiteUrl } from '@/lib/siteUrl'
 
 // ============================================================================
 // FONT OPTIMIZATION (Core Web Vitals: CLS & LCP)
@@ -39,8 +40,8 @@ export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSiteSettings()
   const siteName = settings?.companyName || 'Queretaro Medical Tourism'
 
-  // Security/SEO: Always define a reliable base URL. Fallback to localhost for dev.
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+  // SEO: Always define the public canonical base URL. Avoid localhost canonicals in production builds.
+  const siteUrl = getSiteUrl()
 
   return {
     metadataBase: new URL(siteUrl),

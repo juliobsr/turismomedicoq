@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { MedicalTourismPage } from '@/app/components/Seo/MedicalTourismPage'
+import { getSiteUrl } from '@/lib/siteUrl'
 
 export const revalidate = 3600
 
@@ -64,7 +65,7 @@ export default function MedicalTourismMexicoCostsPage() {
     '@type': 'MedicalWebPage',
     name: title,
     description,
-    url: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://elitemedicaljourney.com'}/medical-tourism-mexico-costs`,
+    url: `${getSiteUrl()}/medical-tourism-mexico-costs`,
     about: ['Medical tourism Mexico costs', 'Surgery pricing in Mexico', 'International patient travel planning'],
     mainEntity: faqs.map((faq) => ({
       '@type': 'Question',

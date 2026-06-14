@@ -33,13 +33,12 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
   // Base SEO Configuration
   let pageTitle = 'Medical Facilities Network';
   let description = `Explore the world-class medical facilities and hospitals within the ${companyName}. Equipped with state-of-the-art technology for international patients.`;
-  let canonicalUrl = '/facilities';
+  const canonicalUrl = '/facilities';
 
   // Dynamic SEO if a filter is applied
   if (specialtyFilter) {
     pageTitle = `Specialized Medical Facilities`;
     description = `Find specialized hospitals and clinics for your medical needs at ${companyName}. Review our premium infrastructure.`;
-    canonicalUrl = `/facilities?specialty=${specialtyFilter}`;
   }
 
   return {

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { MedicalTourismPage } from '@/app/components/Seo/MedicalTourismPage'
+import { getSiteUrl } from '@/lib/siteUrl'
 
 export const revalidate = 3600
 
@@ -64,7 +65,7 @@ export default function MedicalTourismMexicoPage() {
     '@type': 'MedicalWebPage',
     name: title,
     description,
-    url: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://elitemedicaljourney.com'}/medical-tourism-mexico`,
+    url: `${getSiteUrl()}/medical-tourism-mexico`,
     about: ['Medical tourism in Mexico', 'International patient coordination', 'Queretaro medical care'],
     mainEntity: faqs.map((faq) => ({
       '@type': 'Question',

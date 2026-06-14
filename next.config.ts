@@ -7,6 +7,21 @@ import path from 'path';
  * Focus: High-performance SSR, Medical SEO, and Cloud Storage readiness.
  */
 const nextConfig: NextConfig = {
+  async redirects() {
+    return [
+      {
+        source: '/:path*',
+        has: [
+          {
+            type: 'host',
+            value: 'www.elitemedicaljourney.com',
+          },
+        ],
+        destination: 'https://elitemedicaljourney.com/:path*',
+        permanent: true,
+      },
+    ];
+  },
   // 1. CORE PERFORMANCE & SECURITY
   reactStrictMode: false,
   webpack: (config, { isServer }) => {

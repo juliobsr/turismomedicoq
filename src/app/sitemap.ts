@@ -2,8 +2,9 @@ import type { MetadataRoute } from 'next'
 import { getPayload } from 'payload'
 import configPromise from '@payload-config'
 import type { PatientJourney as PatientJourneyType } from '@/payload-types'
+import { getSiteUrl } from '@/lib/siteUrl'
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://elitemedicaljourney.com'
+const siteUrl = getSiteUrl()
 
 const absoluteUrl = (path: string) => `${siteUrl}${path}`
 

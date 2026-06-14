@@ -30,7 +30,7 @@ export async function generateMetadata({ searchParams }: DoctorsDirectoryProps):
   // Default SEO setup
   let title = `Our Medical Specialists `
   let description = `Browse the comprehensive directory of board-certified surgeons and medical specialists at ${companyName}.`
-  let canonicalUrl = '/doctors'
+  const canonicalUrl = '/doctors'
 
   // Dynamic SEO when a specialty filter is applied
   if (specialtySlug) {
@@ -41,7 +41,6 @@ export async function generateMetadata({ searchParams }: DoctorsDirectoryProps):
       
     title = `${formattedTitle} Specialists | ${companyName}`
     description = `Find the top-rated ${formattedTitle} specialists and board-certified doctors at ${companyName}. Secure your consultation today.`
-    canonicalUrl = `/doctors?specialty=${specialtySlug}`
   }
 
   return {
