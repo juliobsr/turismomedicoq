@@ -41,41 +41,62 @@ const isVideoAsset = (item: MedicalAsset) => {
   return String(item.mimeType || '').startsWith('video/');
 };
 
+const getYouTubeThumbnail = (id: string) => {
+  return `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
+};
+
+const getYouTubeId = (parsed: URL) => {
+  const hostname = parsed.hostname.replace(/^www\./, '');
+  const parts = parsed.pathname.split('/').filter(Boolean);
+
+  if (hostname === 'youtu.be') return parts[0];
+  if (hostname !== 'youtube.com' && hostname !== 'm.youtube.com') return null;
+
+  if (parsed.searchParams.get('v')) return parsed.searchParams.get('v');
+  if (parts[0] === 'shorts' || parts[0] === 'embed' || parts[0] === 'live') return parts[1];
+
+  return parts.pop() || null;
+};
+
+const getVimeoId = (parsed: URL) => {
+  const hostname = parsed.hostname.replace(/^www\./, '');
+  if (hostname !== 'vimeo.com' && hostname !== 'player.vimeo.com') return null;
+
+  const parts = parsed.pathname.split('/').filter(Boolean);
+  const numericPart = parts.find((part) => /^\d+$/.test(part));
+
+  return numericPart || null;
+};
+
+const getVideoAssetThumbnail = (item: MedicalAsset) => {
+  return item.thumbnailURL || item.sizes?.thumbnail?.url || null;
+};
+
 const getVideoEmbed = (url: string): VideoEmbed => {
   try {
     const parsed = new URL(url);
     const hostname = parsed.hostname.replace(/^www\./, '');
-    const pathname = parsed.pathname;
+    const youtubeId = getYouTubeId(parsed);
+    const vimeoId = getVimeoId(parsed);
 
     if (/\.(mp4|webm|ogg)(\?.*)?$/i.test(url)) {
       return { type: 'direct', src: url };
     }
 
-    if (hostname === 'youtu.be') {
-      const id = pathname.split('/').filter(Boolean)[0];
-      if (id) {
-        return {
-          type: 'iframe',
-          src: `https://www.youtube.com/embed/${id}?autoplay=1&rel=0`,
-          thumbnail: `https://img.youtube.com/vi/${id}/hqdefault.jpg`,
-        };
-      }
+    if (youtubeId) {
+      return {
+        type: 'iframe',
+        src: `https://www.youtube.com/embed/${youtubeId}?autoplay=1&rel=0`,
+        thumbnail: getYouTubeThumbnail(youtubeId),
+      };
     }
 
-    if (hostname === 'youtube.com' || hostname === 'm.youtube.com') {
-      const id = parsed.searchParams.get('v') || pathname.split('/').filter(Boolean).pop();
-      if (id) {
-        return {
-          type: 'iframe',
-          src: `https://www.youtube.com/embed/${id}?autoplay=1&rel=0`,
-          thumbnail: `https://img.youtube.com/vi/${id}/hqdefault.jpg`,
-        };
-      }
-    }
-
-    if (hostname === 'vimeo.com') {
-      const id = pathname.split('/').filter(Boolean).pop();
-      if (id) return { type: 'iframe', src: `https://player.vimeo.com/video/${id}?autoplay=1` };
+    if (vimeoId) {
+      return {
+        type: 'iframe',
+        src: `https://player.vimeo.com/video/${vimeoId}?autoplay=1`,
+        thumbnail: `https://vumbnail.com/${vimeoId}.jpg`,
+      };
     }
   } catch {
     return { type: 'iframe', src: url };
@@ -363,7 +384,7 @@ export default function DoctorGallery({
                 key={item.id}
                 title={item.alt || 'Procedure video'}
                 caption={item.caption}
-                thumbnailUrl={undefined}
+                thumbnailUrl={getVideoAssetThumbnail(item)}
                 onClick={() => openUploadedVideo(item)}
               />
             ))}
@@ -392,7 +413,7 @@ export default function DoctorGallery({
                 key={item.id}
                 title={item.alt || 'Procedure video'}
                 caption={item.caption}
-                thumbnailUrl={undefined}
+                thumbnailUrl={getVideoAssetThumbnail(item)}
                 onClick={() => openUploadedVideo(item)}
               />
             ))}
