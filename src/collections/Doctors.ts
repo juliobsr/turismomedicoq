@@ -141,16 +141,17 @@ export const Doctors: CollectionConfig = {
               relationTo: 'doctors-media',
               hasMany: true,
               required: false,
+              label: 'Procedure gallery uploaded media',
               admin: {
-                description: 'Procedure, technology, OR or treatment images/videos shown as a clinical gallery on the doctor profile.',
+                description: 'Upload-only images or videos for the procedure gallery. External URLs belong in "Procedure gallery external video URLs".',
               },
             },
             {
               name: 'procedureVideoLinks',
               type: 'array',
-              label: 'Procedure gallery video links',
+              label: 'Procedure gallery external video URLs',
               admin: {
-                description: 'External YouTube, Vimeo or public video URLs shown inside the procedure gallery.',
+                description: 'Paste YouTube, Vimeo, direct MP4/WebM or other public video URLs here. Do not create a Doctors Media upload record for external URLs.',
               },
               fields: [
                 {

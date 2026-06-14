@@ -281,11 +281,11 @@ export interface Doctor {
    */
   heroVideoUrl?: string | null;
   /**
-   * Procedure, technology, OR or treatment images/videos shown as a clinical gallery on the doctor profile.
+   * Upload-only images or videos for the procedure gallery. External URLs belong in "Procedure gallery external video URLs".
    */
   procedureGallery?: (number | DoctorsMedia)[] | null;
   /**
-   * External YouTube, Vimeo or public video URLs shown inside the procedure gallery.
+   * Paste YouTube, Vimeo, direct MP4/WebM or other public video URLs here. Do not create a Doctors Media upload record for external URLs.
    */
   procedureVideoLinks?:
     | {
