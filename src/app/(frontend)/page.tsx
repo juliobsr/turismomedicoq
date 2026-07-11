@@ -24,6 +24,19 @@ const heroImage =
 const cityImage = '/media/globals/queretaro-panoramica-1-1920x1080.jpg'
 const aqueductImage = '/media/globals/ACUEDUCTO-DE-QUERETARO1-1.jpg'
 
+const experienceImages = [
+  {
+    src: cityImage,
+    alt: 'Panoramic view of Queretaro for international medical recovery',
+    label: 'Queretaro recovery base',
+  },
+  {
+    src: aqueductImage,
+    alt: 'Historic aqueduct in Queretaro for light recovery tourism',
+    label: 'Calm cultural surroundings',
+  },
+]
+
 const journeySteps = [
   {
     title: 'Clinical review',
@@ -153,16 +166,12 @@ export default async function HomePage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      <section className="relative overflow-hidden bg-slate-950">
-        <Image
-          src={heroImage}
-          alt="Modern private hospital environment for medical tourism in Queretaro"
-          fill
-          priority
-          className="object-cover object-center opacity-45"
-          sizes="100vw"
-        />
-        <div className="absolute inset-0 bg-slate-950/45" />
+      <section className="relative isolate overflow-hidden bg-[#061826]">
+        <div className="absolute inset-0 bg-[linear-gradient(135deg,#061826_0%,#0a2433_48%,#123747_100%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_82%_16%,rgba(20,184,166,0.24),transparent_32%),radial-gradient(circle_at_18%_82%,rgba(37,99,235,0.18),transparent_30%)]" />
+        <div className="absolute left-1/2 top-0 h-full w-px bg-white/10" />
+        <div className="absolute -right-32 top-20 h-96 w-96 rounded-full bg-brand-primary/10 blur-3xl" />
+        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-slate-950/35 to-transparent" />
 
         <div className="relative mx-auto grid min-h-[760px] max-w-7xl items-center gap-12 px-4 py-16 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:px-8">
           <div className="max-w-3xl text-white">
@@ -207,13 +216,23 @@ export default async function HomePage() {
                 <dd className="mt-1 text-xs font-semibold uppercase tracking-wide text-slate-200">Modern care, easier recovery</dd>
               </div>
             </dl>
+
+            <div className="mt-8 grid max-w-2xl gap-3 sm:grid-cols-3">
+              {['Bilingual coordination', 'Private logistics', 'Secure case review'].map((item) => (
+                <div key={item} className="rounded-lg border border-white/10 bg-white/[0.07] px-4 py-3 backdrop-blur">
+                  <p className="text-xs font-extrabold uppercase tracking-[0.14em] text-cyan-100">
+                    {item}
+                  </p>
+                </div>
+              ))}
+            </div>
           </div>
 
           <HomeLeadForm doctors={doctors} procedures={procedures} />
         </div>
       </section>
 
-      <section className="bg-slate-950 py-14 text-white">
+      <section className="bg-[#061826] py-14 text-white">
         <div className="mx-auto grid max-w-7xl gap-5 px-4 sm:px-6 lg:grid-cols-4 lg:px-8">
           {[
             ['Vetted specialists', 'Clinical profiles are structured so patients can compare expertise, focus and availability.'],
@@ -227,6 +246,43 @@ export default async function HomePage() {
               <p className="mt-2 text-sm leading-6 text-slate-300">{description}</p>
             </article>
           ))}
+        </div>
+      </section>
+
+      <section className="bg-slate-50 py-16">
+        <div className="mx-auto grid max-w-7xl gap-8 px-4 sm:px-6 lg:grid-cols-[0.85fr_1.15fr] lg:items-center lg:px-8">
+          <div>
+            <p className="text-sm font-bold uppercase tracking-[0.22em] text-brand-primary">
+              The visual story
+            </p>
+            <h2 className="mt-3 text-3xl font-black tracking-tight text-slate-950 md:text-4xl">
+              Images should support the journey, not hide the message.
+            </h2>
+            <p className="mt-5 text-base leading-7 text-slate-600">
+              The homepage keeps the conversion area clean and uses destination imagery where patients can appreciate Queretaro, recovery settings and the calm behind the platform.
+            </p>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            {experienceImages.map((image) => (
+              <figure
+                key={image.src}
+                className="group relative min-h-[260px] overflow-hidden rounded-lg bg-slate-900 shadow-xl shadow-slate-900/10"
+              >
+                <Image
+                  src={image.src}
+                  alt={image.alt}
+                  fill
+                  className="object-cover transition duration-500 group-hover:scale-105"
+                  sizes="(max-width: 1024px) 100vw, 360px"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-slate-950/10 to-transparent" />
+                <figcaption className="absolute bottom-0 left-0 right-0 p-5 text-sm font-extrabold uppercase tracking-[0.14em] text-white">
+                  {image.label}
+                </figcaption>
+              </figure>
+            ))}
+          </div>
         </div>
       </section>
 
