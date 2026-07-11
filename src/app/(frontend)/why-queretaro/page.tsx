@@ -13,12 +13,14 @@ import {
   ShieldCheckIcon,
   SparklesIcon,
 } from '@heroicons/react/24/outline'
+import { QueretaroVisualGallery } from '@/app/components/QueretaroVisualGallery'
+import { queretaroVisuals } from '@/lib/queretaroVisuals'
 
 export const revalidate = 3600
 
-const heroImage = '/media/globals/queretaro-panoramica-1-1920x1080.jpg'
-const aqueductImage = '/media/globals/ACUEDUCTO-DE-QUERETARO1-1.jpg'
-const cityImage = '/media/globals/queretaro-panoramica-1.jpg'
+const heroImage = queretaroVisuals[0]?.src || '/media/globals/queretaro-panoramica-1-1920x1080.jpg'
+const aqueductImage = queretaroVisuals[4]?.src || '/media/globals/ACUEDUCTO-DE-QUERETARO1-1.jpg'
+const cityImage = queretaroVisuals[2]?.src || '/media/globals/queretaro-panoramica-1.jpg'
 
 export const metadata: Metadata = {
   title: 'Why Queretaro for Medical Tourism in Mexico',
@@ -294,6 +296,35 @@ export default function WhyQueretaroPage() {
               </article>
             ))}
           </div>
+        </div>
+      </section>
+
+      <section className="bg-[#f6faf8] py-24">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="grid gap-8 lg:grid-cols-[0.78fr_1.22fr] lg:items-end">
+            <div>
+              <p className="text-sm font-bold uppercase tracking-[0.22em] text-brand-primary">
+                Queretaro in context
+              </p>
+              <h2 className="mt-3 text-4xl font-black tracking-tight text-slate-950 md:text-5xl">
+                A destination that supports the patient, not just the procedure.
+              </h2>
+            </div>
+            <div>
+              <p className="text-lg leading-8 text-slate-700">
+                Medical tourism works best when the city reduces friction. Queretaro gives U.S. patients a base that feels safe, clean, modern and easy to understand, while still offering the warmth, architecture and hospitality that make Mexico memorable.
+              </p>
+              <p className="mt-4 text-lg leading-8 text-slate-700">
+                That balance matters after treatment. Patients need quiet hotels, reliable transfers, bilingual coordination and a setting where companions can feel comfortable. Queretaro makes the non-clinical side of recovery easier to plan.
+              </p>
+            </div>
+          </div>
+
+          <QueretaroVisualGallery
+            images={queretaroVisuals}
+            ctaLabel="See the full Queretaro advantage"
+            className="mt-12"
+          />
         </div>
       </section>
 

@@ -14,7 +14,9 @@ import {
 
 import configPromise from '@payload-config'
 import { HomeLeadForm } from '@/app/components/HomeLeadForm'
+import { QueretaroVisualGallery } from '@/app/components/QueretaroVisualGallery'
 import { getSiteSettings } from '@/lib/globals'
+import { queretaroVisuals } from '@/lib/queretaroVisuals'
 
 export const revalidate = 3600
 
@@ -23,19 +25,6 @@ const heroImage =
 
 const cityImage = '/media/globals/queretaro-panoramica-1-1920x1080.jpg'
 const aqueductImage = '/media/globals/ACUEDUCTO-DE-QUERETARO1-1.jpg'
-
-const experienceImages = [
-  {
-    src: cityImage,
-    alt: 'Panoramic view of Queretaro for international medical recovery',
-    label: 'Queretaro recovery base',
-  },
-  {
-    src: aqueductImage,
-    alt: 'Historic aqueduct in Queretaro for light recovery tourism',
-    label: 'Calm cultural surroundings',
-  },
-]
 
 const journeySteps = [
   {
@@ -250,38 +239,41 @@ export default async function HomePage() {
       </section>
 
       <section className="bg-slate-50 py-16">
-        <div className="mx-auto grid max-w-7xl gap-8 px-4 sm:px-6 lg:grid-cols-[0.85fr_1.15fr] lg:items-center lg:px-8">
-          <div>
-            <p className="text-sm font-bold uppercase tracking-[0.22em] text-brand-primary">
-              The visual story
-            </p>
-            <h2 className="mt-3 text-3xl font-black tracking-tight text-slate-950 md:text-4xl">
-              Images should support the journey, not hide the message.
-            </h2>
-            <p className="mt-5 text-base leading-7 text-slate-600">
-              The homepage keeps the conversion area clean and uses destination imagery where patients can appreciate Queretaro, recovery settings and the calm behind the platform.
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="grid gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:items-end">
+            <div>
+              <p className="text-sm font-bold uppercase tracking-[0.22em] text-brand-primary">
+                The visual story
+              </p>
+              <h2 className="mt-3 text-3xl font-black tracking-tight text-slate-950 md:text-4xl">
+                Queretaro gives medical travel a calmer, more confident setting.
+              </h2>
+            </div>
+            <p className="text-base leading-7 text-slate-600">
+              For patients from the United States, the destination matters almost as much as the doctor. Queretaro combines modern private care, safer-feeling urban order, strong hotels, culture for companions and recovery spaces that feel intentional instead of improvised.
             </p>
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2">
-            {experienceImages.map((image) => (
-              <figure
-                key={image.src}
-                className="group relative min-h-[260px] overflow-hidden rounded-lg bg-slate-900 shadow-xl shadow-slate-900/10"
-              >
-                <Image
-                  src={image.src}
-                  alt={image.alt}
-                  fill
-                  className="object-cover transition duration-500 group-hover:scale-105"
-                  sizes="(max-width: 1024px) 100vw, 360px"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-slate-950/10 to-transparent" />
-                <figcaption className="absolute bottom-0 left-0 right-0 p-5 text-sm font-extrabold uppercase tracking-[0.14em] text-white">
-                  {image.label}
-                </figcaption>
-              </figure>
-            ))}
+          <QueretaroVisualGallery
+            images={queretaroVisuals.slice(0, 3)}
+            ctaLabel="Why Queretaro for medical tourism"
+            className="mt-10"
+          />
+
+          <div className="mt-10 rounded-lg border border-slate-200 bg-white p-6 shadow-sm md:p-8">
+            <p className="text-sm font-bold uppercase tracking-[0.22em] text-brand-primary">
+              Destination advantage
+            </p>
+            <p className="mt-3 text-lg leading-8 text-slate-700">
+              Queretaro is not trying to feel like a crowded medical tourism corridor. That is the point. It gives patients a more private, more organized base for clinical decisions, hospital access, travel logistics and recovery. The city feels modern enough for international expectations and human enough for a patient who needs calm, clarity and support.
+            </p>
+            <Link
+              href="/why-queretaro"
+              className="mt-6 inline-flex items-center gap-2 rounded-lg bg-brand-primary px-5 py-3 text-sm font-extrabold uppercase tracking-[0.14em] text-white transition hover:brightness-110"
+            >
+              Explore why Queretaro
+              <ArrowRightIcon className="h-4 w-4" />
+            </Link>
           </div>
         </div>
       </section>
