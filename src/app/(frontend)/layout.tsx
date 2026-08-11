@@ -7,6 +7,7 @@ import { Inter } from 'next/font/google'
 // Components
 import { Header } from '@/app/components/Header/Header'
 import { Footer } from '@/app/components/Footer'
+import { UnderConstructionPage } from '@/app/components/UnderConstructionPage'
 
 // Services & Utils
 import { getSiteSettings } from '@/lib/globals'
@@ -39,6 +40,7 @@ export const viewport: Viewport = {
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSiteSettings()
   const siteName = settings?.companyName || 'Queretaro Medical Tourism'
+  const isUnderConstruction = process.env.SITE_UNDER_CONSTRUCTION === 'true'
 
   // SEO: Always define the public canonical base URL. Avoid localhost canonicals in production builds.
   const siteUrl = getSiteUrl()
@@ -47,20 +49,24 @@ export async function generateMetadata(): Promise<Metadata> {
     metadataBase: new URL(siteUrl),
     title: {
       template: `%s | ${siteName}`,
-      default: siteName,
+      default: isUnderConstruction ? `Sitio en construcción | ${siteName}` : siteName,
     },
-    description: siteName || 'World-class medical procedures with internationally accredited specialists.',
-    robots: {
-      index: true,
-      follow: true,
-      googleBot: {
-        index: true,
-        follow: true,
-        'max-video-preview': -1,
-        'max-image-preview': 'large',
-        'max-snippet': -1,
-      },
-    },
+    description: isUnderConstruction
+      ? 'Estamos preparando una nueva experiencia. Vuelve pronto.'
+      : siteName || 'World-class medical procedures with internationally accredited specialists.',
+    robots: isUnderConstruction
+      ? { index: false, follow: false }
+      : {
+          index: true,
+          follow: true,
+          googleBot: {
+            index: true,
+            follow: true,
+            'max-video-preview': -1,
+            'max-image-preview': 'large',
+            'max-snippet': -1,
+          },
+        },
     openGraph: {
       type: 'website',
       siteName: siteName,
@@ -80,6 +86,7 @@ export default async function FrontendLayout({
 }) {
   // 1. Fetch cached global settings (0ms overhead due to Next.js Cache)
   const settings = await getSiteSettings()
+  const isUnderConstruction = process.env.SITE_UNDER_CONSTRUCTION === 'true'
 
   // 2. Map Payload CMS hex codes to standard CSS custom properties
   const themeVariables = {
@@ -97,20 +104,25 @@ export default async function FrontendLayout({
         // Apply dynamic variables globally and use the optimized Inter font
         className="font-sans antialiased min-h-screen flex flex-col bg-brand-bg text-brand-text transition-colors duration-300"
       >
-        {/* Pass necessary dynamic props to the Header */}
-        <Header 
-          companyName={settings?.companyName}
-          contactPhone={settings?.contactPhone} 
-          displayPhone = {settings?.contactPhone}
-        />
-        
-        {/* Main Content Area */}
-        <main className="flex-grow flex flex-col">
-          {children}
-        </main>
+        {isUnderConstruction ? (
+          <UnderConstructionPage
+            companyName={settings?.companyName}
+            contactEmail={settings?.contactEmail}
+            contactPhone={settings?.contactPhone}
+          />
+        ) : (
+          <>
+            <Header
+              companyName={settings?.companyName}
+              contactPhone={settings?.contactPhone}
+              displayPhone={settings?.contactPhone}
+            />
 
-        {/* Pass the entire settings object to the Footer for addresses, links, etc. */}
-        <Footer settings={settings} />
+            <main className="flex-grow flex flex-col">{children}</main>
+
+            <Footer settings={settings} />
+          </>
+        )}
       </body>
     </html>
   )
